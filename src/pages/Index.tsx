@@ -3,11 +3,13 @@ import { useState } from "react";
 import { Sidebar } from "@/components/Sidebar";
 import { ChatInterface } from "@/components/ChatInterface";
 import { WelcomeScreen } from "@/components/WelcomeScreen";
+import { AnalyticsDashboard } from "@/components/AnalyticsDashboard";
 import { SidebarProvider } from "@/components/ui/sidebar";
 
 const Index = () => {
   const [selectedConversation, setSelectedConversation] = useState<string | null>(null);
   const [conversations, setConversations] = useState<any[]>([]);
+  const [currentView, setCurrentView] = useState<'chat' | 'analytics'>('chat');
 
   const handleNewConversation = () => {
     const newConversation = {
@@ -15,13 +17,40 @@ const Index = () => {
       title: "New Conversation",
       messages: [],
       createdAt: new Date(),
+      isStarred: false,
+      isArchived: false,
     };
     setConversations(prev => [newConversation, ...prev]);
     setSelectedConversation(newConversation.id);
+    setCurrentView('chat');
   };
 
   const handleSelectConversation = (id: string) => {
     setSelectedConversation(id);
+    setCurrentView('chat');
+  };
+
+  const handleUpdateConversation = (updatedConversation: any) => {
+    setConversations(prev => prev.map(c => 
+      c.id === updatedConversation.id ? updatedConversation : c
+    ));
+  };
+
+  const handleDeleteConversation = (id: string) => {
+    setConversations(prev => prev.filter(c => c.id !== id));
+    if (selectedConversation === id) {
+      setSelectedConversation(null);
+    }
+  };
+
+  const handleArchiveConversation = (id: string) => {
+    setConversations(prev => prev.map(c => 
+      c.id === id ? { ...c, isArchived: !c.isArchived } : c
+    ));
+  };
+
+  const handleDuplicateConversation = (conversation: any) => {
+    setConversations(prev => [conversation, ...prev]);
   };
 
   const currentConversation = conversations.find(c => c.id === selectedConversation);
@@ -34,16 +63,21 @@ const Index = () => {
           selectedConversation={selectedConversation}
           onNewConversation={handleNewConversation}
           onSelectConversation={handleSelectConversation}
+          onUpdateConversation={handleUpdateConversation}
+          onDeleteConversation={handleDeleteConversation}
+          onArchiveConversation={handleArchiveConversation}
+          onDuplicateConversation={handleDuplicateConversation}
+          currentView={currentView}
+          onViewChange={setCurrentView}
         />
         <main className="flex-1 flex flex-col">
-          {selectedConversation && currentConversation ? (
+          {currentView === 'analytics' ? (
+            <AnalyticsDashboard conversations={conversations} />
+          ) : selectedConversation && currentConversation ? (
             <ChatInterface
               conversation={currentConversation}
-              onUpdateConversation={(updatedConversation) => {
-                setConversations(prev => prev.map(c => 
-                  c.id === updatedConversation.id ? updatedConversation : c
-                ));
-              }}
+              onUpdateConversation={handleUpdateConversation}
+              allConversations={conversations}
             />
           ) : (
             <WelcomeScreen onStartChat={handleNewConversation} />
