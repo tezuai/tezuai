@@ -1,4 +1,3 @@
-
 import { useState, useRef, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -170,8 +169,7 @@ export function ChatInterface({ conversation, onUpdateConversation, allConversat
             onSelectConversation={handleSelectConversation}
           />
           <ExportDialog 
-            conversations={allConversations} 
-            selectedConversation={conversation.id}
+            conversations={allConversations}
           />
           <Button
             variant="ghost"
