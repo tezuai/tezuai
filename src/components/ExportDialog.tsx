@@ -1,100 +1,115 @@
 
 import { useState } from "react";
-import { Download, FileText, File, Share2 } from "lucide-react";
+import { Download, FileText, Database, Code2 } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
-import { useToast } from "@/hooks/use-toast";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { Label } from "@/components/ui/label";
+import { Separator } from "@/components/ui/separator";
 
 interface ExportDialogProps {
   conversations: any[];
-  selectedConversation?: string;
 }
 
-export function ExportDialog({ conversations, selectedConversation }: ExportDialogProps) {
+export function ExportDialog({ conversations }: ExportDialogProps) {
   const [isOpen, setIsOpen] = useState(false);
-  const [exportFormat, setExportFormat] = useState("json");
+  const [exportFormat, setExportFormat] = useState<'json' | 'csv' | 'txt'>('json');
   const [includeMetadata, setIncludeMetadata] = useState(true);
-  const [exportScope, setExportScope] = useState(selectedConversation ? "current" : "all");
-  const { toast } = useToast();
+  const [includeTimestamps, setIncludeTimestamps] = useState(true);
+  const [selectedConversations, setSelectedConversations] = useState<string[]>([]);
 
   const handleExport = () => {
-    const dataToExport = exportScope === "current" 
-      ? conversations.filter(c => c.id === selectedConversation)
+    const conversationsToExport = selectedConversations.length > 0 
+      ? conversations.filter(c => selectedConversations.includes(c.id))
       : conversations;
 
-    const exportData = {
-      exported_at: new Date().toISOString(),
-      format_version: "1.0",
-      conversations: dataToExport.map(conv => ({
-        id: conv.id,
-        title: conv.title,
-        created_at: conv.createdAt,
-        ...(includeMetadata && {
-          message_count: conv.messages.length,
-          last_updated: conv.messages[conv.messages.length - 1]?.timestamp,
-        }),
-        messages: conv.messages.map((msg: any) => ({
-          id: msg.id,
-          role: msg.role,
-          content: msg.content,
-          timestamp: msg.timestamp,
-          ...(includeMetadata && msg.model && { model: msg.model }),
-        }))
-      }))
-    };
-
-    let content: string;
+    let exportData: string;
     let filename: string;
     let mimeType: string;
 
     switch (exportFormat) {
-      case "json":
-        content = JSON.stringify(exportData, null, 2);
+      case 'json':
+        exportData = JSON.stringify(conversationsToExport, null, 2);
         filename = `conversations_${new Date().toISOString().split('T')[0]}.json`;
-        mimeType = "application/json";
+        mimeType = 'application/json';
         break;
-      case "csv":
-        const csvRows = ["ID,Role,Content,Timestamp,Conversation"];
-        exportData.conversations.forEach(conv => {
-          conv.messages.forEach(msg => {
-            csvRows.push(`"${msg.id}","${msg.role}","${msg.content.replace(/"/g, '""')}","${msg.timestamp}","${conv.title}"`);
+      
+      case 'csv':
+        const csvHeaders = ['Conversation ID', 'Title', 'Message Role', 'Content', 'Timestamp'];
+        const csvRows = [csvHeaders.join(',')];
+        
+        conversationsToExport.forEach(conv => {
+          conv.messages.forEach((msg: any) => {
+            const row = [
+              conv.id,
+              `"${conv.title.replace(/"/g, '""')}"`,
+              msg.role,
+              `"${msg.content.replace(/"/g, '""')}"`,
+              includeTimestamps ? msg.timestamp.toISOString() : ''
+            ];
+            csvRows.push(row.join(','));
           });
         });
-        content = csvRows.join("\n");
+        
+        exportData = csvRows.join('\n');
         filename = `conversations_${new Date().toISOString().split('T')[0]}.csv`;
-        mimeType = "text/csv";
+        mimeType = 'text/csv';
         break;
-      case "txt":
-        content = exportData.conversations.map(conv => 
-          `=== ${conv.title} ===\n\n${conv.messages.map((msg: any) => 
-            `[${msg.role.toUpperCase()}] ${msg.content}`
-          ).join('\n\n')}`
-        ).join('\n\n' + '='.repeat(50) + '\n\n');
+      
+      case 'txt':
+        exportData = conversationsToExport.map(conv => {
+          let convText = `=== ${conv.title} ===\n`;
+          if (includeMetadata) {
+            convText += `Created: ${conv.createdAt.toISOString()}\n`;
+            convText += `Messages: ${conv.messages.length}\n\n`;
+          }
+          
+          conv.messages.forEach((msg: any) => {
+            if (includeTimestamps) {
+              convText += `[${msg.timestamp.toISOString()}] `;
+            }
+            convText += `${msg.role.toUpperCase()}: ${msg.content}\n\n`;
+          });
+          
+          return convText;
+        }).join('\n' + '='.repeat(50) + '\n\n');
+        
         filename = `conversations_${new Date().toISOString().split('T')[0]}.txt`;
-        mimeType = "text/plain";
+        mimeType = 'text/plain';
         break;
+      
       default:
         return;
     }
 
-    const blob = new Blob([content], { type: mimeType });
+    const blob = new Blob([exportData], { type: mimeType });
     const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
+    const a = document.createElement('a');
     a.href = url;
     a.download = filename;
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
-
-    toast({
-      title: "Export successful",
-      description: `Conversations exported as ${filename}`,
-    });
-
+    
     setIsOpen(false);
+  };
+
+  const toggleConversationSelection = (conversationId: string) => {
+    setSelectedConversations(prev => 
+      prev.includes(conversationId)
+        ? prev.filter(id => id !== conversationId)
+        : [...prev, conversationId]
+    );
+  };
+
+  const selectAllConversations = () => {
+    setSelectedConversations(conversations.map(c => c.id));
+  };
+
+  const clearSelection = () => {
+    setSelectedConversations([]);
   };
 
   return (
@@ -104,83 +119,117 @@ export function ExportDialog({ conversations, selectedConversation }: ExportDial
           <Download className="w-4 h-4" />
         </Button>
       </DialogTrigger>
-      <DialogContent className="bg-gray-900 border-gray-700">
+      <DialogContent className="bg-gray-900 border-gray-700 max-w-2xl">
         <DialogHeader>
           <DialogTitle className="text-white flex items-center gap-2">
             <Download className="w-5 h-5" />
             Export Conversations
           </DialogTitle>
         </DialogHeader>
+        
         <div className="space-y-6">
-          <div className="space-y-2">
-            <label className="text-sm font-medium text-gray-300">Export Scope</label>
-            <Select value={exportScope} onValueChange={setExportScope}>
-              <SelectTrigger className="bg-gray-800 border-gray-600 text-white">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent className="bg-gray-800 border-gray-700">
-                {selectedConversation && (
-                  <SelectItem value="current" className="text-white">Current Conversation</SelectItem>
-                )}
-                <SelectItem value="all" className="text-white">All Conversations</SelectItem>
-              </SelectContent>
-            </Select>
+          {/* Export Format */}
+          <div className="space-y-3">
+            <Label className="text-white font-medium">Export Format</Label>
+            <RadioGroup value={exportFormat} onValueChange={(value: 'json' | 'csv' | 'txt') => setExportFormat(value)}>
+              <div className="flex items-center space-x-2">
+                <RadioGroupItem value="json" id="json" />
+                <Label htmlFor="json" className="text-gray-300 flex items-center gap-2">
+                  <Code2 className="w-4 h-4" />
+                  JSON (Structured data)
+                </Label>
+              </div>
+              <div className="flex items-center space-x-2">
+                <RadioGroupItem value="csv" id="csv" />
+                <Label htmlFor="csv" className="text-gray-300 flex items-center gap-2">
+                  <Database className="w-4 h-4" />
+                  CSV (Spreadsheet compatible)
+                </Label>
+              </div>
+              <div className="flex items-center space-x-2">
+                <RadioGroupItem value="txt" id="txt" />
+                <Label htmlFor="txt" className="text-gray-300 flex items-center gap-2">
+                  <FileText className="w-4 h-4" />
+                  Plain Text (Human readable)
+                </Label>
+              </div>
+            </RadioGroup>
           </div>
 
-          <div className="space-y-2">
-            <label className="text-sm font-medium text-gray-300">Format</label>
-            <Select value={exportFormat} onValueChange={setExportFormat}>
-              <SelectTrigger className="bg-gray-800 border-gray-600 text-white">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent className="bg-gray-800 border-gray-700">
-                <SelectItem value="json" className="text-white">
-                  <div className="flex items-center gap-2">
-                    <File className="w-4 h-4" />
-                    JSON (Structured Data)
-                  </div>
-                </SelectItem>
-                <SelectItem value="csv" className="text-white">
-                  <div className="flex items-center gap-2">
-                    <FileText className="w-4 h-4" />
-                    CSV (Spreadsheet)
-                  </div>
-                </SelectItem>
-                <SelectItem value="txt" className="text-white">
-                  <div className="flex items-center gap-2">
-                    <FileText className="w-4 h-4" />
-                    Text (Readable)
-                  </div>
-                </SelectItem>
-              </SelectContent>
-            </Select>
+          <Separator className="bg-gray-700" />
+
+          {/* Export Options */}
+          <div className="space-y-3">
+            <Label className="text-white font-medium">Export Options</Label>
+            <div className="space-y-2">
+              <div className="flex items-center space-x-2">
+                <Checkbox 
+                  id="metadata" 
+                  checked={includeMetadata}
+                  onCheckedChange={(checked) => setIncludeMetadata(checked === true)}
+                />
+                <Label htmlFor="metadata" className="text-gray-300">
+                  Include metadata (creation date, message count)
+                </Label>
+              </div>
+              <div className="flex items-center space-x-2">
+                <Checkbox 
+                  id="timestamps" 
+                  checked={includeTimestamps}
+                  onCheckedChange={(checked) => setIncludeTimestamps(checked === true)}
+                />
+                <Label htmlFor="timestamps" className="text-gray-300">
+                  Include timestamps
+                </Label>
+              </div>
+            </div>
           </div>
 
-          <div className="flex items-center space-x-2">
-            <Checkbox
-              id="metadata"
-              checked={includeMetadata}
-              onCheckedChange={setIncludeMetadata}
-            />
-            <label htmlFor="metadata" className="text-sm text-gray-300">
-              Include metadata (timestamps, models, etc.)
-            </label>
+          <Separator className="bg-gray-700" />
+
+          {/* Conversation Selection */}
+          <div className="space-y-3">
+            <div className="flex items-center justify-between">
+              <Label className="text-white font-medium">Select Conversations</Label>
+              <div className="space-x-2">
+                <Button variant="ghost" size="sm" onClick={selectAllConversations}>
+                  Select All
+                </Button>
+                <Button variant="ghost" size="sm" onClick={clearSelection}>
+                  Clear
+                </Button>
+              </div>
+            </div>
+            <div className="max-h-40 overflow-y-auto space-y-2 border border-gray-700 rounded-lg p-3">
+              {conversations.map(conversation => (
+                <div key={conversation.id} className="flex items-center space-x-2">
+                  <Checkbox
+                    id={conversation.id}
+                    checked={selectedConversations.includes(conversation.id)}
+                    onCheckedChange={() => toggleConversationSelection(conversation.id)}
+                  />
+                  <Label htmlFor={conversation.id} className="text-gray-300 flex-1 cursor-pointer">
+                    {conversation.title}
+                  </Label>
+                  <span className="text-xs text-gray-500">
+                    {conversation.messages.length} messages
+                  </span>
+                </div>
+              ))}
+            </div>
+            {selectedConversations.length === 0 && (
+              <p className="text-sm text-gray-500">
+                No conversations selected. All conversations will be exported.
+              </p>
+            )}
           </div>
 
-          <div className="flex gap-3">
-            <Button
-              onClick={() => setIsOpen(false)}
-              variant="outline"
-              className="flex-1 border-gray-600 text-gray-300"
-            >
+          <div className="flex justify-end space-x-2">
+            <Button variant="outline" onClick={() => setIsOpen(false)}>
               Cancel
             </Button>
-            <Button
-              onClick={handleExport}
-              className="flex-1 bg-gradient-to-r from-blue-600 to-purple-600"
-            >
-              <Download className="w-4 h-4 mr-2" />
-              Export
+            <Button onClick={handleExport} className="bg-blue-600 hover:bg-blue-700">
+              Export {selectedConversations.length > 0 ? selectedConversations.length : conversations.length} Conversations
             </Button>
           </div>
         </div>

@@ -1,145 +1,214 @@
 
+import { useState } from "react";
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, LineChart, Line } from 'recharts';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { BarChart, MessageSquare, Clock, TrendingUp, Brain, Zap } from "lucide-react";
+import { Calendar, MessageSquare, Clock, TrendingUp, Users, Zap } from "lucide-react";
+
+interface Conversation {
+  id: string;
+  title: string;
+  messages: Array<{
+    id: string;
+    content: string;
+    role: 'user' | 'assistant';
+    timestamp: Date;
+    model?: string;
+  }>;
+  createdAt: Date;
+  isStarred: boolean;
+  isArchived: boolean;
+}
 
 interface AnalyticsDashboardProps {
-  conversations: any[];
+  conversations: Conversation[];
 }
 
 export function AnalyticsDashboard({ conversations }: AnalyticsDashboardProps) {
-  const totalMessages = conversations.reduce((sum, conv) => sum + conv.messages.length, 0);
-  const totalConversations = conversations.length;
-  const avgMessagesPerConv = totalConversations > 0 ? Math.round(totalMessages / totalConversations) : 0;
+  const [timeRange, setTimeRange] = useState<'7d' | '30d' | '90d'>('30d');
 
-  // Model usage statistics
-  const modelUsage = conversations.reduce((acc, conv) => {
-    conv.messages.forEach((msg: any) => {
-      if (msg.model) {
+  // Calculate analytics data
+  const totalConversations = conversations.length;
+  const totalMessages = conversations.reduce((acc, conv) => acc + conv.messages.length, 0);
+  const avgMessagesPerConv = totalConversations > 0 ? Math.round(totalMessages / totalConversations) : 0;
+  const starredConversations = conversations.filter(conv => conv.isStarred).length;
+
+  // Activity data for charts
+  const activityData = conversations
+    .filter(conv => {
+      const days = timeRange === '7d' ? 7 : timeRange === '30d' ? 30 : 90;
+      const cutoff = new Date();
+      cutoff.setDate(cutoff.getDate() - days);
+      return conv.createdAt >= cutoff;
+    })
+    .reduce((acc: Record<string, number>, conv) => {
+      const date = conv.createdAt.toISOString().split('T')[0];
+      acc[date] = (acc[date] || 0) + 1;
+      return acc;
+    }, {});
+
+  const chartData = Object.entries(activityData).map(([date, count]) => ({
+    date,
+    conversations: count as number
+  }));
+
+  // Model usage data
+  const modelUsage = conversations.reduce((acc: Record<string, number>, conv) => {
+    conv.messages.forEach(msg => {
+      if (msg.role === 'assistant' && msg.model) {
         acc[msg.model] = (acc[msg.model] || 0) + 1;
       }
     });
     return acc;
-  }, {} as Record<string, number>);
+  }, {});
 
-  // Recent activity (last 7 days)
-  const weekAgo = new Date();
-  weekAgo.setDate(weekAgo.getDate() - 7);
-  const recentConversations = conversations.filter(conv => 
-    new Date(conv.createdAt) > weekAgo
-  ).length;
+  const modelData = Object.entries(modelUsage).map(([model, count]) => ({
+    name: model,
+    value: count as number
+  }));
 
-  // Most active hours
-  const hourlyActivity = conversations.reduce((acc, conv) => {
-    conv.messages.forEach((msg: any) => {
-      const hour = new Date(msg.timestamp).getHours();
-      acc[hour] = (acc[hour] || 0) + 1;
-    });
-    return acc;
-  }, {} as Record<number, number>);
-
-  const peakHour = Object.entries(hourlyActivity).reduce((max, [hour, count]) => 
-    count > max.count ? { hour: parseInt(hour), count } : max, 
-    { hour: 0, count: 0 }
-  );
+  const COLORS = ['#8b5cf6', '#06b6d4', '#10b981', '#f59e0b', '#ef4444'];
 
   return (
-    <div className="p-6 space-y-6">
-      <div className="flex items-center gap-3 mb-6">
-        <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center">
-          <BarChart className="w-4 h-4 text-white" />
+    <div className="p-6 space-y-6 bg-gray-900 min-h-screen">
+      <div className="flex items-center justify-between">
+        <h2 className="text-2xl font-bold text-white">Analytics Dashboard</h2>
+        <div className="flex gap-2">
+          {(['7d', '30d', '90d'] as const).map((range) => (
+            <Badge
+              key={range}
+              variant={timeRange === range ? "default" : "outline"}
+              className="cursor-pointer"
+              onClick={() => setTimeRange(range)}
+            >
+              {range}
+            </Badge>
+          ))}
         </div>
-        <h2 className="text-xl font-bold text-white">Usage Analytics</h2>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-        <Card className="bg-gray-800/50 border-gray-700/50">
+      {/* Stats Cards */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <Card className="bg-gray-800 border-gray-700">
           <CardHeader className="pb-2">
             <CardTitle className="text-sm font-medium text-gray-400 flex items-center gap-2">
               <MessageSquare className="w-4 h-4" />
+              Total Conversations
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold text-white">{totalConversations}</div>
+          </CardContent>
+        </Card>
+
+        <Card className="bg-gray-800 border-gray-700">
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm font-medium text-gray-400 flex items-center gap-2">
+              <Zap className="w-4 h-4" />
               Total Messages
             </CardTitle>
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-white">{totalMessages}</div>
-            <p className="text-xs text-gray-500">Across all conversations</p>
           </CardContent>
         </Card>
 
-        <Card className="bg-gray-800/50 border-gray-700/50">
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-gray-400 flex items-center gap-2">
-              <Brain className="w-4 h-4" />
-              Conversations
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-white">{totalConversations}</div>
-            <p className="text-xs text-gray-500">{recentConversations} this week</p>
-          </CardContent>
-        </Card>
-
-        <Card className="bg-gray-800/50 border-gray-700/50">
+        <Card className="bg-gray-800 border-gray-700">
           <CardHeader className="pb-2">
             <CardTitle className="text-sm font-medium text-gray-400 flex items-center gap-2">
               <TrendingUp className="w-4 h-4" />
-              Avg. Length
+              Avg Messages/Conv
             </CardTitle>
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-white">{avgMessagesPerConv}</div>
-            <p className="text-xs text-gray-500">Messages per conversation</p>
           </CardContent>
         </Card>
 
-        <Card className="bg-gray-800/50 border-gray-700/50">
+        <Card className="bg-gray-800 border-gray-700">
           <CardHeader className="pb-2">
             <CardTitle className="text-sm font-medium text-gray-400 flex items-center gap-2">
-              <Clock className="w-4 h-4" />
-              Peak Hour
+              <Users className="w-4 h-4" />
+              Starred Conversations
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-white">
-              {peakHour.hour}:00
-            </div>
-            <p className="text-xs text-gray-500">{peakHour.count} messages</p>
+            <div className="text-2xl font-bold text-white">{starredConversations}</div>
           </CardContent>
         </Card>
       </div>
 
-      <Card className="bg-gray-800/50 border-gray-700/50">
-        <CardHeader>
-          <CardTitle className="text-white flex items-center gap-2">
-            <Zap className="w-5 h-5" />
-            Model Usage
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-3">
-            {Object.entries(modelUsage)
-              .sort(([,a], [,b]) => b - a)
-              .map(([model, count]) => (
-              <div key={model} className="flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                  <Badge variant="outline" className="border-gray-600 text-gray-300">
-                    {model}
-                  </Badge>
-                </div>
-                <div className="flex items-center gap-2">
-                  <div className="text-sm text-gray-300">{count} messages</div>
-                  <div className="w-16 h-2 bg-gray-700 rounded-full overflow-hidden">
-                    <div 
-                      className="h-full bg-gradient-to-r from-blue-500 to-purple-500 rounded-full"
-                      style={{ width: `${(count / Math.max(...Object.values(modelUsage))) * 100}%` }}
-                    />
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-        </CardContent>
-      </Card>
+      {/* Charts */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <Card className="bg-gray-800 border-gray-700">
+          <CardHeader>
+            <CardTitle className="text-white">Activity Over Time</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <ResponsiveContainer width="100%" height={300}>
+              <LineChart data={chartData}>
+                <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
+                <XAxis 
+                  dataKey="date" 
+                  stroke="#9ca3af"
+                  fontSize={12}
+                  tickFormatter={(value) => new Date(value).toLocaleDateString()}
+                />
+                <YAxis stroke="#9ca3af" fontSize={12} />
+                <Tooltip
+                  contentStyle={{
+                    backgroundColor: '#1f2937',
+                    border: '1px solid #374151',
+                    borderRadius: '8px',
+                    color: '#ffffff'
+                  }}
+                />
+                <Line 
+                  type="monotone" 
+                  dataKey="conversations" 
+                  stroke="#8b5cf6" 
+                  strokeWidth={2}
+                  dot={{ fill: '#8b5cf6' }}
+                />
+              </LineChart>
+            </ResponsiveContainer>
+          </CardContent>
+        </Card>
+
+        <Card className="bg-gray-800 border-gray-700">
+          <CardHeader>
+            <CardTitle className="text-white">Model Usage</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <ResponsiveContainer width="100%" height={300}>
+              <PieChart>
+                <Pie
+                  data={modelData}
+                  cx="50%"
+                  cy="50%"
+                  labelLine={false}
+                  label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
+                  outerRadius={80}
+                  fill="#8884d8"
+                  dataKey="value"
+                >
+                  {modelData.map((entry, index) => (
+                    <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                  ))}
+                </Pie>
+                <Tooltip
+                  contentStyle={{
+                    backgroundColor: '#1f2937',
+                    border: '1px solid #374151',
+                    borderRadius: '8px',
+                    color: '#ffffff'
+                  }}
+                />
+              </PieChart>
+            </ResponsiveContainer>
+          </CardContent>
+        </Card>
+      </div>
     </div>
   );
 }

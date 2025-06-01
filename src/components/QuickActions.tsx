@@ -1,6 +1,6 @@
 
 import { useState } from "react";
-import { Zap, Lightbulb, Code, FileText, Mail, Calendar, Calculator, Translate } from "lucide-react";
+import { Zap, Lightbulb, Code, FileText, Mail, Calendar, Calculator, Languages } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 
@@ -40,7 +40,7 @@ const quickActions = [
     color: "from-red-500 to-pink-500"
   },
   {
-    icon: Translate,
+    icon: Languages,
     title: "Translation",
     prompt: "Please translate this text:",
     color: "from-indigo-500 to-purple-500"
