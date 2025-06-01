@@ -159,9 +159,11 @@ export function ConversationTemplates({ onTemplateSelect }: ConversationTemplate
       icon: "MessageSquare",
       prompt: newTemplate.prompt!,
       systemMessage: newTemplate.systemMessage || "",
-      tags: typeof newTemplate.tags === 'string' ? 
-            (newTemplate.tags as string).split(',').map(t => t.trim()) : 
-            newTemplate.tags || [],
+      tags: Array.isArray(newTemplate.tags) ? 
+            newTemplate.tags : 
+            (typeof newTemplate.tags === 'string' ? 
+             newTemplate.tags.split(',').map(t => t.trim()).filter(t => t) : 
+             []),
       isStarred: false,
       usageCount: 0
     };
@@ -295,8 +297,8 @@ export function ConversationTemplates({ onTemplateSelect }: ConversationTemplate
                 <div>
                   <label className="text-sm font-medium mb-1 block">Tags (comma-separated)</label>
                   <Input
-                    value={Array.isArray(newTemplate.tags) ? newTemplate.tags.join(', ') : newTemplate.tags || ""}
-                    onChange={(e) => setNewTemplate(prev => ({ ...prev, tags: e.target.value }))}
+                    value={Array.isArray(newTemplate.tags) ? newTemplate.tags.join(', ') : ""}
+                    onChange={(e) => setNewTemplate(prev => ({ ...prev, tags: e.target.value.split(',').map(t => t.trim()).filter(t => t) }))}
                     placeholder="tag1, tag2, tag3"
                     className="bg-gray-700 border-gray-600"
                   />
