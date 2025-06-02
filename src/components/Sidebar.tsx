@@ -240,8 +240,6 @@ export function Sidebar({
       )}
 
       <SearchDialog
-        open={showSearchDialog}
-        onOpenChange={setShowSearchDialog}
         conversations={conversations}
         onSelectConversation={onSelectConversation}
       />
