@@ -1,25 +1,21 @@
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import { Slider } from "@/components/ui/slider";
+import { Label } from "@/components/ui/label";
+import { Badge } from "@/components/ui/badge";
+import { Switch } from "@/components/ui/switch";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { 
   Mic, 
-  MicOff, 
-  Volume2, 
-  VolumeX,
-  Play,
-  Pause,
-  Square,
-  Settings,
-  Waveform,
-  Radio,
-  Headphones,
-  MessageSquare,
+  Square, 
+  Settings, 
+  Bot, 
   Languages,
-  Zap
+  Zap,
+  User,
+  PlayCircle
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
@@ -29,10 +25,9 @@ interface VoiceSettings {
   speed: number;
   pitch: number;
   volume: number;
-  voiceType: 'male' | 'female' | 'robotic';
-  enableEmotion: boolean;
-  noiseReduction: boolean;
-  autoTranscribe: boolean;
+  enableNoise: boolean;
+  enableEcho: boolean;
+  voicePersonality: string;
 }
 
 interface AdvancedVoiceInterfaceProps {
@@ -46,229 +41,192 @@ export function AdvancedVoiceInterface({
   onSettingsChange, 
   isEnabled 
 }: AdvancedVoiceInterfaceProps) {
+  const [isRecording, setIsRecording] = useState(false);
   const [isListening, setIsListening] = useState(false);
-  const [isSpeaking, setIsSpeaking] = useState(false);
-  const [audioLevel, setAudioLevel] = useState(0);
+  const [voiceLevel, setVoiceLevel] = useState(0);
+  const [currentLanguage, setCurrentLanguage] = useState("hi-IN");
   const [confidence, setConfidence] = useState(0);
-  const [transcriptText, setTranscriptText] = useState('');
-  const [voiceSettings, setVoiceSettings] = useState<VoiceSettings>({
-    language: 'hi-IN',
-    accent: 'indian',
+  const [transcribedText, setTranscribedText] = useState("");
+  const { toast } = useToast();
+
+  const [settings, setSettings] = useState<VoiceSettings>({
+    language: "hi-IN",
+    accent: "indian",
     speed: 1.0,
     pitch: 1.0,
     volume: 0.8,
-    voiceType: 'female',
-    enableEmotion: true,
-    noiseReduction: true,
-    autoTranscribe: true
+    enableNoise: true,
+    enableEcho: false,
+    voicePersonality: "tezu-friendly"
   });
-  
-  const { toast } = useToast();
-  const audioContextRef = useRef<AudioContext | null>(null);
-  const analyserRef = useRef<AnalyserNode | null>(null);
-  const mediaStreamRef = useRef<MediaStream | null>(null);
 
-  // Voice recognition simulation
-  const startListening = async () => {
+  const languages = [
+    { value: "hi-IN", label: "Hindi (India)", flag: "🇮🇳" },
+    { value: "en-IN", label: "English (India)", flag: "🇮🇳" },
+    { value: "en-US", label: "English (US)", flag: "🇺🇸" },
+    { value: "en-GB", label: "English (UK)", flag: "🇬🇧" },
+  ];
+
+  const voicePersonalities = [
+    { id: "tezu-friendly", name: "Tezu Friendly", desc: "Warm & conversational" },
+    { id: "tezu-professional", name: "Tezu Professional", desc: "Business tone" },
+    { id: "tezu-creative", name: "Tezu Creative", desc: "Artistic & expressive" },
+    { id: "tezu-teacher", name: "Tezu Teacher", desc: "Educational & clear" },
+  ];
+
+  useEffect(() => {
+    if (isRecording) {
+      // Simulate voice level detection
+      const interval = setInterval(() => {
+        setVoiceLevel(Math.random() * 100);
+      }, 100);
+
+      return () => clearInterval(interval);
+    } else {
+      setVoiceLevel(0);
+    }
+  }, [isRecording]);
+
+  const handleStartRecording = () => {
     if (!isEnabled) {
       toast({
-        title: "Voice not enabled",
-        description: "Please enable voice features first",
+        title: "Premium Feature 🔒",
+        description: "Please login to access advanced voice features",
         variant: "destructive"
       });
       return;
     }
 
-    try {
-      setIsListening(true);
-      setTranscriptText('');
-      
-      // Simulate getting microphone access
-      await navigator.mediaDevices.getUserMedia({ audio: true });
-      
-      // Simulate voice recognition
-      setTimeout(() => {
-        const sampleTexts = [
-          "Namaste Tezu, mujhe help chahiye",
-          "Kya aap Hindi mein baat kar sakte hain?",
-          "Please explain this topic in detail",
-          "Create a summary of this document",
-          "How can I improve my productivity?"
-        ];
-        
-        const randomText = sampleTexts[Math.floor(Math.random() * sampleTexts.length)];
-        const confidence = 0.85 + Math.random() * 0.15;
-        
-        setTranscriptText(randomText);
-        setConfidence(confidence);
-        onVoiceInput(randomText, confidence);
-        
-        toast({
-          title: "Voice recognized! 🎤",
-          description: `Confidence: ${Math.round(confidence * 100)}%`,
-        });
-        
-        setIsListening(false);
-      }, 3000);
-      
-    } catch (error) {
-      toast({
-        title: "Microphone Error",
-        description: "Could not access microphone",
-        variant: "destructive"
-      });
-      setIsListening(false);
-    }
-  };
-
-  const stopListening = () => {
-    setIsListening(false);
-    if (mediaStreamRef.current) {
-      mediaStreamRef.current.getTracks().forEach(track => track.stop());
-    }
-  };
-
-  const speakText = (text: string) => {
-    if (!isEnabled) return;
+    setIsRecording(true);
+    setIsListening(true);
+    setTranscribedText("");
     
-    setIsSpeaking(true);
-    
-    // Simulate text-to-speech
+    // Simulate speech recognition
     setTimeout(() => {
-      setIsSpeaking(false);
+      const mockTranscriptions = [
+        "Namaste Tezu, main aapse kuch puchna chahta hun",
+        "Hello Tezu, can you help me with this problem?",
+        "Tezu ji, ye question solve karne mein help kariye",
+        "Hey Tezu, I need assistance with my project"
+      ];
+      
+      const randomText = mockTranscriptions[Math.floor(Math.random() * mockTranscriptions.length)];
+      const mockConfidence = 85 + Math.random() * 15;
+      
+      setTranscribedText(randomText);
+      setConfidence(mockConfidence);
+      onVoiceInput(randomText, mockConfidence);
+      
       toast({
-        title: "Speech completed",
-        description: "AI response has been spoken",
+        title: "Voice Recognition Complete! 🎤",
+        description: `Confidence: ${mockConfidence.toFixed(1)}%`,
       });
-    }, text.length * 50); // Simulate speaking duration
+    }, 3000);
   };
 
-  const updateSetting = (key: keyof VoiceSettings, value: any) => {
-    const newSettings = { ...voiceSettings, [key]: value };
-    setVoiceSettings(newSettings);
+  const handleStopRecording = () => {
+    setIsRecording(false);
+    setIsListening(false);
+  };
+
+  const handleSettingChange = (key: keyof VoiceSettings, value: any) => {
+    const newSettings = { ...settings, [key]: value };
+    setSettings(newSettings);
     onSettingsChange(newSettings);
   };
 
-  // Simulate audio level animation
-  useEffect(() => {
-    if (isListening) {
-      const interval = setInterval(() => {
-        setAudioLevel(Math.random() * 100);
-      }, 100);
-      return () => clearInterval(interval);
-    } else {
-      setAudioLevel(0);
-    }
-  }, [isListening]);
-
-  const languages = [
-    { code: 'hi-IN', name: 'Hindi (India)' },
-    { code: 'en-US', name: 'English (US)' },
-    { code: 'en-IN', name: 'English (India)' },
-    { code: 'bn-IN', name: 'Bengali' },
-    { code: 'ta-IN', name: 'Tamil' },
-    { code: 'te-IN', name: 'Telugu' },
-    { code: 'mr-IN', name: 'Marathi' },
-    { code: 'gu-IN', name: 'Gujarati' }
-  ];
-
-  const accents = [
-    { value: 'indian', name: 'Indian' },
-    { value: 'american', name: 'American' },
-    { value: 'british', name: 'British' },
-    { value: 'australian', name: 'Australian' }
-  ];
+  const testVoice = () => {
+    if (!isEnabled) return;
+    
+    toast({
+      title: "Voice Test 🔊",
+      description: "Namaste! Main Tezu hun, aapka AI assistant!",
+    });
+  };
 
   return (
     <div className="space-y-4">
       <div className="text-center mb-6">
-        <h3 className="text-lg font-bold text-white mb-2">🎤 Advanced Voice AI</h3>
-        <p className="text-sm text-gray-400">Natural voice conversations with Tezu</p>
+        <h3 className="text-lg font-bold text-white mb-2">🎤 Advanced Voice Interface</h3>
+        <p className="text-sm text-gray-400">Professional voice AI by Tezu</p>
       </div>
 
-      {/* Voice Control Panel */}
+      {!isEnabled && (
+        <Card className="bg-gradient-to-r from-purple-500/10 to-blue-500/10 border-purple-500/20">
+          <CardContent className="p-4 text-center">
+            <div className="flex items-center justify-center gap-2 mb-2">
+              <Bot className="w-5 h-5 text-purple-400" />
+              <span className="text-sm font-medium text-purple-400">Premium Feature</span>
+            </div>
+            <p className="text-xs text-gray-300">
+              Login to unlock advanced voice recognition and synthesis
+            </p>
+          </CardContent>
+        </Card>
+      )}
+
+      {/* Voice Recording */}
       <Card className="bg-gray-800/50 border-gray-700">
         <CardHeader>
           <CardTitle className="text-lg text-white flex items-center gap-2">
-            <Radio className="w-5 h-5" />
-            Voice Control
+            <Mic className="w-5 h-5" />
+            Voice Input
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
-          {/* Main Controls */}
-          <div className="flex items-center justify-center gap-4">
-            <Button
-              size="lg"
-              onClick={isListening ? stopListening : startListening}
-              className={`${
-                isListening
-                  ? 'bg-red-600 hover:bg-red-700 animate-pulse'
-                  : 'bg-blue-600 hover:bg-blue-700'
-              } rounded-full w-16 h-16`}
-              disabled={!isEnabled}
-            >
-              {isListening ? <Square className="w-6 h-6" /> : <Mic className="w-6 h-6" />}
-            </Button>
-
-            <div className="flex flex-col items-center gap-2">
-              <div className="text-xs text-gray-400">
-                {isListening ? 'Listening...' : 'Tap to speak'}
-              </div>
+          <div className="flex items-center justify-center">
+            <div className="relative">
+              <Button
+                size="lg"
+                variant={isRecording ? "destructive" : "outline"}
+                onClick={isRecording ? handleStopRecording : handleStartRecording}
+                className={`w-20 h-20 rounded-full ${
+                  isRecording 
+                    ? "bg-red-600 hover:bg-red-700 animate-pulse" 
+                    : "border-gray-600 hover:bg-gray-700"
+                }`}
+                disabled={!isEnabled}
+              >
+                {isRecording ? (
+                  <Square className="w-8 h-8" />
+                ) : (
+                  <Mic className="w-8 h-8" />
+                )}
+              </Button>
               
-              {/* Audio Level Indicator */}
-              <div className="flex items-center gap-1">
-                {[...Array(10)].map((_, i) => (
-                  <div
-                    key={i}
-                    className={`w-1 h-6 rounded-full transition-all duration-100 ${
-                      audioLevel > i * 10 
-                        ? 'bg-blue-400' 
-                        : 'bg-gray-600'
-                    }`}
-                  />
-                ))}
-              </div>
-            </div>
-
-            <Button
-              size="lg"
-              onClick={() => speakText("Hello, I am Tezu AI assistant")}
-              className="bg-green-600 hover:bg-green-700 rounded-full w-16 h-16"
-              disabled={!isEnabled || isSpeaking}
-            >
-              {isSpeaking ? (
-                <Waveform className="w-6 h-6 animate-pulse" />
-              ) : (
-                <Volume2 className="w-6 h-6" />
+              {isRecording && (
+                <div className="absolute inset-0 rounded-full border-4 border-red-400 animate-ping"></div>
               )}
-            </Button>
-          </div>
-
-          {/* Status Display */}
-          <div className="text-center space-y-2">
-            {transcriptText && (
-              <div className="p-3 bg-gray-700/50 rounded-lg">
-                <div className="text-sm text-gray-300 mb-1">Last Transcript:</div>
-                <div className="text-white">{transcriptText}</div>
-                <div className="flex items-center justify-center gap-2 mt-2">
-                  <Badge variant="secondary" className="text-xs bg-green-500/20 text-green-400">
-                    Confidence: {Math.round(confidence * 100)}%
-                  </Badge>
-                </div>
-              </div>
-            )}
-
-            <div className="flex items-center justify-center gap-4 text-xs text-gray-400">
-              <div className="flex items-center gap-1">
-                <div className={`w-2 h-2 rounded-full ${isListening ? 'bg-red-400' : 'bg-gray-600'}`} />
-                {isListening ? 'Recording' : 'Ready'}
-              </div>
-              <div className="flex items-center gap-1">
-                <div className={`w-2 h-2 rounded-full ${isSpeaking ? 'bg-green-400' : 'bg-gray-600'}`} />
-                {isSpeaking ? 'Speaking' : 'Silent'}
-              </div>
             </div>
           </div>
+
+          {isRecording && (
+            <div className="space-y-2">
+              <Label className="text-sm text-gray-300">Voice Level</Label>
+              <div className="w-full bg-gray-700 rounded-full h-2">
+                <div 
+                  className="bg-gradient-to-r from-green-500 to-blue-500 h-2 rounded-full transition-all duration-100"
+                  style={{ width: `${voiceLevel}%` }}
+                ></div>
+              </div>
+              <div className="flex items-center justify-center gap-2 text-sm">
+                <div className="w-2 h-2 bg-red-500 rounded-full animate-pulse"></div>
+                <span className="text-gray-300">Listening...</span>
+              </div>
+            </div>
+          )}
+
+          {transcribedText && (
+            <div className="p-3 bg-gray-700/50 rounded border-l-4 border-blue-500">
+              <Label className="text-sm text-gray-300">Transcribed Text</Label>
+              <p className="text-sm text-white mt-1">{transcribedText}</p>
+              <div className="mt-2">
+                <Badge className="bg-green-500/20 text-green-400">
+                  Confidence: {confidence.toFixed(1)}%
+                </Badge>
+              </div>
+            </div>
+          )}
         </CardContent>
       </Card>
 
@@ -281,141 +239,113 @@ export function AdvancedVoiceInterface({
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
-          {/* Language Selection */}
-          <div className="grid grid-cols-2 gap-3">
-            <div>
-              <label className="text-sm text-gray-300 mb-2 block">Language</label>
-              <Select value={voiceSettings.language} onValueChange={(value) => updateSetting('language', value)}>
-                <SelectTrigger className="bg-gray-700/50 border-gray-600">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  {languages.map((lang) => (
-                    <SelectItem key={lang.code} value={lang.code}>
-                      {lang.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-
-            <div>
-              <label className="text-sm text-gray-300 mb-2 block">Accent</label>
-              <Select value={voiceSettings.accent} onValueChange={(value) => updateSetting('accent', value)}>
-                <SelectTrigger className="bg-gray-700/50 border-gray-600">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  {accents.map((accent) => (
-                    <SelectItem key={accent.value} value={accent.value}>
-                      {accent.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-          </div>
-
-          {/* Voice Type */}
           <div>
-            <label className="text-sm text-gray-300 mb-2 block">Voice Type</label>
-            <div className="flex gap-2">
-              {['female', 'male', 'robotic'].map((type) => (
-                <Button
-                  key={type}
-                  size="sm"
-                  variant={voiceSettings.voiceType === type ? "default" : "outline"}
-                  onClick={() => updateSetting('voiceType', type)}
-                  className={`${
-                    voiceSettings.voiceType === type
-                      ? 'bg-blue-600 text-white'
-                      : 'border-gray-600 text-gray-300'
-                  }`}
-                >
-                  {type.charAt(0).toUpperCase() + type.slice(1)}
-                </Button>
-              ))}
+            <Label className="text-sm text-gray-300 mb-2 block">Language</Label>
+            <Select 
+              value={settings.language} 
+              onValueChange={(value) => handleSettingChange('language', value)}
+              disabled={!isEnabled}
+            >
+              <SelectTrigger className="bg-gray-700/50 border-gray-600">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                {languages.map((lang) => (
+                  <SelectItem key={lang.value} value={lang.value}>
+                    <div className="flex items-center gap-2">
+                      <span>{lang.flag}</span>
+                      <span>{lang.label}</span>
+                    </div>
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+
+          <div>
+            <Label className="text-sm text-gray-300 mb-2 block">Voice Personality</Label>
+            <Select 
+              value={settings.voicePersonality} 
+              onValueChange={(value) => handleSettingChange('voicePersonality', value)}
+              disabled={!isEnabled}
+            >
+              <SelectTrigger className="bg-gray-700/50 border-gray-600">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                {voicePersonalities.map((personality) => (
+                  <SelectItem key={personality.id} value={personality.id}>
+                    <div>
+                      <div className="font-medium">{personality.name}</div>
+                      <div className="text-xs text-gray-400">{personality.desc}</div>
+                    </div>
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <Label className="text-sm text-gray-300 mb-2 block">
+                Speed: {settings.speed}x
+              </Label>
+              <Slider
+                value={[settings.speed]}
+                onValueChange={([value]) => handleSettingChange('speed', value)}
+                min={0.5}
+                max={2.0}
+                step={0.1}
+                disabled={!isEnabled}
+              />
+            </div>
+            
+            <div>
+              <Label className="text-sm text-gray-300 mb-2 block">
+                Pitch: {settings.pitch}x
+              </Label>
+              <Slider
+                value={[settings.pitch]}
+                onValueChange={([value]) => handleSettingChange('pitch', value)}
+                min={0.5}
+                max={2.0}
+                step={0.1}
+                disabled={!isEnabled}
+              />
             </div>
           </div>
 
-          {/* Sliders */}
+          <div>
+            <Label className="text-sm text-gray-300 mb-2 block">
+              Volume: {Math.round(settings.volume * 100)}%
+            </Label>
+            <Slider
+              value={[settings.volume]}
+              onValueChange={([value]) => handleSettingChange('volume', value)}
+              min={0}
+              max={1}
+              step={0.1}
+              disabled={!isEnabled}
+            />
+          </div>
+
           <div className="space-y-3">
-            <div>
-              <label className="text-sm text-gray-300 mb-2 block">
-                Speed: {voiceSettings.speed.toFixed(1)}x
-              </label>
-              <Slider
-                value={[voiceSettings.speed]}
-                onValueChange={([value]) => updateSetting('speed', value)}
-                min={0.5}
-                max={2.0}
-                step={0.1}
-                className="w-full"
+            <div className="flex items-center justify-between">
+              <Label className="text-sm text-gray-300">Noise Reduction</Label>
+              <Switch
+                checked={settings.enableNoise}
+                onCheckedChange={(checked) => handleSettingChange('enableNoise', checked)}
+                disabled={!isEnabled}
               />
             </div>
-
-            <div>
-              <label className="text-sm text-gray-300 mb-2 block">
-                Pitch: {voiceSettings.pitch.toFixed(1)}
-              </label>
-              <Slider
-                value={[voiceSettings.pitch]}
-                onValueChange={([value]) => updateSetting('pitch', value)}
-                min={0.5}
-                max={2.0}
-                step={0.1}
-                className="w-full"
+            
+            <div className="flex items-center justify-between">
+              <Label className="text-sm text-gray-300">Echo Cancellation</Label>
+              <Switch
+                checked={settings.enableEcho}
+                onCheckedChange={(checked) => handleSettingChange('enableEcho', checked)}
+                disabled={!isEnabled}
               />
-            </div>
-
-            <div>
-              <label className="text-sm text-gray-300 mb-2 block">
-                Volume: {Math.round(voiceSettings.volume * 100)}%
-              </label>
-              <Slider
-                value={[voiceSettings.volume]}
-                onValueChange={([value]) => updateSetting('volume', value)}
-                min={0}
-                max={1}
-                step={0.1}
-                className="w-full"
-              />
-            </div>
-          </div>
-
-          {/* Toggle Options */}
-          <div className="space-y-2">
-            <div className="flex items-center justify-between">
-              <span className="text-sm text-gray-300">Emotional Voice</span>
-              <Button
-                size="sm"
-                variant={voiceSettings.enableEmotion ? "default" : "outline"}
-                onClick={() => updateSetting('enableEmotion', !voiceSettings.enableEmotion)}
-              >
-                {voiceSettings.enableEmotion ? 'On' : 'Off'}
-              </Button>
-            </div>
-
-            <div className="flex items-center justify-between">
-              <span className="text-sm text-gray-300">Noise Reduction</span>
-              <Button
-                size="sm"
-                variant={voiceSettings.noiseReduction ? "default" : "outline"}
-                onClick={() => updateSetting('noiseReduction', !voiceSettings.noiseReduction)}
-              >
-                {voiceSettings.noiseReduction ? 'On' : 'Off'}
-              </Button>
-            </div>
-
-            <div className="flex items-center justify-between">
-              <span className="text-sm text-gray-300">Auto Transcribe</span>
-              <Button
-                size="sm"
-                variant={voiceSettings.autoTranscribe ? "default" : "outline"}
-                onClick={() => updateSetting('autoTranscribe', !voiceSettings.autoTranscribe)}
-              >
-                {voiceSettings.autoTranscribe ? 'On' : 'Off'}
-              </Button>
             </div>
           </div>
         </CardContent>
@@ -423,27 +353,23 @@ export function AdvancedVoiceInterface({
 
       {/* Quick Actions */}
       <div className="grid grid-cols-2 gap-3">
-        <Button variant="outline" className="border-gray-600 text-gray-300 hover:bg-gray-700">
-          <MessageSquare className="w-4 h-4 mr-2" />
-          Voice Commands
-        </Button>
-        <Button variant="outline" className="border-gray-600 text-gray-300 hover:bg-gray-700">
-          <Languages className="w-4 h-4 mr-2" />
+        <Button 
+          variant="outline" 
+          className="border-gray-600 text-gray-300"
+          onClick={testVoice}
+          disabled={!isEnabled}
+        >
+          <PlayCircle className="w-4 h-4 mr-2" />
           Test Voice
         </Button>
-      </div>
-
-      {/* Voice Tips */}
-      <div className="p-3 bg-gradient-to-r from-blue-500/10 to-purple-500/10 rounded-lg border border-blue-500/20">
-        <div className="flex items-center gap-2 mb-1">
-          <Zap className="w-4 h-4 text-blue-400" />
-          <span className="text-sm font-medium text-blue-400">Voice Tips</span>
-        </div>
-        <ul className="text-xs text-gray-300 space-y-1">
-          <li>• Speak clearly and at normal pace</li>
-          <li>• Use "Hey Tezu" to wake up voice mode</li>
-          <li>• Try different languages for better experience</li>
-        </ul>
+        <Button 
+          variant="outline" 
+          className="border-gray-600 text-gray-300"
+          disabled={!isEnabled}
+        >
+          <Languages className="w-4 h-4 mr-2" />
+          Voice Training
+        </Button>
       </div>
     </div>
   );
