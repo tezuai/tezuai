@@ -1,4 +1,3 @@
-
 import { useState, useRef, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -22,7 +21,9 @@ import {
   Palette,
   Languages,
   BarChart3,
-  Sparkles
+  Sparkles,
+  User,
+  PlayCircle
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { MessageBubble } from "@/components/MessageBubble";
@@ -39,6 +40,11 @@ import { SmartContextMemory } from "@/components/SmartContextMemory";
 import { AdvancedAnalytics } from "@/components/AdvancedAnalytics";
 import { LanguageTranslator } from "@/components/LanguageTranslator";
 import { SmartTemplates } from "@/components/SmartTemplates";
+import { AuthenticationHub } from "@/components/AuthenticationHub";
+import { VideoLearningHub } from "@/components/VideoLearningHub";
+import { AdvancedVoiceInterface } from "@/components/AdvancedVoiceInterface";
+import { AdvancedFileProcessor } from "@/components/AdvancedFileProcessor";
+import { UserProfileManager } from "@/components/UserProfileManager";
 
 interface Message {
   id: string;
@@ -67,6 +73,12 @@ export function ChatInterface({ conversation, onUpdateConversation, allConversat
   const [currentPersonality, setCurrentPersonality] = useState("tezu-friendly");
   const [currentLanguage, setCurrentLanguage] = useState("hi");
   const [isTranslationEnabled, setIsTranslationEnabled] = useState(false);
+  const [showVideoLearning, setShowVideoLearning] = useState(false);
+  const [showAdvancedVoice, setShowAdvancedVoice] = useState(false);
+  const [showFileProcessor, setShowFileProcessor] = useState(false);
+  const [showUserProfile, setShowUserProfile] = useState(false);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [currentUser, setCurrentUser] = useState<any>(null);
   const scrollAreaRef = useRef<HTMLDivElement>(null);
   const { toast } = useToast();
 
@@ -273,6 +285,52 @@ export function ChatInterface({ conversation, onUpdateConversation, allConversat
     console.log("Memory updated:", memories);
   };
 
+  const handleLogin = (user: any) => {
+    setIsAuthenticated(true);
+    setCurrentUser(user);
+    toast({
+      title: "Welcome to Tezu AI! 🎉",
+      description: "All premium features are now unlocked!",
+    });
+  };
+
+  const handleLogout = () => {
+    setIsAuthenticated(false);
+    setCurrentUser(null);
+    toast({
+      title: "Logged out",
+      description: "Come back soon!",
+    });
+  };
+
+  const handleSignup = (userData: any) => {
+    console.log("New user signed up:", userData);
+  };
+
+  const handleTutorialComplete = (tutorialId: string) => {
+    console.log("Tutorial completed:", tutorialId);
+  };
+
+  const handleVoiceInput = (text: string, confidence: number) => {
+    setInput(prev => prev + text + " ");
+  };
+
+  const handleVoiceSettingsChange = (settings: any) => {
+    console.log("Voice settings updated:", settings);
+  };
+
+  const handleFileAnalyzed = (file: any) => {
+    console.log("File analyzed:", file);
+    toast({
+      title: "File analyzed! 📄",
+      description: `${file.name} has been processed successfully.`,
+    });
+  };
+
+  const handleProfileUpdate = (updates: any) => {
+    setCurrentUser((prev: any) => ({ ...prev, ...updates }));
+  };
+
   return (
     <div className="flex-1 flex flex-col h-screen">
       {/* Header */}
@@ -293,6 +351,11 @@ export function ChatInterface({ conversation, onUpdateConversation, allConversat
               <Badge variant="secondary" className="text-xs bg-green-500/20 text-green-400">
                 {currentLanguage.toUpperCase()}
               </Badge>
+              {isAuthenticated && (
+                <Badge variant="secondary" className="text-xs bg-purple-500/20 text-purple-400">
+                  ✓ Premium
+                </Badge>
+              )}
               <span className="text-xs text-gray-400">
                 {conversation.messages.length} messages
               </span>
@@ -418,27 +481,37 @@ export function ChatInterface({ conversation, onUpdateConversation, allConversat
           <div className="w-96 border-l border-gray-700/50 bg-gray-900/95 backdrop-blur-xl overflow-hidden">
             <Tabs value={activeAdvancedTab} onValueChange={setActiveAdvancedTab} className="h-full flex flex-col">
               <TabsList className="grid w-full grid-cols-6 bg-gray-800 mx-4 mt-4">
+                <TabsTrigger value="auth" className="text-xs p-2">
+                  <User className="w-3 h-3" />
+                </TabsTrigger>
                 <TabsTrigger value="personality" className="text-xs p-2">
                   <Sparkles className="w-3 h-3" />
                 </TabsTrigger>
-                <TabsTrigger value="memory" className="text-xs p-2">
-                  <Brain className="w-3 h-3" />
+                <TabsTrigger value="video" className="text-xs p-2">
+                  <PlayCircle className="w-3 h-3" />
                 </TabsTrigger>
-                <TabsTrigger value="language" className="text-xs p-2">
-                  <Languages className="w-3 h-3" />
+                <TabsTrigger value="voice" className="text-xs p-2">
+                  <Mic className="w-3 h-3" />
                 </TabsTrigger>
-                <TabsTrigger value="templates" className="text-xs p-2">
+                <TabsTrigger value="files" className="text-xs p-2">
                   <FileText className="w-3 h-3" />
                 </TabsTrigger>
-                <TabsTrigger value="analytics" className="text-xs p-2">
-                  <BarChart3 className="w-3 h-3" />
-                </TabsTrigger>
-                <TabsTrigger value="collab" className="text-xs p-2">
-                  <Users className="w-3 h-3" />
+                <TabsTrigger value="profile" className="text-xs p-2">
+                  <Settings className="w-3 h-3" />
                 </TabsTrigger>
               </TabsList>
 
               <div className="flex-1 overflow-hidden">
+                <TabsContent value="auth" className="h-full mt-0 p-4">
+                  <AuthenticationHub
+                    isAuthenticated={isAuthenticated}
+                    currentUser={currentUser}
+                    onLogin={handleLogin}
+                    onLogout={handleLogout}
+                    onSignup={handleSignup}
+                  />
+                </TabsContent>
+
                 <TabsContent value="personality" className="h-full mt-0 p-4">
                   <AIPersonalityHub
                     currentPersonality={currentPersonality}
@@ -446,36 +519,34 @@ export function ChatInterface({ conversation, onUpdateConversation, allConversat
                   />
                 </TabsContent>
 
-                <TabsContent value="memory" className="h-full mt-0 p-4">
-                  <SmartContextMemory
-                    userId="current-user"
-                    onMemoryUpdate={handleMemoryUpdate}
+                <TabsContent value="video" className="h-full mt-0 p-4">
+                  <VideoLearningHub onTutorialComplete={handleTutorialComplete} />
+                </TabsContent>
+
+                <TabsContent value="voice" className="h-full mt-0 p-4">
+                  <AdvancedVoiceInterface
+                    onVoiceInput={handleVoiceInput}
+                    onSettingsChange={handleVoiceSettingsChange}
+                    isEnabled={isAuthenticated}
                   />
                 </TabsContent>
 
-                <TabsContent value="language" className="h-full mt-0 p-4">
-                  <LanguageTranslator
-                    currentLanguage={currentLanguage}
-                    onLanguageChange={setCurrentLanguage}
-                    onTranslationToggle={setIsTranslationEnabled}
-                    isTranslationEnabled={isTranslationEnabled}
-                  />
+                <TabsContent value="files" className="h-full mt-0 p-4">
+                  <AdvancedFileProcessor onFileAnalyzed={handleFileAnalyzed} />
                 </TabsContent>
 
-                <TabsContent value="templates" className="h-full mt-0 p-4">
-                  <SmartTemplates onTemplateSelect={handleTemplateSelect} />
-                </TabsContent>
-
-                <TabsContent value="analytics" className="h-full mt-0 p-4">
-                  <AdvancedAnalytics conversations={allConversations} />
-                </TabsContent>
-
-                <TabsContent value="collab" className="h-full mt-0 p-4">
-                  <CollaborationHub
-                    currentUser={currentUser}
-                    onJoinSession={handleJoinCollaboration}
-                    onCreateSession={handleCreateCollaboration}
-                  />
+                <TabsContent value="profile" className="h-full mt-0 p-4">
+                  {isAuthenticated && currentUser ? (
+                    <UserProfileManager
+                      user={currentUser}
+                      onProfileUpdate={handleProfileUpdate}
+                    />
+                  ) : (
+                    <div className="text-center text-gray-400">
+                      <User className="w-12 h-12 mx-auto mb-4 opacity-50" />
+                      <p>Please login to access profile settings</p>
+                    </div>
+                  )}
                 </TabsContent>
               </div>
             </Tabs>
