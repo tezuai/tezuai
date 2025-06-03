@@ -1,4 +1,3 @@
-
 import { useState, useRef, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -23,7 +22,8 @@ import {
   Languages,
   BarChart3,
   Sparkles,
-  User
+  User,
+  FileText
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { MessageBubble } from "@/components/MessageBubble";
@@ -44,6 +44,10 @@ import { AuthenticationHub } from "@/components/AuthenticationHub";
 import { AdvancedVoiceInterface } from "@/components/AdvancedVoiceInterface";
 import { AdvancedFileProcessor } from "@/components/AdvancedFileProcessor";
 import { UserProfileManager } from "@/components/UserProfileManager";
+import { CodeCompiler } from "@/components/CodeCompiler";
+import { DocumentGenerator } from "@/components/DocumentGenerator";
+import { ImageGenerator } from "@/components/ImageGenerator";
+import { ProfessionalTemplates } from "@/components/ProfessionalTemplates";
 
 interface Message {
   id: string;
@@ -470,11 +474,11 @@ export function ChatInterface({ conversation, onUpdateConversation, allConversat
                 <TabsTrigger value="personality" className="text-xs p-2">
                   <Sparkles className="w-3 h-3" />
                 </TabsTrigger>
-                <TabsTrigger value="voice" className="text-xs p-2">
-                  <Mic className="w-3 h-3" />
+                <TabsTrigger value="tools" className="text-xs p-2">
+                  <Zap className="w-3 h-3" />
                 </TabsTrigger>
                 <TabsTrigger value="files" className="text-xs p-2">
-                  <Video className="w-3 h-3" />
+                  <FileText className="w-3 h-3" />
                 </TabsTrigger>
                 <TabsTrigger value="profile" className="text-xs p-2">
                   <Settings className="w-3 h-3" />
@@ -499,12 +503,31 @@ export function ChatInterface({ conversation, onUpdateConversation, allConversat
                   />
                 </TabsContent>
 
-                <TabsContent value="voice" className="h-full mt-0 p-4">
-                  <AdvancedVoiceInterface
-                    onVoiceInput={handleVoiceInput}
-                    onSettingsChange={handleVoiceSettingsChange}
-                    isEnabled={isAuthenticated}
-                  />
+                <TabsContent value="tools" className="h-full mt-0 p-4">
+                  <Tabs defaultValue="compiler" className="h-full">
+                    <TabsList className="grid w-full grid-cols-4 bg-gray-800 mb-4">
+                      <TabsTrigger value="compiler" className="text-xs">Code</TabsTrigger>
+                      <TabsTrigger value="docs" className="text-xs">Docs</TabsTrigger>
+                      <TabsTrigger value="images" className="text-xs">Images</TabsTrigger>
+                      <TabsTrigger value="templates" className="text-xs">Templates</TabsTrigger>
+                    </TabsList>
+                    
+                    <TabsContent value="compiler" className="h-full">
+                      <CodeCompiler isEnabled={isAuthenticated} />
+                    </TabsContent>
+                    
+                    <TabsContent value="docs" className="h-full">
+                      <DocumentGenerator isEnabled={isAuthenticated} />
+                    </TabsContent>
+                    
+                    <TabsContent value="images" className="h-full">
+                      <ImageGenerator isEnabled={isAuthenticated} />
+                    </TabsContent>
+                    
+                    <TabsContent value="templates" className="h-full">
+                      <ProfessionalTemplates onTemplateSelect={handleTemplateSelect} />
+                    </TabsContent>
+                  </Tabs>
                 </TabsContent>
 
                 <TabsContent value="files" className="h-full mt-0 p-4">
