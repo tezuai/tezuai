@@ -1,3 +1,4 @@
+
 import { useState, useRef, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -16,14 +17,13 @@ import {
   Download,
   Zap,
   Users,
-  FileText,
+  Video,
   Brain,
   Palette,
   Languages,
   BarChart3,
   Sparkles,
-  User,
-  PlayCircle
+  User
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { MessageBubble } from "@/components/MessageBubble";
@@ -41,7 +41,6 @@ import { AdvancedAnalytics } from "@/components/AdvancedAnalytics";
 import { LanguageTranslator } from "@/components/LanguageTranslator";
 import { SmartTemplates } from "@/components/SmartTemplates";
 import { AuthenticationHub } from "@/components/AuthenticationHub";
-import { VideoLearningHub } from "@/components/VideoLearningHub";
 import { AdvancedVoiceInterface } from "@/components/AdvancedVoiceInterface";
 import { AdvancedFileProcessor } from "@/components/AdvancedFileProcessor";
 import { UserProfileManager } from "@/components/UserProfileManager";
@@ -73,7 +72,6 @@ export function ChatInterface({ conversation, onUpdateConversation, allConversat
   const [currentPersonality, setCurrentPersonality] = useState("tezu-friendly");
   const [currentLanguage, setCurrentLanguage] = useState("hi");
   const [isTranslationEnabled, setIsTranslationEnabled] = useState(false);
-  const [showVideoLearning, setShowVideoLearning] = useState(false);
   const [showAdvancedVoice, setShowAdvancedVoice] = useState(false);
   const [showFileProcessor, setShowFileProcessor] = useState(false);
   const [showUserProfile, setShowUserProfile] = useState(false);
@@ -94,17 +92,6 @@ export function ChatInterface({ conversation, onUpdateConversation, allConversat
     fontSize: 14,
     autoSave: true,
   });
-
-  // Mock user for collaboration
-  const currentUser = {
-    id: "current-user",
-    name: "You",
-    email: "user@example.com",
-    role: "owner" as const,
-    status: "online" as const,
-    lastSeen: new Date(),
-    joinedAt: new Date()
-  };
 
   useEffect(() => {
     if (scrollAreaRef.current) {
@@ -307,10 +294,6 @@ export function ChatInterface({ conversation, onUpdateConversation, allConversat
     console.log("New user signed up:", userData);
   };
 
-  const handleTutorialComplete = (tutorialId: string) => {
-    console.log("Tutorial completed:", tutorialId);
-  };
-
   const handleVoiceInput = (text: string, confidence: number) => {
     setInput(prev => prev + text + " ");
   };
@@ -480,21 +463,18 @@ export function ChatInterface({ conversation, onUpdateConversation, allConversat
         {showAdvancedPanel && (
           <div className="w-96 border-l border-gray-700/50 bg-gray-900/95 backdrop-blur-xl overflow-hidden">
             <Tabs value={activeAdvancedTab} onValueChange={setActiveAdvancedTab} className="h-full flex flex-col">
-              <TabsList className="grid w-full grid-cols-6 bg-gray-800 mx-4 mt-4">
+              <TabsList className="grid w-full grid-cols-5 bg-gray-800 mx-4 mt-4">
                 <TabsTrigger value="auth" className="text-xs p-2">
                   <User className="w-3 h-3" />
                 </TabsTrigger>
                 <TabsTrigger value="personality" className="text-xs p-2">
                   <Sparkles className="w-3 h-3" />
                 </TabsTrigger>
-                <TabsTrigger value="video" className="text-xs p-2">
-                  <PlayCircle className="w-3 h-3" />
-                </TabsTrigger>
                 <TabsTrigger value="voice" className="text-xs p-2">
                   <Mic className="w-3 h-3" />
                 </TabsTrigger>
                 <TabsTrigger value="files" className="text-xs p-2">
-                  <FileText className="w-3 h-3" />
+                  <Video className="w-3 h-3" />
                 </TabsTrigger>
                 <TabsTrigger value="profile" className="text-xs p-2">
                   <Settings className="w-3 h-3" />
@@ -517,10 +497,6 @@ export function ChatInterface({ conversation, onUpdateConversation, allConversat
                     currentPersonality={currentPersonality}
                     onPersonalityChange={handlePersonalityChange}
                   />
-                </TabsContent>
-
-                <TabsContent value="video" className="h-full mt-0 p-4">
-                  <VideoLearningHub onTutorialComplete={handleTutorialComplete} />
                 </TabsContent>
 
                 <TabsContent value="voice" className="h-full mt-0 p-4">

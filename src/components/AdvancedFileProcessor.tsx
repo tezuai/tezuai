@@ -8,7 +8,7 @@ import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { 
-  FileText, 
+  Video, 
   Upload, 
   Download, 
   Search, 
@@ -89,12 +89,12 @@ export function AdvancedFileProcessor({ onFileAnalyzed }: AdvancedFileProcessorP
         "📋 Structure well-organized hai",
         "🚀 Actionable recommendations included hain"
       ],
-      sentiment: Math.random() > 0.5 ? 'positive' : 'neutral' as const
+      sentiment: (Math.random() > 0.5 ? 'positive' : 'neutral') as 'positive' | 'negative' | 'neutral'
     };
 
-    const completedFile = {
+    const completedFile: ProcessedFile = {
       ...file,
-      status: 'completed' as const,
+      status: 'completed',
       progress: 100,
       ...analysisResults
     };
@@ -113,10 +113,10 @@ export function AdvancedFileProcessor({ onFileAnalyzed }: AdvancedFileProcessorP
   };
 
   const getFileIcon = (type: string) => {
-    if (type.includes('pdf')) return <FileText className="w-4 h-4 text-red-400" />;
-    if (type.includes('image')) return <FileText className="w-4 h-4 text-blue-400" />;
-    if (type.includes('text')) return <FileText className="w-4 h-4 text-green-400" />;
-    return <FileText className="w-4 h-4 text-gray-400" />;
+    if (type.includes('pdf')) return <Video className="w-4 h-4 text-red-400" />;
+    if (type.includes('image')) return <Video className="w-4 h-4 text-blue-400" />;
+    if (type.includes('text')) return <Video className="w-4 h-4 text-green-400" />;
+    return <Video className="w-4 h-4 text-gray-400" />;
   };
 
   const getStatusColor = (status: string) => {
