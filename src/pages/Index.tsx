@@ -1,9 +1,12 @@
-import { useState } from "react";
+
+import { useState, useEffect } from "react";
 import { Sidebar } from "@/components/Sidebar";
 import { ChatInterface } from "@/components/ChatInterface";
 import { WelcomeScreen } from "@/components/WelcomeScreen";
 import { AnalyticsDashboard } from "@/components/AnalyticsDashboard";
 import { SubscriptionPage } from "@/pages/Subscription";
+import { LandingPage } from "@/components/LandingPage";
+import { OnboardingFlow } from "@/components/OnboardingFlow";
 import { SidebarProvider } from "@/components/ui/sidebar";
 import { SubscriptionProvider } from "@/contexts/SubscriptionContext";
 
@@ -11,6 +14,32 @@ const Index = () => {
   const [selectedConversation, setSelectedConversation] = useState<string | null>(null);
   const [conversations, setConversations] = useState<any[]>([]);
   const [currentView, setCurrentView] = useState<'chat' | 'analytics' | 'subscription'>('chat');
+  const [showLanding, setShowLanding] = useState(true);
+  const [showOnboarding, setShowOnboarding] = useState(false);
+
+  // Check if user is returning (has localStorage data)
+  useEffect(() => {
+    const hasUsedBefore = localStorage.getItem('ai-assistant-used');
+    if (hasUsedBefore) {
+      setShowLanding(false);
+    }
+  }, []);
+
+  const handleStartFromLanding = () => {
+    setShowLanding(false);
+    setShowOnboarding(true);
+  };
+
+  const handleOnboardingComplete = () => {
+    setShowOnboarding(false);
+    localStorage.setItem('ai-assistant-used', 'true');
+    handleNewConversation();
+  };
+
+  const handleOnboardingSkip = () => {
+    setShowOnboarding(false);
+    localStorage.setItem('ai-assistant-used', 'true');
+  };
 
   const handleNewConversation = () => {
     const newConversation = {
@@ -24,6 +53,8 @@ const Index = () => {
     setConversations(prev => [newConversation, ...prev]);
     setSelectedConversation(newConversation.id);
     setCurrentView('chat');
+    setShowLanding(false);
+    setShowOnboarding(false);
   };
 
   const handleSelectConversation = (id: string) => {
@@ -55,6 +86,21 @@ const Index = () => {
   };
 
   const currentConversation = conversations.find(c => c.id === selectedConversation);
+
+  // Show landing page for new users
+  if (showLanding) {
+    return <LandingPage onStartChat={handleStartFromLanding} />;
+  }
+
+  // Show onboarding flow
+  if (showOnboarding) {
+    return (
+      <OnboardingFlow 
+        onComplete={handleOnboardingComplete}
+        onSkip={handleOnboardingSkip}
+      />
+    );
+  }
 
   return (
     <SubscriptionProvider>

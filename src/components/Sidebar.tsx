@@ -7,6 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { ConversationActions } from "./ConversationActions";
 import { SearchDialog } from "./SearchDialog";
 import { UsageTracker } from "./UsageTracker";
+import { ShareDialog } from "./ShareDialog";
 import { useSubscription } from "@/contexts/SubscriptionContext";
 import {
   Plus,
@@ -19,6 +20,8 @@ import {
   Settings,
   User,
   CreditCard,
+  Share2,
+  Gift,
 } from "lucide-react";
 
 interface SidebarProps {
@@ -49,6 +52,7 @@ export function Sidebar({
   const [searchQuery, setSearchQuery] = useState("");
   const [showArchived, setShowArchived] = useState(false);
   const [showSearchDialog, setShowSearchDialog] = useState(false);
+  const [showShareDialog, setShowShareDialog] = useState(false);
   const { currentPlan, features } = useSubscription();
 
   const filteredConversations = conversations.filter((conv) => {
@@ -121,6 +125,16 @@ export function Sidebar({
             {!features.analytics && (
               <Crown className="w-3 h-3 ml-auto text-yellow-400" />
             )}
+          </Button>
+          
+          <Button
+            variant="ghost"
+            onClick={() => setShowShareDialog(true)}
+            className="w-full justify-start text-gray-300 hover:text-white"
+          >
+            <Share2 className="w-4 h-4 mr-2" />
+            Invite Friends
+            <Gift className="w-3 h-3 ml-auto text-yellow-400" />
           </Button>
           
           <Button
@@ -242,6 +256,11 @@ export function Sidebar({
       <SearchDialog
         conversations={conversations}
         onSelectConversation={onSelectConversation}
+      />
+
+      <ShareDialog
+        open={showShareDialog}
+        onOpenChange={setShowShareDialog}
       />
     </div>
   );
