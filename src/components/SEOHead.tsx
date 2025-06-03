@@ -10,11 +10,11 @@ interface SEOHeadProps {
 }
 
 export function SEOHead({
-  title = "AI Assistant - India's Best Free AI Chat Bot | Hindi & English Support",
+  title = "Tezu AI Agent - India's Best Free AI Chat Bot | Hindi & English Support",
   description = "Free AI assistant with unlimited chat, multiple AI models (GPT, Claude, Gemini), voice features, and more. Made for India with Hindi and English support. Start free today!",
   keywords = "AI assistant, free AI chat, Hindi AI bot, Indian AI, ChatGPT alternative, artificial intelligence, AI chatbot, virtual assistant, machine learning, free AI tools",
   image = "/ai-assistant-preview.jpg",
-  url = window.location.href
+  url = typeof window !== 'undefined' ? window.location.href : ''
 }: SEOHeadProps) {
   useEffect(() => {
     // Update document title
@@ -34,7 +34,7 @@ export function SEOHead({
     // Basic meta tags
     updateMetaTag('description', description);
     updateMetaTag('keywords', keywords);
-    updateMetaTag('author', 'AI Assistant Team');
+    updateMetaTag('author', 'Tezu AI Agent Team');
     updateMetaTag('robots', 'index, follow');
     updateMetaTag('language', 'en, hi');
     updateMetaTag('geo.region', 'IN');
@@ -46,7 +46,7 @@ export function SEOHead({
     updateMetaTag('og:image', image, 'property');
     updateMetaTag('og:url', url, 'property');
     updateMetaTag('og:type', 'website', 'property');
-    updateMetaTag('og:site_name', 'AI Assistant', 'property');
+    updateMetaTag('og:site_name', 'Tezu AI Agent', 'property');
     updateMetaTag('og:locale', 'en_IN', 'property');
 
     // Twitter Card tags
@@ -56,7 +56,7 @@ export function SEOHead({
     updateMetaTag('twitter:image', image, 'name');
 
     // Additional SEO tags
-    updateMetaTag('application-name', 'AI Assistant');
+    updateMetaTag('application-name', 'Tezu AI Agent');
     updateMetaTag('theme-color', '#1e40af');
     updateMetaTag('msapplication-TileColor', '#1e40af');
 
@@ -64,7 +64,7 @@ export function SEOHead({
     const structuredData = {
       "@context": "https://schema.org",
       "@type": "WebApplication",
-      "name": "AI Assistant",
+      "name": "Tezu AI Agent",
       "description": description,
       "url": url,
       "applicationCategory": "AI Tool",
@@ -81,7 +81,7 @@ export function SEOHead({
       }
     };
 
-    let jsonLd = document.querySelector('#structured-data');
+    let jsonLd = document.querySelector('#structured-data') as HTMLScriptElement;
     if (!jsonLd) {
       jsonLd = document.createElement('script');
       jsonLd.id = 'structured-data';

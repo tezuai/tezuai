@@ -19,21 +19,26 @@ import {
   Users,
   FileText,
   Brain,
-  Palette
+  Palette,
+  Languages,
+  BarChart3,
+  Sparkles
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { MessageBubble } from "@/components/MessageBubble";
 import { TypingIndicator } from "@/components/TypingIndicator";
-import { ChatSettings } from "@/components/ChatSettings";
 import { SearchDialog } from "@/components/SearchDialog";
 import { ExportDialog } from "@/components/ExportDialog";
 import { QuickActions } from "@/components/QuickActions";
 import { FileUpload } from "@/components/FileUpload";
 import { VoiceInterface } from "@/components/VoiceInterface";
-import { ConversationTemplates } from "@/components/ConversationTemplates";
-import { AdvancedSettings } from "@/components/AdvancedSettings";
 import { CollaborationHub } from "@/components/CollaborationHub";
 import { AIModelSwitcher } from "@/components/AIModelSwitcher";
+import { AIPersonalityHub } from "@/components/AIPersonalityHub";
+import { SmartContextMemory } from "@/components/SmartContextMemory";
+import { AdvancedAnalytics } from "@/components/AdvancedAnalytics";
+import { LanguageTranslator } from "@/components/LanguageTranslator";
+import { SmartTemplates } from "@/components/SmartTemplates";
 
 interface Message {
   id: string;
@@ -55,10 +60,13 @@ export function ChatInterface({ conversation, onUpdateConversation, allConversat
   const [isLoading, setIsLoading] = useState(false);
   const [isRecording, setIsRecording] = useState(false);
   const [showAdvancedPanel, setShowAdvancedPanel] = useState(false);
-  const [activeAdvancedTab, setActiveAdvancedTab] = useState("settings");
+  const [activeAdvancedTab, setActiveAdvancedTab] = useState("personality");
   const [showQuickActions, setShowQuickActions] = useState(false);
   const [showFileUpload, setShowFileUpload] = useState(false);
   const [attachedFiles, setAttachedFiles] = useState<File[]>([]);
+  const [currentPersonality, setCurrentPersonality] = useState("tezu-friendly");
+  const [currentLanguage, setCurrentLanguage] = useState("hi");
+  const [isTranslationEnabled, setIsTranslationEnabled] = useState(false);
   const scrollAreaRef = useRef<HTMLDivElement>(null);
   const { toast } = useToast();
 
@@ -66,8 +74,8 @@ export function ChatInterface({ conversation, onUpdateConversation, allConversat
     model: "gpt-4-turbo",
     temperature: 0.7,
     maxTokens: 1000,
-    systemPrompt: "You are a helpful AI assistant.",
-    persona: "assistant",
+    systemPrompt: "You are Tezu, a friendly AI assistant from India. Always respond in a helpful, warm manner mixing Hindi and English naturally. Be encouraging and positive.",
+    persona: "tezu-friendly",
     enableVoice: true,
     enableCollaboration: false,
     theme: "dark",
@@ -92,6 +100,42 @@ export function ChatInterface({ conversation, onUpdateConversation, allConversat
     }
   }, [conversation.messages]);
 
+  // Enhanced AI response system with personality
+  const generateTezuResponse = (userMessage: string, personality: string): string => {
+    const responses = {
+      "tezu-friendly": [
+        `Namaste! Main Tezu hun 😊 Aapka sawal bahut interesting hai. ${userMessage.includes('help') ? 'Main aapki poori help karunga!' : 'Iske baare mein baat karte hain...'} Kya aur detail mein jana chahte hain?`,
+        `Hello friend! Tezu yahan present! 🙋‍♂️ Aapne jo poocha hai, uska answer bahut simple hai. Main step by step explain karta hun. Ready hain aap?`,
+        `Haan ji! Main Tezu, aapka AI dost. ${userMessage} - ye topic mujhe bhi pasand hai! Aao together explore karte hain. Koi specific point janna hai?`
+      ],
+      "tezu-teacher": [
+        `Namaste student! Main Tezu hun, aapka teacher. 📚 Aapne jo topic mention kiya hai, usse samjhane mein mujhe khushi hogi. Pehle basics se start karte hain...`,
+        `Excellent question! Main Tezu, aapka educational assistant. ${userMessage} ke baare mein comprehensive explanation deta hun. Are you ready to learn?`,
+        `Hello dear learner! Tezu teacher mode mein hai. Jo aapne poocha hai, uska detailed answer with examples dunga. Notebook ready hai?`
+      ],
+      "tezu-creative": [
+        `Wow! Creative mind detected! 🎨 Main Tezu hun, aapka creative partner. ${userMessage} mein bahut potential hai. Kya hum ise aur innovative banayein?`,
+        `Artistic soul! Main Tezu, creativity ka supporter. Aapka idea sun kar mera creative brain activate ho gaya! Let's brainstorm together. Ready for magic?`,
+        `Beautiful thinking! Tezu creative mode mein. ${userMessage} - isme se amazing content ban sakta hai. Shall we explore the possibilities?`
+      ],
+      "tezu-business": [
+        `Good day! Main Tezu hun, aapka business consultant. 💼 ${userMessage} - ye business perspective se interesting point hai. Market analysis karte hain...`,
+        `Professional greetings! Tezu business mode mein. Aapka query business growth ke liye valuable hai. Strategic approach se discuss karte hain.`,
+        `Hello entrepreneur! Main Tezu, business ki duniya se. ${userMessage} mein business opportunity dikh rahi hai. Detailed strategy banate hain?`
+      ],
+      "tezu-coder": [
+        `Hey developer! 👨‍💻 Main Tezu hun, coding ka enthusiast. ${userMessage} - iska technical solution mere paas hai. Code example chahiye?`,
+        `Technical greeting! Tezu programmer mode mein. Aapka coding problem solve karna mere liye easy hai. Step by step approach lete hain...`,
+        `Hello coder! Main Tezu, debugging expert. ${userMessage} ke liye clean aur efficient solution provide karunga. Ready to code?`
+      ]
+    };
+
+    const personalityResponses = responses[personality as keyof typeof responses] || responses["tezu-friendly"];
+    const randomResponse = personalityResponses[Math.floor(Math.random() * personalityResponses.length)];
+    
+    return randomResponse;
+  };
+
   const handleSendMessage = async () => {
     if ((!input.trim() && attachedFiles.length === 0) || isLoading) return;
 
@@ -115,14 +159,16 @@ export function ChatInterface({ conversation, onUpdateConversation, allConversat
     setShowFileUpload(false);
     setIsLoading(true);
 
-    // Simulate AI response with selected model
+    // Enhanced AI response with personality
     setTimeout(() => {
+      const tezuResponse = generateTezuResponse(userMessage.content, currentPersonality);
+      
       const aiMessage: Message = {
         id: (Date.now() + 1).toString(),
         role: "assistant",
-        content: `This is a response from ${settings.model}. ${attachedFiles.length > 0 ? `I can see you've attached ${attachedFiles.length} file(s). ` : ''}The response is generated with temperature ${settings.temperature} and max tokens ${settings.maxTokens}. In a real implementation, this would use the selected AI model and configuration.`,
+        content: tezuResponse,
         timestamp: new Date(),
-        model: settings.model,
+        model: "Tezu AI",
       };
 
       const finalConversation = {
@@ -132,7 +178,13 @@ export function ChatInterface({ conversation, onUpdateConversation, allConversat
 
       onUpdateConversation(finalConversation);
       setIsLoading(false);
-    }, 2000);
+
+      // Show success toast
+      toast({
+        title: "Tezu responded! 🎉",
+        description: "Your AI assistant is ready for the next question.",
+      });
+    }, 1500);
   };
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
@@ -171,21 +223,34 @@ export function ChatInterface({ conversation, onUpdateConversation, allConversat
     });
   };
 
+  const handlePersonalityChange = (personality: any) => {
+    setCurrentPersonality(personality.id);
+    setSettings(prev => ({ 
+      ...prev, 
+      persona: personality.id,
+      systemPrompt: personality.systemPrompt 
+    }));
+    toast({
+      title: "Personality updated! 🤖",
+      description: `Tezu is now in ${personality.name} mode`,
+    });
+  };
+
   const handleTemplateSelect = (template: any) => {
     setInput(template.prompt);
-    if (template.systemMessage) {
-      setSettings(prev => ({ ...prev, systemPrompt: template.systemMessage }));
+    if (template.systemPrompt) {
+      setSettings(prev => ({ ...prev, systemPrompt: template.systemPrompt }));
     }
     toast({
-      title: "Template applied",
-      description: `Applied template: ${template.name}`,
+      title: "Template applied! 📝",
+      description: `Applied: ${template.title}`,
     });
   };
 
   const handleModelChange = (modelId: string, config: any) => {
     setSettings(prev => ({ ...prev, model: modelId, ...config }));
     toast({
-      title: "Model configuration updated",
+      title: "Model updated",
       description: `Now using ${modelId}`,
     });
   };
@@ -204,6 +269,10 @@ export function ChatInterface({ conversation, onUpdateConversation, allConversat
     });
   };
 
+  const handleMemoryUpdate = (memories: any[]) => {
+    console.log("Memory updated:", memories);
+  };
+
   return (
     <div className="flex-1 flex flex-col h-screen">
       {/* Header */}
@@ -216,10 +285,13 @@ export function ChatInterface({ conversation, onUpdateConversation, allConversat
             </AvatarFallback>
           </Avatar>
           <div>
-            <h2 className="text-lg font-semibold text-white">{conversation.title}</h2>
+            <h2 className="text-lg font-semibold text-white">🤖 {conversation.title}</h2>
             <div className="flex items-center gap-2">
               <Badge variant="secondary" className="text-xs bg-blue-500/20 text-blue-400">
-                {settings.model}
+                Tezu AI
+              </Badge>
+              <Badge variant="secondary" className="text-xs bg-green-500/20 text-green-400">
+                {currentLanguage.toUpperCase()}
               </Badge>
               <span className="text-xs text-gray-400">
                 {conversation.messages.length} messages
@@ -295,7 +367,7 @@ export function ChatInterface({ conversation, onUpdateConversation, allConversat
                     value={input}
                     onChange={(e) => setInput(e.target.value)}
                     onKeyPress={handleKeyPress}
-                    placeholder="Type your message here..."
+                    placeholder="Ask Tezu anything... (Hindi/English)"
                     className="pr-12 py-3 bg-gray-800/50 border-gray-600 text-white placeholder-gray-400 focus:border-blue-500 resize-none"
                     disabled={isLoading}
                   />
@@ -345,18 +417,21 @@ export function ChatInterface({ conversation, onUpdateConversation, allConversat
         {showAdvancedPanel && (
           <div className="w-96 border-l border-gray-700/50 bg-gray-900/95 backdrop-blur-xl overflow-hidden">
             <Tabs value={activeAdvancedTab} onValueChange={setActiveAdvancedTab} className="h-full flex flex-col">
-              <TabsList className="grid w-full grid-cols-5 bg-gray-800 mx-4 mt-4">
-                <TabsTrigger value="settings" className="text-xs p-2">
-                  <Settings className="w-3 h-3" />
+              <TabsList className="grid w-full grid-cols-6 bg-gray-800 mx-4 mt-4">
+                <TabsTrigger value="personality" className="text-xs p-2">
+                  <Sparkles className="w-3 h-3" />
                 </TabsTrigger>
-                <TabsTrigger value="voice" className="text-xs p-2">
-                  <Mic className="w-3 h-3" />
+                <TabsTrigger value="memory" className="text-xs p-2">
+                  <Brain className="w-3 h-3" />
+                </TabsTrigger>
+                <TabsTrigger value="language" className="text-xs p-2">
+                  <Languages className="w-3 h-3" />
                 </TabsTrigger>
                 <TabsTrigger value="templates" className="text-xs p-2">
                   <FileText className="w-3 h-3" />
                 </TabsTrigger>
-                <TabsTrigger value="models" className="text-xs p-2">
-                  <Brain className="w-3 h-3" />
+                <TabsTrigger value="analytics" className="text-xs p-2">
+                  <BarChart3 className="w-3 h-3" />
                 </TabsTrigger>
                 <TabsTrigger value="collab" className="text-xs p-2">
                   <Users className="w-3 h-3" />
@@ -364,34 +439,35 @@ export function ChatInterface({ conversation, onUpdateConversation, allConversat
               </TabsList>
 
               <div className="flex-1 overflow-hidden">
-                <TabsContent value="settings" className="h-full mt-0 p-4">
-                  <AdvancedSettings
-                    currentSettings={settings}
-                    onSettingsChange={setSettings}
+                <TabsContent value="personality" className="h-full mt-0 p-4">
+                  <AIPersonalityHub
+                    currentPersonality={currentPersonality}
+                    onPersonalityChange={handlePersonalityChange}
                   />
                 </TabsContent>
 
-                <TabsContent value="voice" className="h-full mt-0 p-4">
-                  <VoiceInterface
-                    onTranscription={handleVoiceTranscription}
-                    onSpeakText={(text) => console.log("Speaking:", text)}
+                <TabsContent value="memory" className="h-full mt-0 p-4">
+                  <SmartContextMemory
+                    userId="current-user"
+                    onMemoryUpdate={handleMemoryUpdate}
+                  />
+                </TabsContent>
+
+                <TabsContent value="language" className="h-full mt-0 p-4">
+                  <LanguageTranslator
+                    currentLanguage={currentLanguage}
+                    onLanguageChange={setCurrentLanguage}
+                    onTranslationToggle={setIsTranslationEnabled}
+                    isTranslationEnabled={isTranslationEnabled}
                   />
                 </TabsContent>
 
                 <TabsContent value="templates" className="h-full mt-0 p-4">
-                  <ConversationTemplates onTemplateSelect={handleTemplateSelect} />
+                  <SmartTemplates onTemplateSelect={handleTemplateSelect} />
                 </TabsContent>
 
-                <TabsContent value="models" className="h-full mt-0 p-4">
-                  <AIModelSwitcher
-                    currentModel={settings.model}
-                    onModelChange={handleModelChange}
-                    usage={{
-                      tokensUsed: 15420,
-                      requestsToday: 23,
-                      costToday: 2.45
-                    }}
-                  />
+                <TabsContent value="analytics" className="h-full mt-0 p-4">
+                  <AdvancedAnalytics conversations={allConversations} />
                 </TabsContent>
 
                 <TabsContent value="collab" className="h-full mt-0 p-4">
