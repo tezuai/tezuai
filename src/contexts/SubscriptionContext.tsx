@@ -14,12 +14,19 @@ interface SubscriptionContextType {
     apiAccess: boolean;
     customTemplates: boolean;
     prioritySupport: boolean;
+    workflowAutomation: boolean;
+    customAITraining: boolean;
+    businessIntelligence: boolean;
+    cloudComputing: boolean;
+    dataAnalytics: boolean;
   };
   usage: {
     messagesUsed: number;
     messagesLimit: number;
     templatesUsed: number;
     templatesLimit: number;
+    workflowsUsed: number;
+    workflowsLimit: number;
   };
   upgradeToPlan: (planId: string) => void;
   checkFeatureAccess: (feature: string) => boolean;
@@ -34,35 +41,50 @@ export function SubscriptionProvider({ children }: { children: ReactNode }) {
     messagesLimit: 10,
     templatesUsed: 0,
     templatesLimit: 5,
+    workflowsUsed: 0,
+    workflowsLimit: 2,
   });
 
   const isSubscribed = currentPlan !== 'free';
 
   const features = {
-    unlimitedChat: currentPlan === 'pro' || currentPlan === 'enterprise',
-    allAIModels: currentPlan === 'pro' || currentPlan === 'enterprise',
-    voiceFeatures: currentPlan === 'pro' || currentPlan === 'enterprise',
-    fileUpload: currentPlan === 'pro' || currentPlan === 'enterprise',
-    analytics: currentPlan === 'pro' || currentPlan === 'enterprise',
-    teamCollaboration: currentPlan === 'enterprise',
+    unlimitedChat: currentPlan === 'starter' || currentPlan === 'professional' || currentPlan === 'enterprise',
+    allAIModels: currentPlan === 'professional' || currentPlan === 'enterprise',
+    voiceFeatures: currentPlan === 'starter' || currentPlan === 'professional' || currentPlan === 'enterprise',
+    fileUpload: currentPlan === 'starter' || currentPlan === 'professional' || currentPlan === 'enterprise',
+    analytics: currentPlan === 'starter' || currentPlan === 'professional' || currentPlan === 'enterprise',
+    teamCollaboration: currentPlan === 'professional' || currentPlan === 'enterprise',
     apiAccess: currentPlan === 'enterprise',
-    customTemplates: currentPlan === 'pro' || currentPlan === 'enterprise',
-    prioritySupport: currentPlan === 'pro' || currentPlan === 'enterprise',
+    customTemplates: currentPlan === 'starter' || currentPlan === 'professional' || currentPlan === 'enterprise',
+    prioritySupport: currentPlan === 'professional' || currentPlan === 'enterprise',
+    workflowAutomation: currentPlan === 'starter' || currentPlan === 'professional' || currentPlan === 'enterprise',
+    customAITraining: currentPlan === 'professional' || currentPlan === 'enterprise',
+    businessIntelligence: currentPlan === 'professional' || currentPlan === 'enterprise',
+    cloudComputing: currentPlan === 'professional' || currentPlan === 'enterprise',
+    dataAnalytics: currentPlan === 'professional' || currentPlan === 'enterprise',
   };
 
   const upgradeToPlan = (planId: string) => {
     setCurrentPlan(planId);
     
     // Update usage limits based on plan
-    if (planId === 'pro' || planId === 'enterprise') {
+    if (planId === 'starter') {
+      setUsage(prev => ({
+        ...prev,
+        messagesLimit: 500,
+        templatesLimit: 20,
+        workflowsLimit: 5,
+      }));
+    } else if (planId === 'professional' || planId === 'enterprise') {
       setUsage(prev => ({
         ...prev,
         messagesLimit: -1, // Unlimited
         templatesLimit: -1, // Unlimited
+        workflowsLimit: -1, // Unlimited
       }));
     }
     
-    console.log(`Upgraded to ${planId} plan`);
+    console.log(`Upgraded to ${planId} plan with enhanced features`);
   };
 
   const checkFeatureAccess = (feature: string): boolean => {
@@ -85,6 +107,16 @@ export function SubscriptionProvider({ children }: { children: ReactNode }) {
         return features.customTemplates || usage.templatesUsed < usage.templatesLimit;
       case 'prioritySupport':
         return features.prioritySupport;
+      case 'workflowAutomation':
+        return features.workflowAutomation || usage.workflowsUsed < usage.workflowsLimit;
+      case 'customAITraining':
+        return features.customAITraining;
+      case 'businessIntelligence':
+        return features.businessIntelligence;
+      case 'cloudComputing':
+        return features.cloudComputing;
+      case 'dataAnalytics':
+        return features.dataAnalytics;
       default:
         return false;
     }
@@ -96,7 +128,8 @@ export function SubscriptionProvider({ children }: { children: ReactNode }) {
       // This would normally track actual usage
       setUsage(prev => ({
         ...prev,
-        messagesUsed: Math.min(prev.messagesUsed, prev.messagesLimit),
+        messagesUsed: Math.min(prev.messagesUsed, prev.messagesLimit === -1 ? prev.messagesUsed : prev.messagesLimit),
+        workflowsUsed: Math.min(prev.workflowsUsed, prev.workflowsLimit === -1 ? prev.workflowsUsed : prev.workflowsLimit),
       }));
     }, 5000);
 
