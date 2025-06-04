@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -11,7 +10,7 @@ import {
   Volume2, 
   VolumeX,
   Settings,
-  Waveform,
+  AudioWaveform,
   Languages,
   Zap
 } from "lucide-react";
@@ -134,7 +133,7 @@ export function AdvancedVoiceInterface({ onVoiceInput, onSettingsChange }: Advan
           {isListening && (
             <div className="space-y-2">
               <div className="flex items-center gap-2">
-                <Waveform className="w-4 h-4 text-blue-400" />
+                <AudioWaveform className="w-4 h-4 text-blue-400" />
                 <div className="flex-1 bg-gray-700 rounded-full h-2">
                   <div 
                     className="bg-gradient-to-r from-blue-500 to-purple-500 h-2 rounded-full transition-all duration-100"
