@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Sidebar } from "@/components/Sidebar";
 import { ChatInterface } from "@/components/ChatInterface";
@@ -9,6 +8,7 @@ import { LandingPage } from "@/components/LandingPage";
 import { OnboardingFlow } from "@/components/OnboardingFlow";
 import { SidebarProvider } from "@/components/ui/sidebar";
 import { SubscriptionProvider } from "@/contexts/SubscriptionContext";
+import { Footer } from "@/components/Footer";
 
 const Index = () => {
   const [selectedConversation, setSelectedConversation] = useState<string | null>(null);
@@ -111,36 +111,39 @@ const Index = () => {
   return (
     <SubscriptionProvider>
       <SidebarProvider>
-        <div className="min-h-screen flex w-full bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900">
-          {currentView !== 'subscription' && (
-            <Sidebar
-              conversations={conversations}
-              selectedConversation={selectedConversation}
-              onNewConversation={handleNewConversation}
-              onSelectConversation={handleSelectConversation}
-              onUpdateConversation={handleUpdateConversation}
-              onDeleteConversation={handleDeleteConversation}
-              onArchiveConversation={handleArchiveConversation}
-              onDuplicateConversation={handleDuplicateConversation}
-              currentView={currentView}
-              onViewChange={setCurrentView}
-            />
-          )}
-          <main className="flex-1 flex flex-col">
-            {currentView === 'subscription' ? (
-              <SubscriptionPage onBack={() => setCurrentView('chat')} />
-            ) : currentView === 'analytics' ? (
-              <AnalyticsDashboard conversations={conversations} />
-            ) : selectedConversation && currentConversation ? (
-              <ChatInterface
-                conversation={currentConversation}
+        <div className="min-h-screen flex flex-col w-full bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900">
+          <div className="flex flex-1">
+            {currentView !== 'subscription' && (
+              <Sidebar
+                conversations={conversations}
+                selectedConversation={selectedConversation}
+                onNewConversation={handleNewConversation}
+                onSelectConversation={handleSelectConversation}
                 onUpdateConversation={handleUpdateConversation}
-                allConversations={conversations}
+                onDeleteConversation={handleDeleteConversation}
+                onArchiveConversation={handleArchiveConversation}
+                onDuplicateConversation={handleDuplicateConversation}
+                currentView={currentView}
+                onViewChange={setCurrentView}
               />
-            ) : (
-              <WelcomeScreen onStartChat={handleNewConversation} />
             )}
-          </main>
+            <main className="flex-1 flex flex-col">
+              {currentView === 'subscription' ? (
+                <SubscriptionPage onBack={() => setCurrentView('chat')} />
+              ) : currentView === 'analytics' ? (
+                <AnalyticsDashboard conversations={conversations} />
+              ) : selectedConversation && currentConversation ? (
+                <ChatInterface
+                  conversation={currentConversation}
+                  onUpdateConversation={handleUpdateConversation}
+                  allConversations={conversations}
+                />
+              ) : (
+                <WelcomeScreen onStartChat={handleNewConversation} />
+              )}
+            </main>
+          </div>
+          <Footer />
         </div>
       </SidebarProvider>
     </SubscriptionProvider>

@@ -324,7 +324,7 @@ export function ChatInterface({ conversation, onUpdateConversation, allConversat
       <div className="flex items-center justify-between p-4 border-b border-gray-700/50 bg-gray-900/95 backdrop-blur-xl">
         <div className="flex items-center gap-3">
           <Avatar className="w-8 h-8">
-            <AvatarImage src="/api/placeholder/32/32" />
+            <AvatarImage src="/lovable-uploads/95fdd9ab-8aef-49dd-b3c6-d153ec4336ca.png" />
             <AvatarFallback className="bg-gradient-to-br from-blue-500 to-purple-600 text-white">
               <Bot className="w-4 h-4" />
             </AvatarFallback>
@@ -333,14 +333,14 @@ export function ChatInterface({ conversation, onUpdateConversation, allConversat
             <h2 className="text-lg font-semibold text-white">🤖 {conversation.title}</h2>
             <div className="flex items-center gap-2">
               <Badge variant="secondary" className="text-xs bg-blue-500/20 text-blue-400">
-                Tezu AI Professional
+                Tezu AI Professional 2025
               </Badge>
               <Badge variant="secondary" className="text-xs bg-green-500/20 text-green-400">
                 {currentLanguage.toUpperCase()}
               </Badge>
               {isAuthenticated && (
                 <Badge variant="secondary" className="text-xs bg-purple-500/20 text-purple-400">
-                  ✓ Premium
+                  ✓ Premium Unlocked
                 </Badge>
               )}
               <span className="text-xs text-gray-400">
@@ -467,7 +467,7 @@ export function ChatInterface({ conversation, onUpdateConversation, allConversat
         {showAdvancedPanel && (
           <div className="w-96 border-l border-gray-700/50 bg-gray-900/95 backdrop-blur-xl overflow-hidden">
             <Tabs value={activeAdvancedTab} onValueChange={setActiveAdvancedTab} className="h-full flex flex-col">
-              <TabsList className="grid w-full grid-cols-5 bg-gray-800 mx-4 mt-4">
+              <TabsList className="grid w-full grid-cols-6 bg-gray-800 mx-4 mt-4">
                 <TabsTrigger value="auth" className="text-xs p-2">
                   <User className="w-3 h-3" />
                 </TabsTrigger>
@@ -477,11 +477,14 @@ export function ChatInterface({ conversation, onUpdateConversation, allConversat
                 <TabsTrigger value="tools" className="text-xs p-2">
                   <Zap className="w-3 h-3" />
                 </TabsTrigger>
-                <TabsTrigger value="files" className="text-xs p-2">
-                  <FileText className="w-3 h-3" />
+                <TabsTrigger value="collaboration" className="text-xs p-2">
+                  <Users className="w-3 h-3" />
                 </TabsTrigger>
-                <TabsTrigger value="profile" className="text-xs p-2">
-                  <Settings className="w-3 h-3" />
+                <TabsTrigger value="voice" className="text-xs p-2">
+                  <Mic className="w-3 h-3" />
+                </TabsTrigger>
+                <TabsTrigger value="analytics" className="text-xs p-2">
+                  <BarChart3 className="w-3 h-3" />
                 </TabsTrigger>
               </TabsList>
 
@@ -530,22 +533,22 @@ export function ChatInterface({ conversation, onUpdateConversation, allConversat
                   </Tabs>
                 </TabsContent>
 
-                <TabsContent value="files" className="h-full mt-0 p-4">
-                  <AdvancedFileProcessor onFileAnalyzed={handleFileAnalyzed} />
+                <TabsContent value="collaboration" className="h-full mt-0 p-4">
+                  <CollaborationHub
+                    onJoinSession={handleJoinCollaboration}
+                    onCreateSession={handleCreateCollaboration}
+                  />
                 </TabsContent>
 
-                <TabsContent value="profile" className="h-full mt-0 p-4">
-                  {isAuthenticated && currentUser ? (
-                    <UserProfileManager
-                      user={currentUser}
-                      onProfileUpdate={handleProfileUpdate}
-                    />
-                  ) : (
-                    <div className="text-center text-gray-400">
-                      <User className="w-12 h-12 mx-auto mb-4 opacity-50" />
-                      <p>Please login to access profile settings</p>
-                    </div>
-                  )}
+                <TabsContent value="voice" className="h-full mt-0 p-4">
+                  <AdvancedVoiceInterface
+                    onVoiceInput={handleVoiceInput}
+                    onSettingsChange={handleVoiceSettingsChange}
+                  />
+                </TabsContent>
+
+                <TabsContent value="analytics" className="h-full mt-0 p-4">
+                  <AdvancedAnalytics />
                 </TabsContent>
               </div>
             </Tabs>
