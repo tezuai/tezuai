@@ -19,7 +19,7 @@ const Index = () => {
 
   // Check if user is returning (has localStorage data)
   useEffect(() => {
-    const hasUsedBefore = localStorage.getItem('ai-assistant-used');
+    const hasUsedBefore = localStorage.getItem('tezu-ai-assistant-used');
     if (hasUsedBefore) {
       setShowLanding(false);
     }
@@ -32,19 +32,19 @@ const Index = () => {
 
   const handleOnboardingComplete = () => {
     setShowOnboarding(false);
-    localStorage.setItem('ai-assistant-used', 'true');
+    localStorage.setItem('tezu-ai-assistant-used', 'true');
     handleNewConversation();
   };
 
   const handleOnboardingSkip = () => {
     setShowOnboarding(false);
-    localStorage.setItem('ai-assistant-used', 'true');
+    localStorage.setItem('tezu-ai-assistant-used', 'true');
   };
 
   const handleNewConversation = () => {
     const newConversation = {
       id: Date.now().toString(),
-      title: "New Conversation",
+      title: "नया Conversation - Tezu AI",
       messages: [],
       createdAt: new Date(),
       isStarred: false,
@@ -82,7 +82,13 @@ const Index = () => {
   };
 
   const handleDuplicateConversation = (conversation: any) => {
-    setConversations(prev => [conversation, ...prev]);
+    const duplicatedConversation = {
+      ...conversation,
+      id: Date.now().toString(),
+      title: `Copy of ${conversation.title}`,
+      createdAt: new Date(),
+    };
+    setConversations(prev => [duplicatedConversation, ...prev]);
   };
 
   const currentConversation = conversations.find(c => c.id === selectedConversation);

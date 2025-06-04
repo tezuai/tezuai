@@ -333,7 +333,7 @@ export function ChatInterface({ conversation, onUpdateConversation, allConversat
             <h2 className="text-lg font-semibold text-white">🤖 {conversation.title}</h2>
             <div className="flex items-center gap-2">
               <Badge variant="secondary" className="text-xs bg-blue-500/20 text-blue-400">
-                Tezu AI
+                Tezu AI Professional
               </Badge>
               <Badge variant="secondary" className="text-xs bg-green-500/20 text-green-400">
                 {currentLanguage.toUpperCase()}
