@@ -32,7 +32,6 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { ConversationActions } from "@/components/ConversationActions";
 import { useToast } from "@/hooks/use-toast";
 
 interface SidebarProps {
@@ -266,14 +265,61 @@ export function Sidebar({
                     <Zap className="w-3 h-3 text-yellow-400 animate-pulse" />
                   </div>
                 </div>
-                <ConversationActions
-                  conversation={conversation}
-                  onEditTitle={handleEditTitle}
-                  onStarToggle={handleStarToggle}
-                  onArchiveToggle={onArchiveConversation}
-                  onDuplicateConversation={onDuplicateConversation}
-                  onDeleteConversation={onDeleteConversation}
-                />
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="opacity-0 group-hover:opacity-100 text-gray-400 hover:text-white hover:bg-gray-700/50 transition-all duration-200"
+                      onClick={(e) => e.stopPropagation()}
+                    >
+                      <MoreHorizontal className="w-4 h-4" />
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end" className="bg-gray-800 border-gray-700">
+                    <DropdownMenuItem 
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleStarToggle(conversation);
+                      }}
+                      className="text-gray-300 hover:text-white"
+                    >
+                      <Star className="w-4 h-4 mr-2" />
+                      {conversation.isStarred ? 'Unstar' : 'Star'}
+                    </DropdownMenuItem>
+                    <DropdownMenuItem 
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        onArchiveConversation(conversation.id);
+                      }}
+                      className="text-gray-300 hover:text-white"
+                    >
+                      <Archive className="w-4 h-4 mr-2" />
+                      {conversation.isArchived ? 'Unarchive' : 'Archive'}
+                    </DropdownMenuItem>
+                    <DropdownMenuItem 
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        onDuplicateConversation(conversation);
+                      }}
+                      className="text-gray-300 hover:text-white"
+                    >
+                      <Copy className="w-4 h-4 mr-2" />
+                      Duplicate
+                    </DropdownMenuItem>
+                    <DropdownMenuSeparator className="bg-gray-700" />
+                    <DropdownMenuItem 
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        onDeleteConversation(conversation.id);
+                      }}
+                      className="text-red-400 hover:text-red-300"
+                    >
+                      <Trash2 className="w-4 h-4 mr-2" />
+                      Delete
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
               </div>
             </div>
           ))}

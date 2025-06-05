@@ -8,140 +8,103 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { 
   Users, 
   Video, 
-  Share2, 
-  MessageSquare,
+  MessageSquare, 
+  Share2,
+  Monitor,
+  Phone,
+  Mic,
+  MicOff,
+  VideoOff,
+  Settings,
   UserPlus,
   Crown,
-  Mic,
-  Camera,
-  Screen,
-  Settings,
-  Copy,
-  Eye
+  Clock
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
-interface Collaborator {
+interface CollaborationSession {
   id: string;
   name: string;
-  role: string;
-  status: 'online' | 'away' | 'offline';
-  avatar: string;
-  permissions: string[];
-}
-
-interface CollabSession {
-  id: string;
-  name: string;
-  type: 'meeting' | 'workspace' | 'presentation';
   participants: number;
-  status: 'active' | 'scheduled' | 'ended';
-  startTime: Date;
+  maxParticipants: number;
+  status: 'active' | 'waiting' | 'ended';
+  type: 'video' | 'chat' | 'screen-share';
+  host: string;
+  duration: string;
 }
 
 export function RealTimeCollaboration() {
-  const [collaborators, setCollaborators] = useState<Collaborator[]>([
+  const [sessions, setSessions] = useState<CollaborationSession[]>([
     {
       id: '1',
-      name: 'Rahul Sharma',
-      role: 'Project Manager',
-      status: 'online',
-      avatar: '/placeholder.svg',
-      permissions: ['edit', 'share', 'admin']
+      name: 'AI Strategy Meeting',
+      participants: 3,
+      maxParticipants: 10,
+      status: 'active',
+      type: 'video',
+      host: 'Rahul Kumar',
+      duration: '45 min'
     },
     {
       id: '2',
-      name: 'Priya Patel',
-      role: 'Designer',
-      status: 'online',
-      avatar: '/placeholder.svg',
-      permissions: ['edit', 'comment']
-    },
-    {
-      id: '3',
-      name: 'Amit Kumar',
-      role: 'Developer',
-      status: 'away',
-      avatar: '/placeholder.svg',
-      permissions: ['edit', 'code']
+      name: 'Code Review Session',
+      participants: 2,
+      maxParticipants: 5,
+      status: 'waiting',
+      type: 'screen-share',
+      host: 'Priya Sharma',
+      duration: '30 min'
     }
   ]);
 
-  const [sessions, setSessions] = useState<CollabSession[]>([
-    {
-      id: '1',
-      name: 'Weekly AI Strategy Meeting',
-      type: 'meeting',
-      participants: 5,
-      status: 'active',
-      startTime: new Date()
-    },
-    {
-      id: '2',
-      name: 'Product Demo Workspace',
-      type: 'workspace',
-      participants: 8,
-      status: 'active',
-      startTime: new Date(Date.now() - 30 * 60 * 1000)
-    }
-  ]);
-
-  const [inviteEmail, setInviteEmail] = useState('');
-  const [sessionName, setSessionName] = useState('');
+  const [newSession, setNewSession] = useState({
+    name: '',
+    type: 'video' as 'video' | 'chat' | 'screen-share',
+    maxParticipants: 5
+  });
 
   const { toast } = useToast();
 
-  const handleInviteUser = () => {
-    if (!inviteEmail) {
-      toast({
-        title: "Missing Email",
-        description: "Please enter an email address to invite",
-        variant: "destructive"
-      });
-      return;
-    }
-
-    toast({
-      title: "🎉 Invitation Sent!",
-      description: `Collaboration invite sent to ${inviteEmail}`,
-    });
-    setInviteEmail('');
-  };
-
   const handleCreateSession = () => {
-    if (!sessionName) {
+    if (!newSession.name) {
       toast({
-        title: "Missing Session Name",
+        title: "Session Name Required",
         description: "Please enter a session name",
         variant: "destructive"
       });
       return;
     }
 
-    const newSession: CollabSession = {
+    const session: CollaborationSession = {
       id: Date.now().toString(),
-      name: sessionName,
-      type: 'workspace',
+      name: newSession.name,
       participants: 1,
-      status: 'active',
-      startTime: new Date()
+      maxParticipants: newSession.maxParticipants,
+      status: 'waiting',
+      type: newSession.type,
+      host: 'You',
+      duration: '0 min'
     };
 
-    setSessions(prev => [...prev, newSession]);
-    setSessionName('');
+    setSessions(prev => [session, ...prev]);
+    setNewSession({ name: '', type: 'video', maxParticipants: 5 });
     
     toast({
-      title: "🚀 Session Created!",
-      description: "Your collaboration session is now live",
+      title: "🎉 Session Created!",
+      description: "Collaboration session is ready for participants",
     });
   };
 
-  const copySessionLink = (sessionId: string) => {
-    const link = `https://tezu-ai.com/collaborate/${sessionId}`;
-    navigator.clipboard.writeText(link);
+  const joinSession = (sessionId: string) => {
+    setSessions(prev => prev.map(s => 
+      s.id === sessionId 
+        ? { ...s, participants: s.participants + 1, status: 'active' as const }
+        : s
+    ));
+    
     toast({
-      title: "Link Copied!",
-      description: "Session link copied to clipboard",
+      title: "Joined Session! 🎯",
+      description: "You're now part of the collaboration",
     });
   };
 
@@ -149,160 +112,128 @@ export function RealTimeCollaboration() {
     <div className="space-y-6">
       <div className="text-center">
         <h3 className="text-lg font-bold text-white mb-2">👥 Real-Time Collaboration</h3>
-        <p className="text-sm text-gray-400">Work together with your team in real-time</p>
+        <p className="text-sm text-gray-400">Work together in secure sessions</p>
       </div>
 
-      {/* Active Collaborators */}
-      <Card className="bg-gradient-to-r from-gray-800/50 to-blue-800/30 border-blue-500/30">
-        <CardHeader>
-          <CardTitle className="text-white flex items-center gap-2">
-            <Users className="w-4 h-4" />
-            Active Collaborators ({collaborators.filter(c => c.status === 'online').length})
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-3">
-          {collaborators.map((collaborator) => (
-            <div key={collaborator.id} className="flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <div className="relative">
-                  <Avatar className="w-8 h-8">
-                    <AvatarImage src={collaborator.avatar} />
-                    <AvatarFallback className="bg-blue-600 text-white text-xs">
-                      {collaborator.name.split(' ').map(n => n[0]).join('')}
-                    </AvatarFallback>
-                  </Avatar>
-                  <div className={`absolute -bottom-1 -right-1 w-3 h-3 rounded-full border-2 border-gray-800 ${
-                    collaborator.status === 'online' ? 'bg-green-500' :
-                    collaborator.status === 'away' ? 'bg-yellow-500' : 'bg-gray-500'
-                  }`} />
-                </div>
-                <div>
-                  <p className="text-white text-sm font-medium">{collaborator.name}</p>
-                  <p className="text-xs text-gray-400">{collaborator.role}</p>
-                </div>
-              </div>
-              <div className="flex items-center gap-1">
-                {collaborator.permissions.includes('admin') && (
-                  <Crown className="w-3 h-3 text-yellow-400" />
-                )}
-                <Badge className={`text-xs ${
-                  collaborator.status === 'online' ? 'bg-green-500/20 text-green-400' :
-                  collaborator.status === 'away' ? 'bg-yellow-500/20 text-yellow-400' :
-                  'bg-gray-500/20 text-gray-400'
-                }`}>
-                  {collaborator.status}
-                </Badge>
-              </div>
-            </div>
-          ))}
-        </CardContent>
-      </Card>
-
-      {/* Invite Collaborator */}
-      <Card className="bg-gray-800/50 border-gray-700">
+      {/* Create New Session */}
+      <Card className="bg-gradient-to-r from-gray-800/50 to-purple-800/30 border-purple-500/30">
         <CardHeader>
           <CardTitle className="text-white flex items-center gap-2">
             <UserPlus className="w-4 h-4" />
-            Invite Collaborator
+            Create Collaboration Session
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-3">
           <Input
-            placeholder="Enter email address"
-            type="email"
-            value={inviteEmail}
-            onChange={(e) => setInviteEmail(e.target.value)}
-            className="bg-gray-700/50 border-gray-600 text-white"
+            placeholder="Session name (e.g., Team Meeting)"
+            value={newSession.name}
+            onChange={(e) => setNewSession(prev => ({ ...prev, name: e.target.value }))}
+            className="bg-gray-700/50 border-purple-500/30 text-white"
           />
+          <div className="grid grid-cols-2 gap-2">
+            <Button
+              variant={newSession.type === 'video' ? 'default' : 'outline'}
+              onClick={() => setNewSession(prev => ({ ...prev, type: 'video' }))}
+              className="text-xs"
+            >
+              <Video className="w-3 h-3 mr-1" />
+              Video
+            </Button>
+            <Button
+              variant={newSession.type === 'screen-share' ? 'default' : 'outline'}
+              onClick={() => setNewSession(prev => ({ ...prev, type: 'screen-share' }))}
+              className="text-xs"
+            >
+              <Monitor className="w-3 h-3 mr-1" />
+              Screen
+            </Button>
+          </div>
           <Button 
-            onClick={handleInviteUser}
-            className="w-full bg-gradient-to-r from-blue-600 to-purple-600"
+            onClick={handleCreateSession}
+            className="w-full bg-gradient-to-r from-purple-600 to-pink-600"
           >
-            <Share2 className="w-4 h-4 mr-2" />
-            Send Invitation
+            <Users className="w-4 h-4 mr-2" />
+            Create Session
           </Button>
         </CardContent>
       </Card>
 
       {/* Active Sessions */}
-      <Card className="bg-gray-800/50 border-gray-700">
-        <CardHeader>
-          <CardTitle className="text-white flex items-center gap-2">
-            <Video className="w-4 h-4" />
-            Active Sessions
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-3">
-          {sessions.filter(s => s.status === 'active').map((session) => (
-            <div key={session.id} className="p-3 bg-gray-700/30 rounded-lg">
-              <div className="flex items-center justify-between mb-2">
-                <div>
-                  <h4 className="text-white font-medium">{session.name}</h4>
-                  <p className="text-xs text-gray-400">
-                    {session.participants} participants • Started {session.startTime.toLocaleTimeString()}
-                  </p>
+      <div className="space-y-3">
+        {sessions.map((session) => (
+          <Card key={session.id} className="bg-gray-800/50 border-gray-700">
+            <CardContent className="p-4">
+              <div className="flex items-center justify-between mb-3">
+                <div className="flex items-center gap-3">
+                  <div className={`w-10 h-10 rounded-full flex items-center justify-center ${
+                    session.type === 'video' 
+                      ? 'bg-blue-500/20 text-blue-400'
+                      : session.type === 'screen-share'
+                      ? 'bg-green-500/20 text-green-400'
+                      : 'bg-purple-500/20 text-purple-400'
+                  }`}>
+                    {session.type === 'video' && <Video className="w-5 h-5" />}
+                    {session.type === 'screen-share' && <Monitor className="w-5 h-5" />}
+                    {session.type === 'chat' && <MessageSquare className="w-5 h-5" />}
+                  </div>
+                  <div>
+                    <h4 className="text-white font-medium">{session.name}</h4>
+                    <p className="text-sm text-gray-400">Host: {session.host}</p>
+                  </div>
                 </div>
-                <Badge className="bg-green-500/20 text-green-400">
-                  <Eye className="w-3 h-3 mr-1" />
-                  Live
+                <Badge className={`${
+                  session.status === 'active' 
+                    ? 'bg-green-500/20 text-green-400'
+                    : session.status === 'waiting'
+                    ? 'bg-yellow-500/20 text-yellow-400'
+                    : 'bg-gray-500/20 text-gray-400'
+                }`}>
+                  {session.status}
                 </Badge>
               </div>
+
+              <div className="flex items-center justify-between text-sm mb-3">
+                <span className="text-gray-400">
+                  👥 {session.participants}/{session.maxParticipants} participants
+                </span>
+                <span className="text-blue-300 flex items-center gap-1">
+                  <Clock className="w-3 h-3" />
+                  {session.duration}
+                </span>
+              </div>
+
               <div className="flex gap-2">
-                <Button size="sm" variant="outline" className="border-gray-600 text-gray-300">
-                  <Video className="w-3 h-3 mr-1" />
+                <Button
+                  onClick={() => joinSession(session.id)}
+                  disabled={session.participants >= session.maxParticipants}
+                  className="flex-1 bg-blue-600 hover:bg-blue-700 text-xs"
+                >
+                  <UserPlus className="w-3 h-3 mr-1" />
                   Join
                 </Button>
-                <Button 
-                  size="sm" 
-                  variant="outline" 
-                  className="border-gray-600 text-gray-300"
-                  onClick={() => copySessionLink(session.id)}
-                >
-                  <Copy className="w-3 h-3 mr-1" />
-                  Copy Link
+                <Button variant="outline" className="text-xs">
+                  <Share2 className="w-3 h-3 mr-1" />
+                  Share
                 </Button>
               </div>
-            </div>
-          ))}
-        </CardContent>
-      </Card>
+            </CardContent>
+          </Card>
+        ))}
+      </div>
 
-      {/* Create New Session */}
-      <Card className="bg-gradient-to-r from-gray-800/50 to-green-800/30 border-green-500/30">
-        <CardHeader>
-          <CardTitle className="text-white flex items-center gap-2">
-            <Video className="w-4 h-4" />
-            Start New Session
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-3">
-          <Input
-            placeholder="Session name"
-            value={sessionName}
-            onChange={(e) => setSessionName(e.target.value)}
-            className="bg-gray-700/50 border-green-500/30 text-white"
-          />
-          <div className="grid grid-cols-3 gap-2">
-            <Button size="sm" variant="outline" className="border-green-500/30 text-green-300">
-              <MessageSquare className="w-3 h-3 mr-1" />
-              Chat
-            </Button>
-            <Button size="sm" variant="outline" className="border-green-500/30 text-green-300">
-              <Screen className="w-3 h-3 mr-1" />
-              Screen
-            </Button>
-            <Button size="sm" variant="outline" className="border-green-500/30 text-green-300">
-              <Mic className="w-3 h-3 mr-1" />
-              Audio
-            </Button>
+      {/* Collaboration Stats */}
+      <Card className="bg-gradient-to-r from-blue-800/30 to-cyan-800/30 border-cyan-500/30">
+        <CardContent className="p-4">
+          <div className="grid grid-cols-2 gap-4 text-center">
+            <div>
+              <div className="text-2xl font-bold text-cyan-400">12</div>
+              <div className="text-xs text-gray-400">Active Sessions</div>
+            </div>
+            <div>
+              <div className="text-2xl font-bold text-green-400">45</div>
+              <div className="text-xs text-gray-400">Team Members</div>
+            </div>
           </div>
-          <Button 
-            onClick={handleCreateSession}
-            className="w-full bg-gradient-to-r from-green-600 to-emerald-600"
-          >
-            <Video className="w-4 h-4 mr-2" />
-            Start Live Session
-          </Button>
         </CardContent>
       </Card>
     </div>
