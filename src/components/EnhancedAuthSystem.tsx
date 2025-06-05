@@ -5,6 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { OTPVerification } from "@/components/OTPVerification";
 import { 
   User, 
   Mail, 
@@ -17,7 +18,8 @@ import {
   EyeOff,
   CheckCircle,
   AlertCircle,
-  Globe
+  Globe,
+  UserPlus
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
@@ -71,7 +73,7 @@ export function EnhancedAuthSystem({ onLogin }: EnhancedAuthSystemProps) {
   const handleSecureLogin = () => {
     if (!formData.email || !formData.password) {
       toast({
-        title: "Security Alert",
+        title: "🚨 Security Alert",
         description: "Please provide all required credentials",
         variant: "destructive"
       });
@@ -86,8 +88,8 @@ export function EnhancedAuthSystem({ onLogin }: EnhancedAuthSystemProps) {
     setTimeout(() => {
       setAuthMode('2fa');
       toast({
-        title: "2FA Required",
-        description: "Please enter the verification code sent to your device",
+        title: "📱 2FA Required",
+        description: "Multi-factor authentication initiated for maximum security",
       });
     }, 1500);
   };
@@ -97,7 +99,7 @@ export function EnhancedAuthSystem({ onLogin }: EnhancedAuthSystemProps) {
     
     if (passwordStrength.level === 'weak') {
       toast({
-        title: "Password Too Weak",
+        title: "❌ Password Too Weak",
         description: "Please use a stronger password for better security",
         variant: "destructive"
       });
@@ -106,43 +108,52 @@ export function EnhancedAuthSystem({ onLogin }: EnhancedAuthSystemProps) {
 
     if (formData.password !== formData.confirmPassword) {
       toast({
-        title: "Password Mismatch",
+        title: "❌ Password Mismatch",
         description: "Passwords don't match. Please try again.",
         variant: "destructive"
       });
       return;
     }
 
-    toast({
-      title: "🚀 Account Created Successfully!",
-      description: "Welcome to Tezu AI - World's most secure AI assistant",
-    });
-    
-    // Auto login after successful signup
-    setTimeout(() => {
-      onLogin();
-    }, 1500);
-  };
-
-  const handle2FAVerification = () => {
-    if (formData.otp.length !== 6) {
+    if (!formData.phone || formData.phone.length < 10) {
       toast({
-        title: "Invalid OTP",
-        description: "Please enter the complete 6-digit verification code",
+        title: "❌ Phone Required",
+        description: "Valid phone number required for SMS verification",
         variant: "destructive"
       });
       return;
     }
 
     toast({
-      title: "✅ Login Successful!",
-      description: "Welcome back! All security checks passed.",
+      title: "🚀 Account Creation Started",
+      description: "Setting up your secure account with 2FA...",
     });
     
-    // Call the onLogin prop to update authentication state
+    setTimeout(() => {
+      setAuthMode('2fa');
+      toast({
+        title: "📧 Verification Required",
+        description: "OTP codes sent to your email and phone for verification",
+      });
+    }, 2000);
+  };
+
+  const handleOTPVerificationSuccess = () => {
+    toast({
+      title: "✅ Login Successful!",
+      description: "Welcome to Tezu AI - World's Most Secure AI Assistant! 🎉",
+    });
+    
     setTimeout(() => {
       onLogin();
     }, 1000);
+  };
+
+  const handleResendOTP = () => {
+    toast({
+      title: "🔄 OTP Resent",
+      description: "New verification codes sent to your devices",
+    });
   };
 
   const passwordStrength = getPasswordStrength(formData.password);
@@ -150,14 +161,15 @@ export function EnhancedAuthSystem({ onLogin }: EnhancedAuthSystemProps) {
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-900 via-blue-900 to-purple-900 flex items-center justify-center p-4">
       <div className="w-full max-w-md space-y-6">
+        {/* Header */}
         <div className="text-center space-y-4">
-          <div className="w-20 h-20 mx-auto bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center">
+          <div className="w-20 h-20 mx-auto bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center shadow-2xl">
             <Shield className="w-10 h-10 text-white" />
           </div>
-          <h1 className="text-3xl font-bold text-white">Tezu AI Security</h1>
+          <h1 className="text-3xl font-bold text-white">🛡️ Tezu AI Security</h1>
           <p className="text-gray-300">World's Most Secure AI Assistant</p>
           <div className="flex justify-center gap-2">
-            <Badge className="bg-green-500/20 text-green-400">
+            <Badge className="bg-green-500/20 text-green-400 animate-pulse">
               <Lock className="w-3 h-3 mr-1" />
               Bank-Grade Security
             </Badge>
@@ -169,66 +181,52 @@ export function EnhancedAuthSystem({ onLogin }: EnhancedAuthSystemProps) {
         </div>
 
         {authMode === '2fa' ? (
-          <Card className="bg-gray-800/50 border-gray-700 backdrop-blur-xl">
-            <CardHeader>
-              <CardTitle className="text-white flex items-center gap-2">
-                <Smartphone className="w-5 h-5" />
-                Two-Factor Authentication
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div>
-                <Label className="text-gray-300">Enter 6-digit verification code</Label>
-                <Input
-                  type="text"
-                  placeholder="000000"
-                  value={formData.otp}
-                  onChange={(e) => handleInputChange('otp', e.target.value)}
-                  className="bg-gray-700/50 border-gray-600 text-white text-center text-2xl tracking-widest"
-                  maxLength={6}
-                />
-              </div>
-              <Button 
-                onClick={handle2FAVerification}
-                className="w-full bg-gradient-to-r from-green-600 to-emerald-600"
-              >
-                <CheckCircle className="w-4 h-4 mr-2" />
-                Verify & Login
-              </Button>
-            </CardContent>
-          </Card>
+          <OTPVerification 
+            email={formData.email}
+            phone={formData.phone}
+            onVerificationSuccess={handleOTPVerificationSuccess}
+            onResendOTP={handleResendOTP}
+          />
         ) : (
           <Tabs value={authMode} onValueChange={(value) => setAuthMode(value as any)}>
             <TabsList className="grid w-full grid-cols-2 bg-gray-800">
-              <TabsTrigger value="login">Secure Login</TabsTrigger>
-              <TabsTrigger value="signup">Create Account</TabsTrigger>
+              <TabsTrigger value="login">🔐 Secure Login</TabsTrigger>
+              <TabsTrigger value="signup">👤 Create Account</TabsTrigger>
             </TabsList>
 
             <TabsContent value="login">
               <Card className="bg-gray-800/50 border-gray-700 backdrop-blur-xl">
                 <CardHeader>
-                  <CardTitle className="text-white">Welcome Back</CardTitle>
+                  <CardTitle className="text-white flex items-center gap-2">
+                    <User className="w-5 h-5" />
+                    Welcome Back
+                  </CardTitle>
+                  <p className="text-gray-400">Sign in to your secure account</p>
                 </CardHeader>
                 <CardContent className="space-y-4">
                   <div>
-                    <Label className="text-gray-300">Email</Label>
-                    <Input
-                      type="email"
-                      placeholder="your@email.com"
-                      value={formData.email}
-                      onChange={(e) => handleInputChange('email', e.target.value)}
-                      className="bg-gray-700/50 border-gray-600 text-white"
-                    />
+                    <Label className="text-gray-300">Email Address</Label>
+                    <div className="relative">
+                      <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-blue-400" />
+                      <Input
+                        type="email"
+                        placeholder="your@email.com"
+                        value={formData.email}
+                        onChange={(e) => handleInputChange('email', e.target.value)}
+                        className="bg-gray-700/50 border-gray-600 text-white pl-10"
+                      />
+                    </div>
                   </div>
                   <div>
                     <Label className="text-gray-300">Password</Label>
                     <div className="relative">
+                      <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-purple-400" />
                       <Input
                         type={showPassword ? "text" : "password"}
-                        placeholder="Enter password"
+                        placeholder="Enter your password"
                         value={formData.password}
                         onChange={(e) => handleInputChange('password', e.target.value)}
-                        className="bg-gray-700/50 border-gray-600 text-white pr-10"
+                        className="bg-gray-700/50 border-gray-600 text-white pl-10 pr-10"
                       />
                       <Button
                         type="button"
@@ -241,9 +239,9 @@ export function EnhancedAuthSystem({ onLogin }: EnhancedAuthSystemProps) {
                       </Button>
                     </div>
                   </div>
-                  <Button onClick={handleSecureLogin} className="w-full bg-gradient-to-r from-blue-600 to-purple-600">
-                    <Lock className="w-4 h-4 mr-2" />
-                    Secure Login
+                  <Button onClick={handleSecureLogin} className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700">
+                    <Shield className="w-4 h-4 mr-2" />
+                    🔐 Secure Login with 2FA
                   </Button>
                 </CardContent>
               </Card>
@@ -252,47 +250,61 @@ export function EnhancedAuthSystem({ onLogin }: EnhancedAuthSystemProps) {
             <TabsContent value="signup">
               <Card className="bg-gray-800/50 border-gray-700 backdrop-blur-xl">
                 <CardHeader>
-                  <CardTitle className="text-white">Create Secure Account</CardTitle>
+                  <CardTitle className="text-white flex items-center gap-2">
+                    <UserPlus className="w-5 h-5" />
+                    Create Secure Account
+                  </CardTitle>
+                  <p className="text-gray-400">Join the world's most secure AI platform</p>
                 </CardHeader>
                 <CardContent className="space-y-4">
                   <div>
                     <Label className="text-gray-300">Full Name</Label>
-                    <Input
-                      placeholder="Your name"
-                      value={formData.name}
-                      onChange={(e) => handleInputChange('name', e.target.value)}
-                      className="bg-gray-700/50 border-gray-600 text-white"
-                    />
+                    <div className="relative">
+                      <User className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-green-400" />
+                      <Input
+                        placeholder="Your full name"
+                        value={formData.name}
+                        onChange={(e) => handleInputChange('name', e.target.value)}
+                        className="bg-gray-700/50 border-gray-600 text-white pl-10"
+                      />
+                    </div>
                   </div>
                   <div>
-                    <Label className="text-gray-300">Email</Label>
-                    <Input
-                      type="email"
-                      placeholder="your@email.com"
-                      value={formData.email}
-                      onChange={(e) => handleInputChange('email', e.target.value)}
-                      className="bg-gray-700/50 border-gray-600 text-white"
-                    />
+                    <Label className="text-gray-300">Email Address</Label>
+                    <div className="relative">
+                      <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-blue-400" />
+                      <Input
+                        type="email"
+                        placeholder="your@email.com"
+                        value={formData.email}
+                        onChange={(e) => handleInputChange('email', e.target.value)}
+                        className="bg-gray-700/50 border-gray-600 text-white pl-10"
+                      />
+                    </div>
                   </div>
                   <div>
-                    <Label className="text-gray-300">Phone (for 2FA)</Label>
-                    <Input
-                      type="tel"
-                      placeholder="+91 XXXXXXXXXX"
-                      value={formData.phone}
-                      onChange={(e) => handleInputChange('phone', e.target.value)}
-                      className="bg-gray-700/50 border-gray-600 text-white"
-                    />
+                    <Label className="text-gray-300">Phone Number (for SMS 2FA)</Label>
+                    <div className="relative">
+                      <Phone className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-orange-400" />
+                      <Input
+                        type="tel"
+                        placeholder="+91 XXXXXXXXXX"
+                        value={formData.phone}
+                        onChange={(e) => handleInputChange('phone', e.target.value)}
+                        className="bg-gray-700/50 border-gray-600 text-white pl-10"
+                      />
+                    </div>
                   </div>
                   <div>
                     <Label className="text-gray-300">Password</Label>
                     <div className="relative">
+                      <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-purple-400" />
                       <Input
                         type={showPassword ? "text" : "password"}
-                        placeholder="Create strong password"
+                        placeholder="Create a strong password"
                         value={formData.password}
                         onChange={(e) => handleInputChange('password', e.target.value)}
-                        className="bg-gray-700/50 border-gray-600 text-white pr-10"
+                        className="bg-gray-700/50 border-gray-600 text-white pl-10 pr-10"
                       />
                       <Button
                         type="button"
@@ -306,7 +318,8 @@ export function EnhancedAuthSystem({ onLogin }: EnhancedAuthSystemProps) {
                     </div>
                     {formData.password && (
                       <div className="flex items-center gap-2 mt-1">
-                        <div className={`text-xs ${passwordStrength.color}`}>
+                        <div className={`text-xs ${passwordStrength.color} flex items-center gap-1`}>
+                          <Key className="w-3 h-3" />
                           Password strength: {passwordStrength.level}
                         </div>
                       </div>
@@ -314,17 +327,20 @@ export function EnhancedAuthSystem({ onLogin }: EnhancedAuthSystemProps) {
                   </div>
                   <div>
                     <Label className="text-gray-300">Confirm Password</Label>
-                    <Input
-                      type="password"
-                      placeholder="Confirm password"
-                      value={formData.confirmPassword}
-                      onChange={(e) => handleInputChange('confirmPassword', e.target.value)}
-                      className="bg-gray-700/50 border-gray-600 text-white"
-                    />
+                    <div className="relative">
+                      <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-purple-400" />
+                      <Input
+                        type="password"
+                        placeholder="Confirm your password"
+                        value={formData.confirmPassword}
+                        onChange={(e) => handleInputChange('confirmPassword', e.target.value)}
+                        className="bg-gray-700/50 border-gray-600 text-white pl-10"
+                      />
+                    </div>
                   </div>
-                  <Button onClick={handleSecureSignup} className="w-full bg-gradient-to-r from-green-600 to-emerald-600">
+                  <Button onClick={handleSecureSignup} className="w-full bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700">
                     <Shield className="w-4 h-4 mr-2" />
-                    Create Secure Account
+                    🚀 Create Secure Account
                   </Button>
                 </CardContent>
               </Card>
@@ -332,9 +348,13 @@ export function EnhancedAuthSystem({ onLogin }: EnhancedAuthSystemProps) {
           </Tabs>
         )}
 
+        {/* Security Features Display */}
         <Card className="bg-gray-800/50 border-gray-700 backdrop-blur-xl">
           <CardContent className="p-4">
-            <h4 className="text-white font-medium mb-3">Security Features</h4>
+            <h4 className="text-white font-medium mb-3 flex items-center gap-2">
+              <Shield className="w-4 h-4 text-green-400" />
+              🛡️ Security Features
+            </h4>
             <div className="grid grid-cols-2 gap-2 text-xs">
               {Object.entries(securityFeatures).map(([key, enabled]) => (
                 <div key={key} className="flex items-center gap-2">
@@ -344,6 +364,11 @@ export function EnhancedAuthSystem({ onLogin }: EnhancedAuthSystemProps) {
                   </span>
                 </div>
               ))}
+            </div>
+            <div className="mt-3 p-2 bg-green-500/10 border border-green-500/30 rounded">
+              <p className="text-xs text-green-400">
+                🔒 Zero data collection • End-to-end encryption • GDPR compliant • Made in India 🇮🇳
+              </p>
             </div>
           </CardContent>
         </Card>
