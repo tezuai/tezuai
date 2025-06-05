@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { Sidebar } from "@/components/Sidebar";
 import { ChatInterface } from "@/components/ChatInterface";
@@ -51,7 +52,7 @@ const Index = () => {
   const handleNewConversation = () => {
     const newConversation = {
       id: Date.now().toString(),
-      title: "नया Conversation - Tezu AI",
+      title: "नया Conversation - Tezu AI Pro",
       messages: [],
       createdAt: new Date(),
       isStarred: false,
@@ -110,6 +111,10 @@ const Index = () => {
     setCurrentView('auth');
   };
 
+  const handleViewChange = (view: 'chat' | 'analytics' | 'subscription' | 'privacy' | 'auth') => {
+    setCurrentView(view);
+  };
+
   const currentConversation = conversations.find(c => c.id === selectedConversation);
 
   // Show auth system if not authenticated
@@ -135,7 +140,7 @@ const Index = () => {
   return (
     <SubscriptionProvider>
       <SidebarProvider>
-        <div className="min-h-screen flex flex-col w-full bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900">
+        <div className="min-h-screen flex flex-col w-full bg-gradient-to-br from-gray-900 via-blue-900 to-purple-900">
           <div className="flex flex-1">
             {(currentView !== 'subscription' && currentView !== 'privacy' && currentView !== 'auth') && (
               <Sidebar
@@ -148,7 +153,7 @@ const Index = () => {
                 onArchiveConversation={handleArchiveConversation}
                 onDuplicateConversation={handleDuplicateConversation}
                 currentView={currentView}
-                onViewChange={setCurrentView}
+                onViewChange={handleViewChange}
                 onLogout={handleLogout}
                 isAuthenticated={isAuthenticated}
               />

@@ -24,7 +24,8 @@ import {
   Sparkles,
   User,
   FileText,
-  Shield
+  Shield,
+  Store
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { MessageBubble } from "@/components/MessageBubble";
@@ -54,6 +55,11 @@ import { DataAnalytics } from "@/components/DataAnalytics";
 import { CustomAITraining } from "@/components/CustomAITraining";
 import { CloudComputing } from "@/components/CloudComputing";
 import { BusinessIntelligence } from "@/components/BusinessIntelligence";
+import { AIAssistantManager } from "@/components/AIAssistantManager";
+import { RealTimeCollaboration } from "@/components/RealTimeCollaboration";
+import { SmartIntegrations } from "@/components/SmartIntegrations";
+import { AIMarketplace } from "@/components/AIMarketplace";
+import { AdvancedSecurity } from "@/components/AdvancedSecurity";
 
 interface Message {
   id: string;
@@ -328,7 +334,7 @@ export function ChatInterface({ conversation, onUpdateConversation, allConversat
   return (
     <div className="flex-1 flex flex-col h-screen">
       {/* Header */}
-      <div className="flex items-center justify-between p-4 border-b border-gray-700/50 bg-gray-900/95 backdrop-blur-xl">
+      <div className="flex items-center justify-between p-4 border-b border-gray-700/50 bg-gradient-to-r from-gray-900/95 to-blue-900/50 backdrop-blur-xl">
         <div className="flex items-center gap-3">
           <Avatar className="w-8 h-8">
             <AvatarImage src="/lovable-uploads/95fdd9ab-8aef-49dd-b3c6-d153ec4336ca.png" />
@@ -505,9 +511,9 @@ export function ChatInterface({ conversation, onUpdateConversation, allConversat
 
         {/* Advanced Panel with New Professional Features */}
         {showAdvancedPanel && (
-          <div className="w-96 border-l border-gray-700/50 bg-gray-900/95 backdrop-blur-xl overflow-hidden">
+          <div className="w-96 border-l border-gray-700/50 bg-gradient-to-b from-gray-900/95 to-purple-900/30 backdrop-blur-xl overflow-hidden">
             <Tabs value={activeAdvancedTab} onValueChange={setActiveAdvancedTab} className="h-full flex flex-col">
-              <TabsList className="grid w-full grid-cols-4 bg-gray-800 mx-4 mt-4">
+              <TabsList className="grid w-full grid-cols-5 bg-gray-800 mx-4 mt-4">
                 <TabsTrigger value="auth" className="text-xs p-2">
                   <User className="w-3 h-3" />
                 </TabsTrigger>
@@ -519,6 +525,9 @@ export function ChatInterface({ conversation, onUpdateConversation, allConversat
                 </TabsTrigger>
                 <TabsTrigger value="tools" className="text-xs p-2">
                   <Settings className="w-3 h-3" />
+                </TabsTrigger>
+                <TabsTrigger value="marketplace" className="text-xs p-2">
+                  <Store className="w-3 h-3" />
                 </TabsTrigger>
               </TabsList>
 
@@ -536,43 +545,36 @@ export function ChatInterface({ conversation, onUpdateConversation, allConversat
 
                 {/* Privacy Tab */}
                 <TabsContent value="privacy" className="h-full mt-0 p-4">
-                  <div className="space-y-4">
-                    <div className="text-center mb-6">
-                      <h3 className="text-lg font-bold text-white mb-2">🛡️ Privacy & Security</h3>
-                      <p className="text-sm text-gray-400">World-class data protection</p>
-                    </div>
-                    
-                    <div className="space-y-3">
-                      <div className="p-3 bg-green-500/10 border border-green-500/30 rounded">
-                        <h4 className="text-green-400 font-medium text-sm mb-1">✓ GDPR Compliant</h4>
-                        <p className="text-xs text-gray-300">European data protection standards</p>
-                      </div>
-                      <div className="p-3 bg-blue-500/10 border border-blue-500/30 rounded">
-                        <h4 className="text-blue-400 font-medium text-sm mb-1">✓ Local Processing</h4>
-                        <p className="text-xs text-gray-300">AI runs on your device only</p>
-                      </div>
-                      <div className="p-3 bg-purple-500/10 border border-purple-500/30 rounded">
-                        <h4 className="text-purple-400 font-medium text-sm mb-1">✓ Zero Data Mining</h4>
-                        <p className="text-xs text-gray-300">We never analyze your conversations</p>
-                      </div>
-                      <div className="p-3 bg-yellow-500/10 border border-yellow-500/30 rounded">
-                        <h4 className="text-yellow-400 font-medium text-sm mb-1">✓ Open Source</h4>
-                        <p className="text-xs text-gray-300">Transparent and auditable code</p>
-                      </div>
-                    </div>
-
-                    <Button 
-                      className="w-full bg-gradient-to-r from-green-600 to-emerald-600"
-                      onClick={() => toast({ title: "Privacy Policy", description: "Opening detailed privacy documentation..." })}
-                    >
-                      <FileText className="w-4 h-4 mr-2" />
-                      View Privacy Policy
-                    </Button>
-                  </div>
+                  <AdvancedSecurity />
                 </TabsContent>
 
                 {/* Professional Features Tab */}
                 <TabsContent value="professional" className="h-full mt-0 p-4">
+                  <Tabs defaultValue="assistants" className="h-full">
+                    <TabsList className="grid w-full grid-cols-3 bg-gray-800 mb-4">
+                      <TabsTrigger value="assistants" className="text-xs">AI Assistants</TabsTrigger>
+                      <TabsTrigger value="collaboration" className="text-xs">Collaborate</TabsTrigger>
+                      <TabsTrigger value="integrations" className="text-xs">Integrations</TabsTrigger>
+                    </TabsList>
+                    
+                    <div className="h-full overflow-auto">
+                      <TabsContent value="assistants">
+                        <AIAssistantManager />
+                      </TabsContent>
+                      
+                      <TabsContent value="collaboration">
+                        <RealTimeCollaboration />
+                      </TabsContent>
+                      
+                      <TabsContent value="integrations">
+                        <SmartIntegrations />
+                      </TabsContent>
+                    </div>
+                  </Tabs>
+                </TabsContent>
+
+                {/* Tools Tab */}
+                <TabsContent value="tools" className="h-full mt-0 p-4">
                   <Tabs defaultValue="workflow" className="h-full">
                     <TabsList className="grid w-full grid-cols-3 bg-gray-800 mb-4">
                       <TabsTrigger value="workflow" className="text-xs">Workflow</TabsTrigger>
@@ -596,29 +598,9 @@ export function ChatInterface({ conversation, onUpdateConversation, allConversat
                   </Tabs>
                 </TabsContent>
 
-                {/* Tools Tab */}
-                <TabsContent value="tools" className="h-full mt-0 p-4">
-                  <Tabs defaultValue="cloud" className="h-full">
-                    <TabsList className="grid w-full grid-cols-3 bg-gray-800 mb-4">
-                      <TabsTrigger value="cloud" className="text-xs">Cloud</TabsTrigger>
-                      <TabsTrigger value="business" className="text-xs">Business</TabsTrigger>
-                      <TabsTrigger value="compiler" className="text-xs">Code</TabsTrigger>
-                    </TabsList>
-                    
-                    <div className="h-full overflow-auto">
-                      <TabsContent value="cloud">
-                        <CloudComputing />
-                      </TabsContent>
-                      
-                      <TabsContent value="business">
-                        <BusinessIntelligence />
-                      </TabsContent>
-                      
-                      <TabsContent value="compiler">
-                        <CodeCompiler isEnabled={isAuthenticated} />
-                      </TabsContent>
-                    </div>
-                  </Tabs>
+                {/* Marketplace Tab */}
+                <TabsContent value="marketplace" className="h-full mt-0 p-4">
+                  <AIMarketplace />
                 </TabsContent>
               </div>
             </Tabs>
