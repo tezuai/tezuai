@@ -6,6 +6,8 @@ import { AnalyticsDashboard } from "@/components/AnalyticsDashboard";
 import { SubscriptionPage } from "@/pages/Subscription";
 import { LandingPage } from "@/components/LandingPage";
 import { OnboardingFlow } from "@/components/OnboardingFlow";
+import { PrivacySecurityHub } from "@/components/PrivacySecurityHub";
+import { EnhancedAuthSystem } from "@/components/EnhancedAuthSystem";
 import { SidebarProvider } from "@/components/ui/sidebar";
 import { SubscriptionProvider } from "@/contexts/SubscriptionContext";
 import { Footer } from "@/components/Footer";
@@ -13,15 +15,20 @@ import { Footer } from "@/components/Footer";
 const Index = () => {
   const [selectedConversation, setSelectedConversation] = useState<string | null>(null);
   const [conversations, setConversations] = useState<any[]>([]);
-  const [currentView, setCurrentView] = useState<'chat' | 'analytics' | 'subscription'>('chat');
+  const [currentView, setCurrentView] = useState<'chat' | 'analytics' | 'subscription' | 'privacy' | 'auth'>('chat');
   const [showLanding, setShowLanding] = useState(true);
   const [showOnboarding, setShowOnboarding] = useState(false);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
 
   // Check if user is returning (has localStorage data)
   useEffect(() => {
     const hasUsedBefore = localStorage.getItem('tezu-ai-assistant-used');
+    const isLoggedIn = localStorage.getItem('tezu-ai-authenticated') === 'true';
     if (hasUsedBefore) {
       setShowLanding(false);
+    }
+    if (isLoggedIn) {
+      setIsAuthenticated(true);
     }
   }, []);
 
@@ -91,7 +98,24 @@ const Index = () => {
     setConversations(prev => [duplicatedConversation, ...prev]);
   };
 
+  const handleLogin = () => {
+    setIsAuthenticated(true);
+    localStorage.setItem('tezu-ai-authenticated', 'true');
+    setCurrentView('chat');
+  };
+
+  const handleLogout = () => {
+    setIsAuthenticated(false);
+    localStorage.removeItem('tezu-ai-authenticated');
+    setCurrentView('auth');
+  };
+
   const currentConversation = conversations.find(c => c.id === selectedConversation);
+
+  // Show auth system if not authenticated
+  if (!isAuthenticated && !showLanding && !showOnboarding) {
+    return <EnhancedAuthSystem onLogin={handleLogin} />;
+  }
 
   // Show landing page for new users
   if (showLanding) {
@@ -113,7 +137,7 @@ const Index = () => {
       <SidebarProvider>
         <div className="min-h-screen flex flex-col w-full bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900">
           <div className="flex flex-1">
-            {currentView !== 'subscription' && (
+            {(currentView !== 'subscription' && currentView !== 'privacy' && currentView !== 'auth') && (
               <Sidebar
                 conversations={conversations}
                 selectedConversation={selectedConversation}
@@ -125,11 +149,17 @@ const Index = () => {
                 onDuplicateConversation={handleDuplicateConversation}
                 currentView={currentView}
                 onViewChange={setCurrentView}
+                onLogout={handleLogout}
+                isAuthenticated={isAuthenticated}
               />
             )}
             <main className="flex-1 flex flex-col">
               {currentView === 'subscription' ? (
                 <SubscriptionPage onBack={() => setCurrentView('chat')} />
+              ) : currentView === 'privacy' ? (
+                <PrivacySecurityHub />
+              ) : currentView === 'auth' ? (
+                <EnhancedAuthSystem onLogin={handleLogin} />
               ) : currentView === 'analytics' ? (
                 <AnalyticsDashboard conversations={conversations} />
               ) : selectedConversation && currentConversation ? (

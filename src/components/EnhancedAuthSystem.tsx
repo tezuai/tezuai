@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -30,10 +29,13 @@ interface SecurityFeatures {
   encryptedStorage: boolean;
 }
 
-export function EnhancedAuthSystem() {
+interface EnhancedAuthSystemProps {
+  onLogin: () => void;
+}
+
+export function EnhancedAuthSystem({ onLogin }: EnhancedAuthSystemProps) {
   const [authMode, setAuthMode] = useState<'login' | 'signup' | '2fa'>('login');
   const [showPassword, setShowPassword] = useState(false);
-  const [securityLevel, setSecurityLevel] = useState<'basic' | 'advanced' | 'enterprise'>('advanced');
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -115,6 +117,11 @@ export function EnhancedAuthSystem() {
       title: "🚀 Account Created Successfully!",
       description: "Welcome to Tezu AI - World's most secure AI assistant",
     });
+    
+    // Auto login after successful signup
+    setTimeout(() => {
+      onLogin();
+    }, 1500);
   };
 
   const handle2FAVerification = () => {
@@ -131,6 +138,11 @@ export function EnhancedAuthSystem() {
       title: "✅ Login Successful!",
       description: "Welcome back! All security checks passed.",
     });
+    
+    // Call the onLogin prop to update authentication state
+    setTimeout(() => {
+      onLogin();
+    }, 1000);
   };
 
   const passwordStrength = getPasswordStrength(formData.password);

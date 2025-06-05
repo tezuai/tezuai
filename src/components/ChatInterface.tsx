@@ -49,6 +49,11 @@ import { CodeCompiler } from "@/components/CodeCompiler";
 import { DocumentGenerator } from "@/components/DocumentGenerator";
 import { ImageGenerator } from "@/components/ImageGenerator";
 import { ProfessionalTemplates } from "@/components/ProfessionalTemplates";
+import { WorkflowAutomation } from "@/components/WorkflowAutomation";
+import { DataAnalytics } from "@/components/DataAnalytics";
+import { CustomAITraining } from "@/components/CustomAITraining";
+import { CloudComputing } from "@/components/CloudComputing";
+import { BusinessIntelligence } from "@/components/BusinessIntelligence";
 
 interface Message {
   id: string;
@@ -70,7 +75,7 @@ export function ChatInterface({ conversation, onUpdateConversation, allConversat
   const [isLoading, setIsLoading] = useState(false);
   const [isRecording, setIsRecording] = useState(false);
   const [showAdvancedPanel, setShowAdvancedPanel] = useState(false);
-  const [activeAdvancedTab, setActiveAdvancedTab] = useState("personality");
+  const [activeAdvancedTab, setActiveAdvancedTab] = useState("auth");
   const [showQuickActions, setShowQuickActions] = useState(false);
   const [showFileUpload, setShowFileUpload] = useState(false);
   const [attachedFiles, setAttachedFiles] = useState<File[]>([]);
@@ -498,31 +503,22 @@ export function ChatInterface({ conversation, onUpdateConversation, allConversat
           </div>
         </div>
 
-        {/* Advanced Panel with Privacy Tab */}
+        {/* Advanced Panel with New Professional Features */}
         {showAdvancedPanel && (
           <div className="w-96 border-l border-gray-700/50 bg-gray-900/95 backdrop-blur-xl overflow-hidden">
             <Tabs value={activeAdvancedTab} onValueChange={setActiveAdvancedTab} className="h-full flex flex-col">
-              <TabsList className="grid w-full grid-cols-7 bg-gray-800 mx-4 mt-4">
+              <TabsList className="grid w-full grid-cols-4 bg-gray-800 mx-4 mt-4">
                 <TabsTrigger value="auth" className="text-xs p-2">
                   <User className="w-3 h-3" />
                 </TabsTrigger>
                 <TabsTrigger value="privacy" className="text-xs p-2">
                   <Shield className="w-3 h-3" />
                 </TabsTrigger>
-                <TabsTrigger value="personality" className="text-xs p-2">
-                  <Sparkles className="w-3 h-3" />
-                </TabsTrigger>
-                <TabsTrigger value="tools" className="text-xs p-2">
+                <TabsTrigger value="professional" className="text-xs p-2">
                   <Zap className="w-3 h-3" />
                 </TabsTrigger>
-                <TabsTrigger value="collaboration" className="text-xs p-2">
-                  <Users className="w-3 h-3" />
-                </TabsTrigger>
-                <TabsTrigger value="voice" className="text-xs p-2">
-                  <Mic className="w-3 h-3" />
-                </TabsTrigger>
-                <TabsTrigger value="analytics" className="text-xs p-2">
-                  <BarChart3 className="w-3 h-3" />
+                <TabsTrigger value="tools" className="text-xs p-2">
+                  <Settings className="w-3 h-3" />
                 </TabsTrigger>
               </TabsList>
 
@@ -575,61 +571,54 @@ export function ChatInterface({ conversation, onUpdateConversation, allConversat
                   </div>
                 </TabsContent>
 
-                {/* Personality Tab */}
-                <TabsContent value="personality" className="h-full mt-0 p-4">
-                  <AIPersonalityHub
-                    currentPersonality={currentPersonality}
-                    onPersonalityChange={handlePersonalityChange}
-                  />
+                {/* Professional Features Tab */}
+                <TabsContent value="professional" className="h-full mt-0 p-4">
+                  <Tabs defaultValue="workflow" className="h-full">
+                    <TabsList className="grid w-full grid-cols-3 bg-gray-800 mb-4">
+                      <TabsTrigger value="workflow" className="text-xs">Workflow</TabsTrigger>
+                      <TabsTrigger value="analytics" className="text-xs">Analytics</TabsTrigger>
+                      <TabsTrigger value="training" className="text-xs">Training</TabsTrigger>
+                    </TabsList>
+                    
+                    <div className="h-full overflow-auto">
+                      <TabsContent value="workflow">
+                        <WorkflowAutomation />
+                      </TabsContent>
+                      
+                      <TabsContent value="analytics">
+                        <DataAnalytics />
+                      </TabsContent>
+                      
+                      <TabsContent value="training">
+                        <CustomAITraining />
+                      </TabsContent>
+                    </div>
+                  </Tabs>
                 </TabsContent>
 
                 {/* Tools Tab */}
                 <TabsContent value="tools" className="h-full mt-0 p-4">
-                  <Tabs defaultValue="compiler" className="h-full">
-                    <TabsList className="grid w-full grid-cols-4 bg-gray-800 mb-4">
+                  <Tabs defaultValue="cloud" className="h-full">
+                    <TabsList className="grid w-full grid-cols-3 bg-gray-800 mb-4">
+                      <TabsTrigger value="cloud" className="text-xs">Cloud</TabsTrigger>
+                      <TabsTrigger value="business" className="text-xs">Business</TabsTrigger>
                       <TabsTrigger value="compiler" className="text-xs">Code</TabsTrigger>
-                      <TabsTrigger value="docs" className="text-xs">Docs</TabsTrigger>
-                      <TabsTrigger value="images" className="text-xs">Images</TabsTrigger>
-                      <TabsTrigger value="templates" className="text-xs">Templates</TabsTrigger>
                     </TabsList>
                     
-                    <TabsContent value="compiler" className="h-full">
-                      <CodeCompiler isEnabled={isAuthenticated} />
-                    </TabsContent>
-                    
-                    <TabsContent value="docs" className="h-full">
-                      <DocumentGenerator isEnabled={isAuthenticated} />
-                    </TabsContent>
-                    
-                    <TabsContent value="images" className="h-full">
-                      <ImageGenerator isEnabled={isAuthenticated} />
-                    </TabsContent>
-                    
-                    <TabsContent value="templates" className="h-full">
-                      <ProfessionalTemplates onTemplateSelect={handleTemplateSelect} />
-                    </TabsContent>
+                    <div className="h-full overflow-auto">
+                      <TabsContent value="cloud">
+                        <CloudComputing />
+                      </TabsContent>
+                      
+                      <TabsContent value="business">
+                        <BusinessIntelligence />
+                      </TabsContent>
+                      
+                      <TabsContent value="compiler">
+                        <CodeCompiler isEnabled={isAuthenticated} />
+                      </TabsContent>
+                    </div>
                   </Tabs>
-                </TabsContent>
-
-                {/* Collaboration Tab */}
-                <TabsContent value="collaboration" className="h-full mt-0 p-4">
-                  <CollaborationHub
-                    onJoinSession={handleJoinCollaboration}
-                    onCreateSession={handleCreateCollaboration}
-                  />
-                </TabsContent>
-
-                {/* Voice Tab */}
-                <TabsContent value="voice" className="h-full mt-0 p-4">
-                  <AdvancedVoiceInterface
-                    onVoiceInput={handleVoiceInput}
-                    onSettingsChange={handleVoiceSettingsChange}
-                  />
-                </TabsContent>
-
-                {/* Analytics Tab */}
-                <TabsContent value="analytics" className="h-full mt-0 p-4">
-                  <AdvancedAnalytics />
                 </TabsContent>
               </div>
             </Tabs>
