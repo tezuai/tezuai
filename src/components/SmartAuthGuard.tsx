@@ -33,6 +33,9 @@ interface UserSession {
   securityScore: number;
   isVerified: boolean;
   lastActivity: Date;
+  avatar?: string;
+  totalChats?: number;
+  level?: string;
 }
 
 export function SmartAuthGuard({ children, requireAuth = false, onAuthStateChange }: SmartAuthGuardProps) {
@@ -88,7 +91,10 @@ export function SmartAuthGuard({ children, requireAuth = false, onAuthStateChang
       joinDate: new Date(),
       securityScore: 98,
       isVerified: true,
-      lastActivity: new Date()
+      lastActivity: new Date(),
+      avatar: '',
+      totalChats: 0,
+      level: 'Premium'
     };
 
     // Store session with 24-hour expiry

@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -126,7 +125,7 @@ export function Sidebar({
               <DropdownMenuTrigger asChild>
                 <Button variant="ghost" size="sm" className="text-gray-400 hover:text-white hover:bg-blue-600/20">
                   <Avatar className="w-6 h-6">
-                    <AvatarImage src={currentUser.avatar} />
+                    <AvatarImage src={currentUser.avatar || ''} />
                     <AvatarFallback className="bg-gradient-to-br from-green-500 to-blue-500 text-white text-xs">
                       {currentUser.name.charAt(0).toUpperCase()}
                     </AvatarFallback>

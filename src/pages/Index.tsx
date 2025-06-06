@@ -270,7 +270,6 @@ const Index = () => {
                     conversation={currentConversation}
                     onUpdateConversation={handleUpdateConversation}
                     allConversations={conversations}
-                    currentUser={currentUser}
                   />
                 ) : (
                   <WelcomeScreen onStartChat={handleNewConversation} />

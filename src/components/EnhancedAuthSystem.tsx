@@ -125,15 +125,15 @@ export function EnhancedAuthSystem({ onLogin, authAttempts = 0, onAuthAttempt }:
       // Send OTP to both email and phone
       const [emailResult, smsResult] = await Promise.all([
         notificationService.sendEmailOTP(formData.email),
-        formData.phone ? notificationService.sendSMSOTP(formData.phone) : { success: false }
+        formData.phone ? notificationService.sendSMSOTP(formData.phone) : { success: false, otp: undefined }
       ]);
 
       if (emailResult.success || smsResult.success) {
         setOtpData({
           email: formData.email,
           phone: formData.phone,
-          emailOTP: emailResult.otp,
-          smsOTP: smsResult.otp
+          emailOTP: emailResult.success ? (emailResult as any).otp : undefined,
+          smsOTP: smsResult.success ? (smsResult as any).otp : undefined
         });
         setAuthMode('2fa');
         
@@ -212,8 +212,8 @@ export function EnhancedAuthSystem({ onLogin, authAttempts = 0, onAuthAttempt }:
         setOtpData({
           email: formData.email,
           phone: formData.phone,
-          emailOTP: emailResult.otp,
-          smsOTP: smsResult.otp
+          emailOTP: (emailResult as any).otp,
+          smsOTP: (smsResult as any).otp
         });
         setAuthMode('2fa');
         
@@ -260,13 +260,13 @@ export function EnhancedAuthSystem({ onLogin, authAttempts = 0, onAuthAttempt }:
     try {
       const [emailResult, smsResult] = await Promise.all([
         notificationService.sendEmailOTP(otpData.email!),
-        otpData.phone ? notificationService.sendSMSOTP(otpData.phone) : { success: false }
+        otpData.phone ? notificationService.sendSMSOTP(otpData.phone) : { success: false, otp: undefined }
       ]);
 
       setOtpData(prev => prev ? {
         ...prev,
-        emailOTP: emailResult.otp,
-        smsOTP: smsResult.otp
+        emailOTP: emailResult.success ? (emailResult as any).otp : undefined,
+        smsOTP: smsResult.success ? (smsResult as any).otp : undefined
       } : null);
 
       toast({
