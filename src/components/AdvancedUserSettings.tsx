@@ -40,7 +40,7 @@ interface UserProfile {
   joinDate: Date;
   securityScore: number;
   totalChats: number;
-  level: number;
+  level: string;
 }
 
 interface AdvancedUserSettingsProps {

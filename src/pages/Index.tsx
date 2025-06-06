@@ -202,6 +202,22 @@ const Index = () => {
     }
   };
 
+  // Convert UserSession to UserProfile format for AdvancedUserSettings
+  const convertUserSessionToProfile = (user: UserSession) => {
+    return {
+      id: user.id,
+      name: user.name,
+      email: user.email,
+      phone: user.phone,
+      avatar: user.avatar,
+      plan: user.plan,
+      joinDate: user.joinDate,
+      securityScore: user.securityScore,
+      totalChats: user.totalChats || 0,
+      level: user.level || 'Beginner'
+    };
+  };
+
   const currentConversation = conversations.find(c => c.id === selectedConversation);
 
   // Show landing page for new users
@@ -253,7 +269,7 @@ const Index = () => {
                 ) : currentView === 'settings' ? (
                   <div className="p-6">
                     <AdvancedUserSettings
-                      user={currentUser}
+                      user={currentUser ? convertUserSessionToProfile(currentUser) : null}
                       onLogout={handleLogout}
                       onDeleteAccount={handleDeleteAccount}
                       onUpdateProfile={handleUpdateProfile}
