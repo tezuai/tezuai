@@ -1,263 +1,424 @@
 
 import { useState } from "react";
+import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Progress } from "@/components/ui/progress";
-import { 
-  BarChart3, 
-  TrendingUp, 
-  Clock, 
-  MessageSquare,
-  User,
-  Zap,
-  Target,
-  Award,
+import {
+  BarChart3,
+  PieChart,
+  LineChart,
+  Download,
+  FileText,
   Calendar,
-  Activity
+  Settings,
+  Zap,
+  TrendingUp,
+  TrendingDown,
+  Share,
+  RefreshCw,
+  ArrowRight,
+  Users,
+  MessageSquare,
+  Clock,
+  HelpCircle,
+  Target,
+  BrainCircuit,
+  Lightbulb
 } from "lucide-react";
+import {
+  LineChart as RechartsLineChart,
+  Line,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  Legend,
+  ResponsiveContainer,
+  BarChart,
+  Bar,
+  Cell,
+  PieChart as RechartsPieChart,
+  Pie
+} from "recharts";
 
 export function AdvancedAnalytics() {
-  const [analyticsData] = useState({
-    totalChats: 145,
-    totalMessages: 1250,
-    avgResponseTime: 1.2,
-    userSatisfaction: 96,
-    topFeatures: [
-      { name: "AI Chat", usage: 85, trend: "+12%" },
-      { name: "Voice Interface", usage: 72, trend: "+8%" },
-      { name: "File Processing", usage: 58, trend: "+15%" },
-      { name: "Code Compiler", usage: 45, trend: "+22%" },
-      { name: "Templates", usage: 38, trend: "+5%" }
-    ],
-    dailyStats: {
-      today: 25,
-      yesterday: 22,
-      thisWeek: 156,
-      thisMonth: 678
+  const [dateRange, setDateRange] = useState("30d");
+  const [refreshing, setRefreshing] = useState(false);
+
+  const handleRefresh = () => {
+    setRefreshing(true);
+    setTimeout(() => setRefreshing(false), 1500);
+  };
+
+  // Sample data for charts
+  const usageData = [
+    { name: "Jan 1", messages: 400, queries: 240, interactions: 140 },
+    { name: "Jan 5", messages: 300, queries: 139, interactions: 980 },
+    { name: "Jan 10", messages: 200, queries: 980, interactions: 200 },
+    { name: "Jan 15", messages: 278, queries: 390, interactions: 400 },
+    { name: "Jan 20", messages: 189, queries: 480, interactions: 218 },
+    { name: "Jan 25", messages: 239, queries: 380, interactions: 250 },
+    { name: "Jan 30", messages: 349, queries: 430, interactions: 210 }
+  ];
+
+  const modelUsageData = [
+    { name: "GPT-4o", value: 35, color: "#16a34a" },
+    { name: "Claude 3.5", value: 25, color: "#7e22ce" },
+    { name: "Gemini Pro", value: 20, color: "#0ea5e9" },
+    { name: "Llama 3", value: 15, color: "#f97316" },
+    { name: "Mistral", value: 5, color: "#8b5cf6" }
+  ];
+
+  const performanceMetrics = [
+    {
+      name: "Average Response Time",
+      value: "0.45s",
+      change: -15,
+      status: "improved",
+      icon: Clock
     },
-    performanceMetrics: {
-      aiAccuracy: 94,
-      responseSpeed: 88,
-      userEngagement: 92,
-      systemUptime: 99.8
+    {
+      name: "Messages Processed",
+      value: "28.5K",
+      change: 32,
+      status: "improved",
+      icon: MessageSquare
+    },
+    {
+      name: "Active Users",
+      value: "1,240",
+      change: 18,
+      status: "improved",
+      icon: Users
+    },
+    {
+      name: "Error Rate",
+      value: "0.32%",
+      change: -25,
+      status: "improved",
+      icon: HelpCircle
     }
-  });
+  ];
+
+  const insightData = [
+    {
+      title: "Usage Pattern Detected",
+      description: "Most users access the system during morning hours (9-11 AM)",
+      icon: Lightbulb,
+      category: "Usage",
+      color: "from-blue-500 to-cyan-500"
+    },
+    {
+      title: "Performance Opportunity",
+      description: "Responses for technical queries can be optimized - currently 25% slower",
+      icon: Zap,
+      category: "Performance",
+      color: "from-yellow-500 to-orange-500"
+    },
+    {
+      title: "User Behavior",
+      description: "78% of users prefer multimodal interactions vs text-only",
+      icon: Users,
+      category: "User",
+      color: "from-purple-500 to-pink-500"
+    },
+    {
+      title: "AI Model Efficiency",
+      description: "GPT-4o has 22% better token efficiency than alternative models",
+      icon: BrainCircuit,
+      category: "AI",
+      color: "from-green-500 to-teal-500"
+    }
+  ];
 
   return (
-    <div className="space-y-4">
-      <div className="text-center">
-        <h3 className="text-lg font-bold text-white mb-2">📊 Advanced Analytics</h3>
-        <p className="text-sm text-gray-400">Deep insights and performance metrics</p>
+    <div className="space-y-6">
+      <div className="flex items-center justify-between">
+        <div>
+          <h2 className="text-3xl font-bold text-white flex items-center gap-3">
+            <BarChart3 className="w-8 h-8 text-blue-400" />
+            Advanced Analytics
+            <Badge className="bg-gradient-to-r from-blue-600 to-purple-600 text-white">
+              Professional
+            </Badge>
+          </h2>
+          <p className="text-gray-400 mt-2">Comprehensive analytics and insights for your AI assistant</p>
+        </div>
+        <div className="flex items-center gap-3">
+          <div className="flex border border-gray-600 rounded-md overflow-hidden">
+            <Button
+              variant="ghost"
+              size="sm"
+              className={`rounded-none ${dateRange === "7d" ? "bg-gray-700/50" : "bg-transparent"}`}
+              onClick={() => setDateRange("7d")}
+            >
+              7D
+            </Button>
+            <Button
+              variant="ghost"
+              size="sm"
+              className={`rounded-none ${dateRange === "30d" ? "bg-gray-700/50" : "bg-transparent"}`}
+              onClick={() => setDateRange("30d")}
+            >
+              30D
+            </Button>
+            <Button
+              variant="ghost"
+              size="sm"
+              className={`rounded-none ${dateRange === "90d" ? "bg-gray-700/50" : "bg-transparent"}`}
+              onClick={() => setDateRange("90d")}
+            >
+              90D
+            </Button>
+          </div>
+          <Button
+            variant="outline"
+            className="border-gray-600 text-gray-300"
+            onClick={handleRefresh}
+            disabled={refreshing}
+          >
+            <RefreshCw className={`w-4 h-4 mr-2 ${refreshing ? "animate-spin" : ""}`} />
+            Refresh
+          </Button>
+          <Button className="bg-blue-600 hover:bg-blue-700">
+            <Download className="w-4 h-4 mr-2" />
+            Export
+          </Button>
+        </div>
       </div>
 
-      <Tabs defaultValue="overview" className="w-full">
-        <TabsList className="grid w-full grid-cols-4 bg-gray-800">
-          <TabsTrigger value="overview">Overview</TabsTrigger>
-          <TabsTrigger value="usage">Usage</TabsTrigger>
-          <TabsTrigger value="performance">Performance</TabsTrigger>
-          <TabsTrigger value="insights">Insights</TabsTrigger>
+      {/* Key Metrics */}
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+        {performanceMetrics.map((metric, index) => (
+          <Card
+            key={index}
+            className="bg-gradient-to-br from-gray-800/50 to-gray-900/50 border border-gray-600/50"
+          >
+            <CardContent className="p-6">
+              <div className="flex items-center justify-between mb-4">
+                <div className="p-3 bg-gray-700/50 rounded-xl">
+                  <metric.icon className="w-6 h-6 text-blue-400" />
+                </div>
+                <div
+                  className={`flex items-center gap-1 text-sm ${
+                    metric.status === "improved" ? "text-green-400" : "text-red-400"
+                  }`}
+                >
+                  {metric.change > 0 ? "+" : ""}
+                  {metric.change}%
+                  {metric.status === "improved" ? (
+                    <TrendingUp className="w-4 h-4" />
+                  ) : (
+                    <TrendingDown className="w-4 h-4" />
+                  )}
+                </div>
+              </div>
+              <div className="text-gray-400 text-sm">{metric.name}</div>
+              <div className="text-white text-2xl font-bold">{metric.value}</div>
+            </CardContent>
+          </Card>
+        ))}
+      </div>
+
+      <Tabs defaultValue="usage" className="space-y-6">
+        <TabsList className="grid w-full grid-cols-5 bg-gray-800/50">
+          <TabsTrigger value="usage">Usage Analytics</TabsTrigger>
+          <TabsTrigger value="models">AI Model Performance</TabsTrigger>
+          <TabsTrigger value="users">User Analytics</TabsTrigger>
+          <TabsTrigger value="content">Content Analytics</TabsTrigger>
+          <TabsTrigger value="insights">AI Insights</TabsTrigger>
         </TabsList>
 
-        <TabsContent value="overview" className="space-y-4">
-          {/* Key Metrics */}
-          <div className="grid grid-cols-2 gap-3">
-            <Card className="bg-gray-800/50 border-gray-700">
-              <CardContent className="p-4 text-center">
-                <div className="text-2xl font-bold text-blue-400">{analyticsData.totalChats}</div>
-                <div className="text-xs text-gray-400">Total Conversations</div>
+        <TabsContent value="usage" className="space-y-6">
+          <Card className="bg-gradient-to-br from-gray-800/50 to-gray-900/50 border border-gray-600/50">
+            <CardHeader>
+              <CardTitle className="text-white flex items-center gap-2">
+                <LineChart className="w-5 h-5 text-blue-400" />
+                System Usage Analytics
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="h-80">
+                <ResponsiveContainer width="100%" height="100%">
+                  <RechartsLineChart
+                    data={usageData}
+                    margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
+                  >
+                    <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
+                    <XAxis dataKey="name" tick={{ fill: "#9ca3af" }} />
+                    <YAxis tick={{ fill: "#9ca3af" }} />
+                    <Tooltip
+                      contentStyle={{
+                        backgroundColor: "#1f2937",
+                        borderColor: "#4b5563",
+                        color: "#f9fafb"
+                      }}
+                    />
+                    <Legend wrapperStyle={{ color: "#e5e7eb" }} />
+                    <Line
+                      type="monotone"
+                      dataKey="messages"
+                      stroke="#3b82f6"
+                      activeDot={{ r: 8 }}
+                      strokeWidth={2}
+                    />
+                    <Line
+                      type="monotone"
+                      dataKey="queries"
+                      stroke="#10b981"
+                      strokeWidth={2}
+                    />
+                    <Line
+                      type="monotone"
+                      dataKey="interactions"
+                      stroke="#8b5cf6"
+                      strokeWidth={2}
+                    />
+                  </RechartsLineChart>
+                </ResponsiveContainer>
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="models" className="space-y-6">
+          <div className="grid md:grid-cols-2 gap-6">
+            <Card className="bg-gradient-to-br from-gray-800/50 to-gray-900/50 border border-gray-600/50">
+              <CardHeader>
+                <CardTitle className="text-white flex items-center gap-2">
+                  <PieChart className="w-5 h-5 text-purple-400" />
+                  AI Model Usage Distribution
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="h-80">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <RechartsPieChart>
+                      <Pie
+                        data={modelUsageData}
+                        cx="50%"
+                        cy="50%"
+                        labelLine={false}
+                        label={({ name, percent }) => `${name}: ${(percent * 100).toFixed(0)}%`}
+                        outerRadius={80}
+                        fill="#8884d8"
+                        dataKey="value"
+                      >
+                        {modelUsageData.map((entry, index) => (
+                          <Cell key={`cell-${index}`} fill={entry.color} />
+                        ))}
+                      </Pie>
+                      <Tooltip
+                        contentStyle={{
+                          backgroundColor: "#1f2937",
+                          borderColor: "#4b5563",
+                          color: "#f9fafb"
+                        }}
+                      />
+                      <Legend wrapperStyle={{ color: "#e5e7eb" }} />
+                    </RechartsPieChart>
+                  </ResponsiveContainer>
+                </div>
               </CardContent>
             </Card>
-            
-            <Card className="bg-gray-800/50 border-gray-700">
-              <CardContent className="p-4 text-center">
-                <div className="text-2xl font-bold text-green-400">{analyticsData.totalMessages}</div>
-                <div className="text-xs text-gray-400">Messages Sent</div>
-              </CardContent>
-            </Card>
-            
-            <Card className="bg-gray-800/50 border-gray-700">
-              <CardContent className="p-4 text-center">
-                <div className="text-2xl font-bold text-purple-400">{analyticsData.avgResponseTime}s</div>
-                <div className="text-xs text-gray-400">Avg Response Time</div>
-              </CardContent>
-            </Card>
-            
-            <Card className="bg-gray-800/50 border-gray-700">
-              <CardContent className="p-4 text-center">
-                <div className="text-2xl font-bold text-yellow-400">{analyticsData.userSatisfaction}%</div>
-                <div className="text-xs text-gray-400">Satisfaction Rate</div>
+
+            <Card className="bg-gradient-to-br from-gray-800/50 to-gray-900/50 border border-gray-600/50">
+              <CardHeader>
+                <CardTitle className="text-white flex items-center gap-2">
+                  <BarChart3 className="w-5 h-5 text-green-400" />
+                  Performance Comparison
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="h-80">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <BarChart
+                      data={[
+                        { name: "Response Time", "GPT-4o": 0.45, "Claude 3.5": 0.52, "Gemini Pro": 0.48 },
+                        { name: "Accuracy", "GPT-4o": 96, "Claude 3.5": 95, "Gemini Pro": 94 },
+                        { name: "Token Usage", "GPT-4o": 75, "Claude 3.5": 85, "Gemini Pro": 78 },
+                        { name: "Cost Efficiency", "GPT-4o": 85, "Claude 3.5": 80, "Gemini Pro": 90 }
+                      ]}
+                      margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
+                    >
+                      <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
+                      <XAxis dataKey="name" tick={{ fill: "#9ca3af" }} />
+                      <YAxis tick={{ fill: "#9ca3af" }} />
+                      <Tooltip
+                        contentStyle={{
+                          backgroundColor: "#1f2937",
+                          borderColor: "#4b5563",
+                          color: "#f9fafb"
+                        }}
+                      />
+                      <Legend wrapperStyle={{ color: "#e5e7eb" }} />
+                      <Bar dataKey="GPT-4o" fill="#16a34a" />
+                      <Bar dataKey="Claude 3.5" fill="#7e22ce" />
+                      <Bar dataKey="Gemini Pro" fill="#0ea5e9" />
+                    </BarChart>
+                  </ResponsiveContainer>
+                </div>
               </CardContent>
             </Card>
           </div>
-
-          {/* Daily Activity */}
-          <Card className="bg-gray-800/50 border-gray-700">
-            <CardHeader>
-              <CardTitle className="text-white flex items-center gap-2">
-                <Calendar className="w-5 h-5" />
-                Daily Activity
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-3">
-              <div className="flex items-center justify-between">
-                <span className="text-sm text-gray-300">Today</span>
-                <Badge className="bg-green-500/20 text-green-400">
-                  {analyticsData.dailyStats.today} chats
-                </Badge>
-              </div>
-              <div className="flex items-center justify-between">
-                <span className="text-sm text-gray-300">Yesterday</span>
-                <Badge className="bg-blue-500/20 text-blue-400">
-                  {analyticsData.dailyStats.yesterday} chats
-                </Badge>
-              </div>
-              <div className="flex items-center justify-between">
-                <span className="text-sm text-gray-300">This Week</span>
-                <Badge className="bg-purple-500/20 text-purple-400">
-                  {analyticsData.dailyStats.thisWeek} chats
-                </Badge>
-              </div>
-              <div className="flex items-center justify-between">
-                <span className="text-sm text-gray-300">This Month</span>
-                <Badge className="bg-orange-500/20 text-orange-400">
-                  {analyticsData.dailyStats.thisMonth} chats
-                </Badge>
-              </div>
-            </CardContent>
-          </Card>
         </TabsContent>
 
-        <TabsContent value="usage" className="space-y-4">
-          <Card className="bg-gray-800/50 border-gray-700">
-            <CardHeader>
-              <CardTitle className="text-white flex items-center gap-2">
-                <BarChart3 className="w-5 h-5" />
-                Feature Usage
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              {analyticsData.topFeatures.map((feature, index) => (
-                <div key={index} className="space-y-2">
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm text-gray-300">{feature.name}</span>
-                    <div className="flex items-center gap-2">
-                      <Badge className="bg-blue-500/20 text-blue-400">{feature.usage}%</Badge>
-                      <Badge className="bg-green-500/20 text-green-400">
-                        <TrendingUp className="w-3 h-3 mr-1" />
-                        {feature.trend}
+        <TabsContent value="insights" className="space-y-6">
+          <div className="grid md:grid-cols-2 gap-6">
+            {insightData.map((insight, index) => (
+              <Card
+                key={index}
+                className="bg-gradient-to-br from-gray-800/50 to-gray-900/50 border border-gray-600/50 hover:border-blue-500/50 transition-all"
+              >
+                <CardContent className="p-6">
+                  <div className="flex items-start gap-4">
+                    <div className={`p-3 rounded-xl bg-gradient-to-r ${insight.color}`}>
+                      <insight.icon className="w-6 h-6 text-white" />
+                    </div>
+                    <div>
+                      <Badge
+                        variant="outline"
+                        className="text-blue-400 border-blue-400 mb-2"
+                      >
+                        {insight.category} Insight
                       </Badge>
+                      <h3 className="text-lg font-bold text-white mb-2">{insight.title}</h3>
+                      <p className="text-gray-400">{insight.description}</p>
                     </div>
                   </div>
-                  <Progress value={feature.usage} className="h-2" />
-                </div>
-              ))}
-            </CardContent>
-          </Card>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
         </TabsContent>
 
-        <TabsContent value="performance" className="space-y-4">
-          <Card className="bg-gray-800/50 border-gray-700">
-            <CardHeader>
-              <CardTitle className="text-white flex items-center gap-2">
-                <Activity className="w-5 h-5" />
-                Performance Metrics
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="space-y-2">
-                <div className="flex items-center justify-between">
-                  <span className="text-sm text-gray-300">AI Accuracy</span>
-                  <Badge className="bg-green-500/20 text-green-400">
-                    {analyticsData.performanceMetrics.aiAccuracy}%
-                  </Badge>
-                </div>
-                <Progress value={analyticsData.performanceMetrics.aiAccuracy} className="h-2" />
-              </div>
-
-              <div className="space-y-2">
-                <div className="flex items-center justify-between">
-                  <span className="text-sm text-gray-300">Response Speed</span>
-                  <Badge className="bg-blue-500/20 text-blue-400">
-                    {analyticsData.performanceMetrics.responseSpeed}%
-                  </Badge>
-                </div>
-                <Progress value={analyticsData.performanceMetrics.responseSpeed} className="h-2" />
-              </div>
-
-              <div className="space-y-2">
-                <div className="flex items-center justify-between">
-                  <span className="text-sm text-gray-300">User Engagement</span>
-                  <Badge className="bg-purple-500/20 text-purple-400">
-                    {analyticsData.performanceMetrics.userEngagement}%
-                  </Badge>
-                </div>
-                <Progress value={analyticsData.performanceMetrics.userEngagement} className="h-2" />
-              </div>
-
-              <div className="space-y-2">
-                <div className="flex items-center justify-between">
-                  <span className="text-sm text-gray-300">System Uptime</span>
-                  <Badge className="bg-green-500/20 text-green-400">
-                    {analyticsData.performanceMetrics.systemUptime}%
-                  </Badge>
-                </div>
-                <Progress value={analyticsData.performanceMetrics.systemUptime} className="h-2" />
-              </div>
-            </CardContent>
-          </Card>
+        <TabsContent value="users">
+          <div className="bg-gray-800/50 rounded-xl p-24 text-center">
+            <Users className="w-16 h-16 text-blue-400 mx-auto mb-4" />
+            <h3 className="text-2xl font-bold text-white mb-2">User Analytics</h3>
+            <p className="text-gray-400 mb-4">
+              Detailed user analytics will be available soon
+            </p>
+            <Button className="bg-blue-600 hover:bg-blue-700">
+              <Calendar className="w-5 h-5 mr-2" />
+              Schedule Update
+            </Button>
+          </div>
         </TabsContent>
 
-        <TabsContent value="insights" className="space-y-4">
-          <Card className="bg-gray-800/50 border-gray-700">
-            <CardHeader>
-              <CardTitle className="text-white flex items-center gap-2">
-                <Target className="w-5 h-5" />
-                AI Insights
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-3">
-              <div className="p-3 bg-green-500/10 border border-green-500/20 rounded">
-                <div className="flex items-center gap-2 mb-1">
-                  <Award className="w-4 h-4 text-green-400" />
-                  <span className="text-sm font-medium text-green-400">Top Performance</span>
-                </div>
-                <p className="text-xs text-gray-300">
-                  Voice interface usage increased by 15% this week
-                </p>
-              </div>
-
-              <div className="p-3 bg-blue-500/10 border border-blue-500/20 rounded">
-                <div className="flex items-center gap-2 mb-1">
-                  <Zap className="w-4 h-4 text-blue-400" />
-                  <span className="text-sm font-medium text-blue-400">Trending Feature</span>
-                </div>
-                <p className="text-xs text-gray-300">
-                  Code compiler is your most used new feature
-                </p>
-              </div>
-
-              <div className="p-3 bg-purple-500/10 border border-purple-500/20 rounded">
-                <div className="flex items-center gap-2 mb-1">
-                  <User className="w-4 h-4 text-purple-400" />
-                  <span className="text-sm font-medium text-purple-400">User Behavior</span>
-                </div>
-                <p className="text-xs text-gray-300">
-                  Most active during afternoon hours (2-5 PM)
-                </p>
-              </div>
-
-              <div className="p-3 bg-orange-500/10 border border-orange-500/20 rounded">
-                <div className="flex items-center gap-2 mb-1">
-                  <MessageSquare className="w-4 h-4 text-orange-400" />
-                  <span className="text-sm font-medium text-orange-400">Communication</span>
-                </div>
-                <p className="text-xs text-gray-300">
-                  Hindi-English mixed responses preferred 85% of time
-                </p>
-              </div>
-            </CardContent>
-          </Card>
+        <TabsContent value="content">
+          <div className="bg-gray-800/50 rounded-xl p-24 text-center">
+            <FileText className="w-16 h-16 text-green-400 mx-auto mb-4" />
+            <h3 className="text-2xl font-bold text-white mb-2">Content Analytics</h3>
+            <p className="text-gray-400 mb-4">
+              Detailed content analytics will be available soon
+            </p>
+            <Button className="bg-green-600 hover:bg-green-700">
+              <Calendar className="w-5 h-5 mr-2" />
+              Schedule Update
+            </Button>
+          </div>
         </TabsContent>
       </Tabs>
     </div>

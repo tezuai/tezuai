@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Sidebar } from "@/components/Sidebar";
 import { ChatInterface } from "@/components/ChatInterface";
@@ -14,11 +13,28 @@ import { ProfessionalAIAssistant } from "@/components/ProfessionalAIAssistant";
 import { SidebarProvider } from "@/components/ui/sidebar";
 import { SubscriptionProvider } from "@/contexts/SubscriptionContext";
 import { Footer } from "@/components/Footer";
+import { AIModelSwitcher } from "@/components/AIModelSwitcher";
+import { RealTimeCollaboration } from "@/components/RealTimeCollaboration";
+import { CustomAITraining } from "@/components/CustomAITraining";
+import { ProfessionalTemplates } from "@/components/ProfessionalTemplates";
+import { AdvancedAnalytics } from "@/components/AdvancedAnalytics";
 
 const Index = () => {
   const [selectedConversation, setSelectedConversation] = useState<string | null>(null);
   const [conversations, setConversations] = useState<any[]>([]);
-  const [currentView, setCurrentView] = useState<'chat' | 'analytics' | 'subscription' | 'privacy' | 'settings' | 'ai-assistant'>('chat');
+  const [currentView, setCurrentView] = useState<
+    | 'chat'
+    | 'analytics'
+    | 'subscription'
+    | 'privacy'
+    | 'settings'
+    | 'ai-assistant'
+    | 'ai-model-switcher'
+    | 'collaboration'
+    | 'custom-training'
+    | 'templates'
+    | 'advanced-analytics'
+  >('chat');
   const [showLanding, setShowLanding] = useState(true);
   const [showOnboarding, setShowOnboarding] = useState(false);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -179,9 +195,32 @@ const Index = () => {
     }
   };
 
-  const handleViewChange = (view: 'chat' | 'analytics' | 'subscription' | 'privacy' | 'settings' | 'ai-assistant') => {
+  const handleViewChange = (
+    view:
+      | 'chat'
+      | 'analytics'
+      | 'subscription'
+      | 'privacy'
+      | 'settings'
+      | 'ai-assistant'
+      | 'ai-model-switcher'
+      | 'collaboration'
+      | 'custom-training'
+      | 'templates'
+      | 'advanced-analytics'
+  ) => {
     // Check if view requires authentication
-    const authRequiredViews = ['subscription', 'privacy', 'settings', 'ai-assistant'];
+    const authRequiredViews = [
+      'subscription', 
+      'privacy', 
+      'settings', 
+      'ai-assistant', 
+      'ai-model-switcher',
+      'collaboration',
+      'custom-training',
+      'templates',
+      'advanced-analytics'
+    ];
     
     if (authRequiredViews.includes(view) && !isAuthenticated) {
       setRequireAuth(true);
@@ -244,7 +283,7 @@ const Index = () => {
         >
           <div className="min-h-screen flex flex-col w-full bg-gradient-to-br from-gray-900 via-blue-900 to-purple-900">
             <div className="flex flex-1">
-              {(currentView !== 'subscription' && currentView !== 'privacy' && currentView !== 'settings' && currentView !== 'ai-assistant') && (
+              {(['chat', 'analytics', 'ai-model-switcher', 'collaboration', 'custom-training', 'templates', 'advanced-analytics'].includes(currentView)) && (
                 <Sidebar
                   conversations={conversations}
                   selectedConversation={selectedConversation}
@@ -281,6 +320,26 @@ const Index = () => {
                   </div>
                 ) : currentView === 'analytics' ? (
                   <AnalyticsDashboard conversations={conversations} />
+                ) : currentView === 'ai-model-switcher' ? (
+                  <div className="p-6">
+                    <AIModelSwitcher />
+                  </div>
+                ) : currentView === 'collaboration' ? (
+                  <div className="p-6">
+                    <RealTimeCollaboration />
+                  </div>
+                ) : currentView === 'custom-training' ? (
+                  <div className="p-6">
+                    <CustomAITraining />
+                  </div>
+                ) : currentView === 'templates' ? (
+                  <div className="p-6">
+                    <ProfessionalTemplates />
+                  </div>
+                ) : currentView === 'advanced-analytics' ? (
+                  <div className="p-6">
+                    <AdvancedAnalytics />
+                  </div>
                 ) : selectedConversation && currentConversation ? (
                   <ChatInterface
                     conversation={currentConversation}

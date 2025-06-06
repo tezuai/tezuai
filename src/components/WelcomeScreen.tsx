@@ -13,7 +13,12 @@ import {
   Mic,
   Brain,
   Calendar,
-  BarChart3
+  BarChart3,
+  Cpu,
+  Users,
+  Layers,
+  Database,
+  Lock
 } from "lucide-react";
 
 interface WelcomeScreenProps {
@@ -30,21 +35,37 @@ export function WelcomeScreen({ onStartChat }: WelcomeScreenProps) {
     { icon: Calendar, label: "Plan my schedule", prompt: "मेरे schedule की planning करो" },
   ];
 
+  const newProfessionalFeatures = [
+    { icon: Brain, label: "Switch AI Models", description: "Choose from 15+ advanced AI models" },
+    { icon: Users, label: "Real-time Collaboration", description: "Work together with your team" },
+    { icon: Cpu, label: "Custom AI Training", description: "Train personalized models for your business" },
+    { icon: FileText, label: "Professional Templates", description: "Access 150+ business templates" },
+    { icon: Layers, label: "Advanced Analytics", description: "Get detailed insights and reports" }
+  ];
+
   return (
     <div className="flex-1 flex items-center justify-center p-8 bg-gradient-to-br from-gray-900 via-blue-900 to-purple-900">
       <div className="max-w-4xl mx-auto text-center">
         {/* Main Header */}
         <div className="mb-8">
-          <div className="w-24 h-24 mx-auto mb-6 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center shadow-2xl">
-            <Bot className="w-12 h-12 text-white" />
-          </div>
+          <Badge className="mb-6 bg-gradient-to-r from-blue-500 to-purple-500 text-white text-lg px-6 py-2 rounded-full">
+            🚀 India's Most Advanced AI Assistant - Professional Edition
+          </Badge>
           
-          <h1 className="text-5xl font-bold text-white mb-4 bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">
-            Welcome to AI Agent Pro
+          <h1 className="text-7xl font-bold text-white mb-4 bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">
+            Tezu AI
           </h1>
           
+          <h2 className="text-4xl font-bold text-white mb-6">
+            Professional <span className="bg-gradient-to-r from-yellow-400 to-orange-400 bg-clip-text text-transparent">Enterprise</span>
+          </h2>
+          
           <p className="text-xl text-gray-300 mb-6 max-w-2xl mx-auto leading-relaxed">
-            Your advanced AI assistant with cutting-edge capabilities for all your creative and analytical needs
+            15+ AI Models • Workflow Automation • Custom Training • Business Intelligence
+            <br />
+            <span className="text-transparent bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text font-bold">
+              Professional Features से Business को Next Level पर ले जाएं!
+            </span>
           </p>
 
           <div className="flex items-center justify-center gap-3 mb-8">
@@ -70,8 +91,44 @@ export function WelcomeScreen({ onStartChat }: WelcomeScreenProps) {
           className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white px-8 py-4 text-lg rounded-xl shadow-2xl hover:shadow-blue-500/25 transition-all duration-300 mb-12"
         >
           <MessageSquare className="w-6 h-6 mr-3" />
-          Start New Conversation
+          Start Professional AI Journey
         </Button>
+
+        {/* New Professional Features */}
+        <div className="mb-12">
+          <h3 className="text-2xl font-bold text-white mb-6">New Professional Features</h3>
+          <div className="grid grid-cols-5 gap-4">
+            {newProfessionalFeatures.map((feature, index) => (
+              <div key={index} className="p-4 bg-gradient-to-br from-gray-800/50 to-gray-700/50 border border-gray-700/50 hover:border-purple-500/50 transition-all duration-300 hover:scale-105 rounded-xl">
+                <div className="w-16 h-16 mx-auto mb-4 bg-gradient-to-br from-purple-600 to-pink-600 rounded-full flex items-center justify-center">
+                  <feature.icon className="w-8 h-8 text-white" />
+                </div>
+                <h4 className="text-lg font-medium text-white mb-2">{feature.label}</h4>
+                <p className="text-sm text-gray-400">{feature.description}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Stats Row */}
+        <div className="grid grid-cols-4 gap-6 mb-12">
+          <div className="p-4 bg-gradient-to-br from-gray-800/50 to-gray-700/50 border border-gray-700/50 rounded-xl">
+            <div className="text-4xl font-bold bg-gradient-to-r from-blue-400 to-cyan-400 bg-clip-text text-transparent">100,000+</div>
+            <div className="text-gray-400">Enterprise Users</div>
+          </div>
+          <div className="p-4 bg-gradient-to-br from-gray-800/50 to-gray-700/50 border border-gray-700/50 rounded-xl">
+            <div className="text-4xl font-bold bg-gradient-to-r from-green-400 to-teal-400 bg-clip-text text-transparent">50M+</div>
+            <div className="text-gray-400">Messages Processed</div>
+          </div>
+          <div className="p-4 bg-gradient-to-br from-gray-800/50 to-gray-700/50 border border-gray-700/50 rounded-xl">
+            <div className="text-4xl font-bold bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">150+</div>
+            <div className="text-gray-400">Countries</div>
+          </div>
+          <div className="p-4 bg-gradient-to-br from-gray-800/50 to-gray-700/50 border border-gray-700/50 rounded-xl">
+            <div className="text-4xl font-bold bg-gradient-to-r from-yellow-400 to-orange-400 bg-clip-text text-transparent">4.9/5</div>
+            <div className="text-gray-400">Enterprise Rating</div>
+          </div>
+        </div>
 
         {/* Quick Actions */}
         <div className="mb-12">
@@ -97,45 +154,45 @@ export function WelcomeScreen({ onStartChat }: WelcomeScreenProps) {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-5xl mx-auto">
           <div className="p-6 bg-gray-800/50 rounded-xl border border-gray-700/50 backdrop-blur-sm hover:bg-gray-700/50 transition-all duration-300">
             <Brain className="w-12 h-12 text-blue-400 mx-auto mb-4" />
-            <h4 className="text-xl font-bold text-white mb-2">Advanced AI Models</h4>
-            <p className="text-gray-400 text-sm">Access to multiple AI models including GPT-4, Claude, and custom models</p>
+            <h4 className="text-xl font-bold text-white mb-2">15+ AI Models</h4>
+            <p className="text-gray-400 text-sm">Access to multiple AI models including GPT-4o, Claude 3.5, Gemini Pro, Llama 3, and more</p>
           </div>
           
           <div className="p-6 bg-gray-800/50 rounded-xl border border-gray-700/50 backdrop-blur-sm hover:bg-gray-700/50 transition-all duration-300">
-            <FileText className="w-12 h-12 text-green-400 mx-auto mb-4" />
-            <h4 className="text-xl font-bold text-white mb-2">Document Analysis</h4>
-            <p className="text-gray-400 text-sm">Upload and analyze documents, PDFs, and text files with advanced AI processing</p>
+            <Users className="w-12 h-12 text-green-400 mx-auto mb-4" />
+            <h4 className="text-xl font-bold text-white mb-2">Team Collaboration</h4>
+            <p className="text-gray-400 text-sm">Real-time collaboration with team members, shared workspaces, and project management</p>
           </div>
           
           <div className="p-6 bg-gray-800/50 rounded-xl border border-gray-700/50 backdrop-blur-sm hover:bg-gray-700/50 transition-all duration-300">
-            <Mic className="w-12 h-12 text-purple-400 mx-auto mb-4" />
-            <h4 className="text-xl font-bold text-white mb-2">Voice Interface</h4>
-            <p className="text-gray-400 text-sm">Natural voice conversations with speech-to-text and text-to-speech capabilities</p>
+            <Cpu className="w-12 h-12 text-purple-400 mx-auto mb-4" />
+            <h4 className="text-xl font-bold text-white mb-2">Custom AI Training</h4>
+            <p className="text-gray-400 text-sm">Train personalized AI models for your specific business needs and use cases</p>
           </div>
           
           <div className="p-6 bg-gray-800/50 rounded-xl border border-gray-700/50 backdrop-blur-sm hover:bg-gray-700/50 transition-all duration-300">
-            <ImageIcon className="w-12 h-12 text-yellow-400 mx-auto mb-4" />
-            <h4 className="text-xl font-bold text-white mb-2">Image Processing</h4>
-            <p className="text-gray-400 text-sm">Generate, analyze, and edit images with advanced AI assistance</p>
+            <FileText className="w-12 h-12 text-yellow-400 mx-auto mb-4" />
+            <h4 className="text-xl font-bold text-white mb-2">150+ Templates</h4>
+            <p className="text-gray-400 text-sm">Access to professional templates for business, marketing, technical, and creative use cases</p>
           </div>
           
           <div className="p-6 bg-gray-800/50 rounded-xl border border-gray-700/50 backdrop-blur-sm hover:bg-gray-700/50 transition-all duration-300">
-            <Code className="w-12 h-12 text-red-400 mx-auto mb-4" />
-            <h4 className="text-xl font-bold text-white mb-2">Code Assistant</h4>
-            <p className="text-gray-400 text-sm">Advanced coding help with multiple programming languages and frameworks</p>
+            <Layers className="w-12 h-12 text-red-400 mx-auto mb-4" />
+            <h4 className="text-xl font-bold text-white mb-2">Advanced Analytics</h4>
+            <p className="text-gray-400 text-sm">Comprehensive analytics dashboard with usage metrics, performance tracking, and AI insights</p>
           </div>
           
           <div className="p-6 bg-gray-800/50 rounded-xl border border-gray-700/50 backdrop-blur-sm hover:bg-gray-700/50 transition-all duration-300">
-            <Zap className="w-12 h-12 text-orange-400 mx-auto mb-4" />
-            <h4 className="text-xl font-bold text-white mb-2">Real-time Responses</h4>
-            <p className="text-gray-400 text-sm">Lightning-fast responses with streaming capabilities for instant feedback</p>
+            <Database className="w-12 h-12 text-orange-400 mx-auto mb-4" />
+            <h4 className="text-xl font-bold text-white mb-2">Enterprise Security</h4>
+            <p className="text-gray-400 text-sm">Bank-level security with end-to-end encryption, compliance features, and data protection</p>
           </div>
         </div>
 
         {/* Bottom Info */}
         <div className="mt-12 p-4 bg-blue-500/10 border border-blue-500/30 rounded-xl">
-          <p className="text-blue-400 font-medium mb-2">🚀 Ready to get started?</p>
-          <p className="text-gray-300 text-sm">Click "Start New Conversation" above to begin chatting with your AI assistant. All conversations are 100% private and secure!</p>
+          <p className="text-blue-400 font-medium mb-2">🚀 Professional Edition Features Unlocked!</p>
+          <p className="text-gray-300 text-sm">All professional features are now available. Click "Start Professional AI Journey" above to begin exploring!</p>
         </div>
       </div>
     </div>
