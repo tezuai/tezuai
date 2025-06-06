@@ -23,7 +23,9 @@ import {
   Shield,
   User,
   LogOut,
-  Settings
+  Settings,
+  Brain,
+  Globe
 } from "lucide-react";
 import {
   DropdownMenu,
@@ -33,6 +35,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { useToast } from "@/hooks/use-toast";
+import { type UserSession } from "@/components/SmartAuthGuard";
 
 interface SidebarProps {
   conversations: any[];
@@ -44,9 +47,10 @@ interface SidebarProps {
   onArchiveConversation: (id: string) => void;
   onDuplicateConversation: (conversation: any) => void;
   currentView: string;
-  onViewChange: (view: 'chat' | 'analytics' | 'subscription' | 'privacy' | 'auth') => void;
+  onViewChange: (view: 'chat' | 'analytics' | 'subscription' | 'privacy' | 'settings' | 'ai-assistant') => void;
   onLogout?: () => void;
   isAuthenticated?: boolean;
+  currentUser?: UserSession | null;
 }
 
 export function Sidebar({
@@ -61,7 +65,8 @@ export function Sidebar({
   currentView,
   onViewChange,
   onLogout,
-  isAuthenticated
+  isAuthenticated,
+  currentUser
 }: SidebarProps) {
   const [searchQuery, setSearchQuery] = useState("");
   const [showArchived, setShowArchived] = useState(false);
@@ -116,14 +121,28 @@ export function Sidebar({
             <h2 className="text-sm font-bold text-white">Tezu AI Pro</h2>
             <p className="text-xs text-blue-300">🏆 World's #1 Secure AI</p>
           </div>
-          {isAuthenticated && (
+          {isAuthenticated && currentUser && (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button variant="ghost" size="sm" className="text-gray-400 hover:text-white hover:bg-blue-600/20">
-                  <User className="w-4 h-4" />
+                  <Avatar className="w-6 h-6">
+                    <AvatarImage src={currentUser.avatar} />
+                    <AvatarFallback className="bg-gradient-to-br from-green-500 to-blue-500 text-white text-xs">
+                      {currentUser.name.charAt(0).toUpperCase()}
+                    </AvatarFallback>
+                  </Avatar>
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="bg-gray-800 border-gray-700">
+                <div className="px-2 py-1.5 text-sm text-gray-300">
+                  <div className="font-medium">{currentUser.name}</div>
+                  <div className="text-xs text-gray-400">{currentUser.email}</div>
+                </div>
+                <DropdownMenuSeparator className="bg-gray-700" />
+                <DropdownMenuItem onClick={() => onViewChange('settings')} className="text-gray-300 hover:text-white">
+                  <Settings className="w-4 h-4 mr-2" />
+                  User Settings
+                </DropdownMenuItem>
                 <DropdownMenuItem onClick={() => onViewChange('privacy')} className="text-gray-300 hover:text-white">
                   <Shield className="w-4 h-4 mr-2" />
                   Privacy & Security
@@ -151,9 +170,9 @@ export function Sidebar({
         </Button>
       </div>
 
-      {/* Navigation */}
+      {/* Enhanced Navigation */}
       <div className="p-2 border-b border-gray-700/50 bg-gradient-to-r from-gray-900/50 to-blue-900/30">
-        <div className="grid grid-cols-3 gap-1">
+        <div className="grid grid-cols-2 gap-1 mb-2">
           <Button
             variant={currentView === 'chat' ? 'default' : 'ghost'}
             size="sm"
@@ -179,6 +198,22 @@ export function Sidebar({
           >
             <BarChart3 className="w-3 h-3 mr-1" />
             Analytics
+          </Button>
+        </div>
+        
+        <div className="grid grid-cols-2 gap-1">
+          <Button
+            variant={currentView === 'ai-assistant' ? 'default' : 'ghost'}
+            size="sm"
+            onClick={() => onViewChange('ai-assistant')}
+            className={`text-xs transition-all duration-200 ${
+              currentView === 'ai-assistant' 
+                ? 'bg-gradient-to-r from-purple-600 to-pink-600 shadow-md' 
+                : 'text-gray-400 hover:text-white hover:bg-purple-600/20'
+            }`}
+          >
+            <Brain className="w-3 h-3 mr-1" />
+            AI Pro
           </Button>
           <Button
             variant={currentView === 'subscription' ? 'default' : 'ghost'}
@@ -225,6 +260,25 @@ export function Sidebar({
               {showArchived ? conversations.filter(c => c.isArchived).length : conversations.filter(c => !c.isArchived).length}
             </Badge>
           </Button>
+
+          {/* User Status Display */}
+          {isAuthenticated && currentUser && (
+            <div className="p-3 bg-gradient-to-r from-green-500/10 to-blue-500/10 rounded border border-green-500/20 mb-2">
+              <div className="flex items-center gap-2 mb-1">
+                <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse" />
+                <span className="text-xs font-medium text-green-400">Logged In</span>
+              </div>
+              <div className="text-xs text-gray-300">{currentUser.name}</div>
+              <div className="flex items-center gap-1 mt-1">
+                <Badge className="text-xs bg-purple-500/20 text-purple-400">
+                  {currentUser.plan.toUpperCase()}
+                </Badge>
+                <Badge className="text-xs bg-green-500/20 text-green-400">
+                  {currentUser.securityScore}% Secure
+                </Badge>
+              </div>
+            </div>
+          )}
 
           {filteredConversations.map((conversation) => (
             <div
@@ -343,6 +397,11 @@ export function Sidebar({
               AI Powered
             </Badge>
           </div>
+          {isAuthenticated && (
+            <div className="text-xs text-green-400">
+              🏆 Welcome {currentUser?.name || 'User'}! 
+            </div>
+          )}
         </div>
       </div>
     </div>

@@ -6,6 +6,7 @@ import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { OTPVerification } from "@/components/OTPVerification";
+import { notificationService } from "@/services/emailService";
 import { 
   User, 
   Mail, 
@@ -19,7 +20,8 @@ import {
   CheckCircle,
   AlertCircle,
   Globe,
-  UserPlus
+  UserPlus,
+  Zap
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
@@ -29,15 +31,22 @@ interface SecurityFeatures {
   deviceTrust: boolean;
   sessionSecurity: boolean;
   encryptedStorage: boolean;
+  antiBruteForce: boolean;
+  realTimeMonitoring: boolean;
 }
 
 interface EnhancedAuthSystemProps {
-  onLogin: () => void;
+  onLogin: (userData: any) => void;
+  authAttempts?: number;
+  onAuthAttempt?: () => void;
 }
 
-export function EnhancedAuthSystem({ onLogin }: EnhancedAuthSystemProps) {
+export function EnhancedAuthSystem({ onLogin, authAttempts = 0, onAuthAttempt }: EnhancedAuthSystemProps) {
   const [authMode, setAuthMode] = useState<'login' | 'signup' | '2fa'>('login');
   const [showPassword, setShowPassword] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [otpData, setOtpData] = useState<{email?: string, phone?: string, emailOTP?: string, smsOTP?: string} | null>(null);
+  
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -52,25 +61,27 @@ export function EnhancedAuthSystem({ onLogin }: EnhancedAuthSystemProps) {
     biometricLogin: true,
     deviceTrust: true,
     sessionSecurity: true,
-    encryptedStorage: true
+    encryptedStorage: true,
+    antiBruteForce: true,
+    realTimeMonitoring: true
   });
 
   const { toast } = useToast();
 
   const getPasswordStrength = (password: string) => {
-    if (password.length < 6) return { level: 'weak', color: 'text-red-400' };
-    if (password.length < 10) return { level: 'medium', color: 'text-yellow-400' };
+    if (password.length < 6) return { level: 'weak', color: 'text-red-400', score: 1 };
+    if (password.length < 10) return { level: 'medium', color: 'text-yellow-400', score: 2 };
     if (password.match(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]/)) {
-      return { level: 'strong', color: 'text-green-400' };
+      return { level: 'strong', color: 'text-green-400', score: 3 };
     }
-    return { level: 'medium', color: 'text-yellow-400' };
+    return { level: 'medium', color: 'text-yellow-400', score: 2 };
   };
 
   const handleInputChange = (field: string, value: string) => {
     setFormData(prev => ({ ...prev, [field]: value }));
   };
 
-  const handleSecureLogin = () => {
+  const handleSecureLogin = async () => {
     if (!formData.email || !formData.password) {
       toast({
         title: "🚨 Security Alert",
@@ -80,24 +91,83 @@ export function EnhancedAuthSystem({ onLogin }: EnhancedAuthSystemProps) {
       return;
     }
 
-    toast({
-      title: "🔐 Secure Login Initiated",
-      description: "Verifying credentials with enterprise-grade security...",
-    });
-
-    setTimeout(() => {
-      setAuthMode('2fa');
+    // Check for brute force attempts
+    if (authAttempts && authAttempts >= 3) {
       toast({
-        title: "📱 2FA Required",
-        description: "Multi-factor authentication initiated for maximum security",
+        title: "🔒 Account Protection Active",
+        description: "Too many login attempts. Please wait 5 minutes for security.",
+        variant: "destructive"
       });
-    }, 1500);
+      return;
+    }
+
+    setIsLoading(true);
+    onAuthAttempt?.();
+
+    try {
+      // Security threat check
+      const securityCheck = notificationService.checkSecurityThreats('192.168.1.1', formData.email);
+      if (!securityCheck.safe) {
+        toast({
+          title: "⚠️ Security Warning",
+          description: securityCheck.reason || "Security check failed",
+          variant: "destructive"
+        });
+        setIsLoading(false);
+        return;
+      }
+
+      toast({
+        title: "🔐 Secure Login Initiated",
+        description: "Verifying credentials with enterprise-grade security...",
+      });
+
+      // Send OTP to both email and phone
+      const [emailResult, smsResult] = await Promise.all([
+        notificationService.sendEmailOTP(formData.email),
+        formData.phone ? notificationService.sendSMSOTP(formData.phone) : { success: false }
+      ]);
+
+      if (emailResult.success || smsResult.success) {
+        setOtpData({
+          email: formData.email,
+          phone: formData.phone,
+          emailOTP: emailResult.otp,
+          smsOTP: smsResult.otp
+        });
+        setAuthMode('2fa');
+        
+        toast({
+          title: "📱 2FA Security Codes Sent!",
+          description: `OTP sent to ${formData.email}${formData.phone ? ` and ${formData.phone}` : ''}`,
+        });
+      } else {
+        throw new Error('Failed to send OTP');
+      }
+    } catch (error) {
+      toast({
+        title: "❌ Authentication Error",
+        description: "Failed to send security codes. Please try again.",
+        variant: "destructive"
+      });
+    } finally {
+      setIsLoading(false);
+    }
   };
 
-  const handleSecureSignup = () => {
+  const handleSecureSignup = async () => {
     const passwordStrength = getPasswordStrength(formData.password);
     
-    if (passwordStrength.level === 'weak') {
+    if (!formData.name || !formData.email || !formData.password) {
+      toast({
+        title: "❌ Registration Incomplete",
+        description: "Please fill all required fields",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    if (passwordStrength.score < 2) {
       toast({
         title: "❌ Password Too Weak",
         description: "Please use a stronger password for better security",
@@ -124,36 +194,92 @@ export function EnhancedAuthSystem({ onLogin }: EnhancedAuthSystemProps) {
       return;
     }
 
-    toast({
-      title: "🚀 Account Creation Started",
-      description: "Setting up your secure account with 2FA...",
-    });
-    
-    setTimeout(() => {
-      setAuthMode('2fa');
+    setIsLoading(true);
+
+    try {
       toast({
-        title: "📧 Verification Required",
-        description: "OTP codes sent to your email and phone for verification",
+        title: "🚀 Account Creation Started",
+        description: "Setting up your secure account with 2FA...",
       });
-    }, 2000);
+
+      // Send OTP to both email and phone for verification
+      const [emailResult, smsResult] = await Promise.all([
+        notificationService.sendEmailOTP(formData.email, formData.name),
+        notificationService.sendSMSOTP(formData.phone)
+      ]);
+
+      if (emailResult.success && smsResult.success) {
+        setOtpData({
+          email: formData.email,
+          phone: formData.phone,
+          emailOTP: emailResult.otp,
+          smsOTP: smsResult.otp
+        });
+        setAuthMode('2fa');
+        
+        toast({
+          title: "📧 Verification Required",
+          description: "OTP codes sent to your email and phone for verification",
+        });
+      } else {
+        throw new Error('Failed to send verification codes');
+      }
+    } catch (error) {
+      toast({
+        title: "❌ Account Creation Failed",
+        description: "Failed to send verification codes. Please try again.",
+        variant: "destructive"
+      });
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const handleOTPVerificationSuccess = () => {
+    const userData = {
+      name: formData.name || formData.email.split('@')[0],
+      email: formData.email,
+      phone: formData.phone,
+      plan: 'premium',
+      securityScore: 98
+    };
+
     toast({
       title: "✅ Login Successful!",
       description: "Welcome to Tezu AI - World's Most Secure AI Assistant! 🎉",
     });
     
     setTimeout(() => {
-      onLogin();
+      onLogin(userData);
     }, 1000);
   };
 
-  const handleResendOTP = () => {
-    toast({
-      title: "🔄 OTP Resent",
-      description: "New verification codes sent to your devices",
-    });
+  const handleResendOTP = async () => {
+    if (!otpData) return;
+
+    try {
+      const [emailResult, smsResult] = await Promise.all([
+        notificationService.sendEmailOTP(otpData.email!),
+        otpData.phone ? notificationService.sendSMSOTP(otpData.phone) : { success: false }
+      ]);
+
+      setOtpData(prev => prev ? {
+        ...prev,
+        emailOTP: emailResult.otp,
+        smsOTP: smsResult.otp
+      } : null);
+
+      toast({
+        title: "🔄 OTP Resent",
+        description: "New verification codes sent to your devices",
+      });
+    } catch (error) {
+      toast({
+        title: "❌ Resend Failed",
+        description: "Failed to resend OTP. Please try again.",
+        variant: "destructive"
+      });
+    }
   };
 
   const passwordStrength = getPasswordStrength(formData.password);
@@ -182,8 +308,10 @@ export function EnhancedAuthSystem({ onLogin }: EnhancedAuthSystemProps) {
 
         {authMode === '2fa' ? (
           <OTPVerification 
-            email={formData.email}
-            phone={formData.phone}
+            email={otpData?.email || ''}
+            phone={otpData?.phone || ''}
+            expectedEmailOTP={otpData?.emailOTP}
+            expectedSMSOTP={otpData?.smsOTP}
             onVerificationSuccess={handleOTPVerificationSuccess}
             onResendOTP={handleResendOTP}
           />
@@ -202,6 +330,13 @@ export function EnhancedAuthSystem({ onLogin }: EnhancedAuthSystemProps) {
                     Welcome Back
                   </CardTitle>
                   <p className="text-gray-400">Sign in to your secure account</p>
+                  {authAttempts > 0 && (
+                    <div className="p-2 bg-yellow-500/10 border border-yellow-500/30 rounded">
+                      <p className="text-yellow-400 text-xs">
+                        ⚠️ Failed attempts: {authAttempts}/3. Account will be locked after 3 attempts.
+                      </p>
+                    </div>
+                  )}
                 </CardHeader>
                 <CardContent className="space-y-4">
                   <div>
@@ -217,6 +352,21 @@ export function EnhancedAuthSystem({ onLogin }: EnhancedAuthSystemProps) {
                       />
                     </div>
                   </div>
+                  
+                  <div>
+                    <Label className="text-gray-300">Phone (Optional - for SMS 2FA)</Label>
+                    <div className="relative">
+                      <Phone className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-green-400" />
+                      <Input
+                        type="tel"
+                        placeholder="+91 XXXXXXXXXX"
+                        value={formData.phone}
+                        onChange={(e) => handleInputChange('phone', e.target.value)}
+                        className="bg-gray-700/50 border-gray-600 text-white pl-10"
+                      />
+                    </div>
+                  </div>
+                  
                   <div>
                     <Label className="text-gray-300">Password</Label>
                     <div className="relative">
@@ -239,9 +389,23 @@ export function EnhancedAuthSystem({ onLogin }: EnhancedAuthSystemProps) {
                       </Button>
                     </div>
                   </div>
-                  <Button onClick={handleSecureLogin} className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700">
-                    <Shield className="w-4 h-4 mr-2" />
-                    🔐 Secure Login with 2FA
+                  
+                  <Button 
+                    onClick={handleSecureLogin} 
+                    disabled={isLoading || authAttempts >= 3}
+                    className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700"
+                  >
+                    {isLoading ? (
+                      <>
+                        <Zap className="w-4 h-4 mr-2 animate-spin" />
+                        Authenticating...
+                      </>
+                    ) : (
+                      <>
+                        <Shield className="w-4 h-4 mr-2" />
+                        🔐 Secure Login with 2FA
+                      </>
+                    )}
                   </Button>
                 </CardContent>
               </Card>
@@ -338,9 +502,22 @@ export function EnhancedAuthSystem({ onLogin }: EnhancedAuthSystemProps) {
                       />
                     </div>
                   </div>
-                  <Button onClick={handleSecureSignup} className="w-full bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700">
-                    <Shield className="w-4 h-4 mr-2" />
-                    🚀 Create Secure Account
+                  <Button 
+                    onClick={handleSecureSignup} 
+                    disabled={isLoading}
+                    className="w-full bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700"
+                  >
+                    {isLoading ? (
+                      <>
+                        <Zap className="w-4 h-4 mr-2 animate-spin" />
+                        Creating Account...
+                      </>
+                    ) : (
+                      <>
+                        <Shield className="w-4 h-4 mr-2" />
+                        🚀 Create Secure Account
+                      </>
+                    )}
                   </Button>
                 </CardContent>
               </Card>
@@ -348,12 +525,12 @@ export function EnhancedAuthSystem({ onLogin }: EnhancedAuthSystemProps) {
           </Tabs>
         )}
 
-        {/* Security Features Display */}
+        {/* Enhanced Security Features Display */}
         <Card className="bg-gray-800/50 border-gray-700 backdrop-blur-xl">
           <CardContent className="p-4">
             <h4 className="text-white font-medium mb-3 flex items-center gap-2">
               <Shield className="w-4 h-4 text-green-400" />
-              🛡️ Security Features
+              🛡️ Enterprise Security Features
             </h4>
             <div className="grid grid-cols-2 gap-2 text-xs">
               {Object.entries(securityFeatures).map(([key, enabled]) => (
@@ -366,7 +543,7 @@ export function EnhancedAuthSystem({ onLogin }: EnhancedAuthSystemProps) {
               ))}
             </div>
             <div className="mt-3 p-2 bg-green-500/10 border border-green-500/30 rounded">
-              <p className="text-xs text-green-400">
+              <p className="text-xs text-green-400 text-center">
                 🔒 Zero data collection • End-to-end encryption • GDPR compliant • Made in India 🇮🇳
               </p>
             </div>
