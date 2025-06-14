@@ -24,6 +24,7 @@ import {
 import { useState } from "react";
 
 import { ProSuiteWidget } from "./ProSuiteWidget";
+import { ProDashboardWidget } from "./ProDashboardWidget";
 
 interface WelcomeScreenProps {
   onStartChat: () => void;
@@ -100,7 +101,10 @@ export function WelcomeScreen({ onStartChat }: WelcomeScreenProps) {
     <div className="flex-1 flex items-center justify-center p-4 bg-gradient-to-br from-blue-900 via-purple-900 to-fuchsia-900">
       <div className="w-full max-w-3xl mx-auto flex flex-col items-center">
         
-        {/* === NEW: Pro Suite Widget (Full Pro features, badges, gamified etc.) === */}
+        {/* === NEW: Pro Dashboard Widget (Full advanced demo features) === */}
+        <ProDashboardWidget />
+        
+        {/* === Pro Suite Widget (Full Pro features, badges, gamified etc.) === */}
         <ProSuiteWidget />
 
         {/* Progress Bar Section */}
