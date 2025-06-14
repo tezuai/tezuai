@@ -18,6 +18,7 @@ import { RealTimeCollaboration } from "@/components/RealTimeCollaboration";
 import { CustomAITraining } from "@/components/CustomAITraining";
 import { ProfessionalTemplates } from "@/components/ProfessionalTemplates";
 import { AdvancedAnalytics } from "@/components/AdvancedAnalytics";
+import { FloatingActions } from "@/components/FloatingActions";
 
 const Index = () => {
   const [selectedConversation, setSelectedConversation] = useState<string | null>(null);
@@ -352,6 +353,8 @@ const Index = () => {
               </main>
             </div>
             <Footer />
+            {/* ADD Floating Actions for all routes */}
+            <FloatingActions />
           </div>
         </SmartAuthGuard>
       </SidebarProvider>
