@@ -10,6 +10,8 @@ const themes = [
   { name: "Kaala", class: "from-gray-900 to-gray-800" },
   { name: "Retro", class: "from-orange-900 to-yellow-400" },
   { name: "Magic Neon", class: "from-fuchsia-600 via-violet-700 to-cyan-400 animate-gradient-x" },
+  { name: "Luxury", class: "from-[#2f2e77] via-[#fe4a8a] to-[#fdedee]" },
+  { name: "Deep Space", class: "from-[#18144a] via-[#4e2661] to-[#1f254e]" },
   { name: "Random", class: "from-sky-500 to-emerald-400" } // Will randomize on select
 ];
 
