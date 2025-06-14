@@ -101,12 +101,12 @@ export function Sidebar({
   const [searchQuery, setSearchQuery] = useState("");
   const [isCreatingChat, setIsCreatingChat] = useState(false);
   const { toast } = useToast();
-  const { isOpen, setIsOpen } = useSidebar();
+  const { open, setOpen } = useSidebar();
 
   const handleSelect = (id: string) => {
     onSelectConversation(id);
     if (window.innerWidth < 768) {
-      setIsOpen(false);
+      setOpen(false);
     }
   };
 
@@ -323,7 +323,7 @@ export function Sidebar({
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent className="w-56 bg-gray-800 border border-gray-700/50">
-                  <DropdownMenuItem onClick={() => handleUpdateConversation({ ...conversation, isStarred: !conversation.isStarred })}>
+                  <DropdownMenuItem onClick={() => onUpdateConversation({ ...conversation, isStarred: !conversation.isStarred })}>
                     <Star className="mr-2 h-4 w-4" />
                     {conversation.isStarred ? "Unstar" : "Star"}
                   </DropdownMenuItem>

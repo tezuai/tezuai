@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -11,7 +10,7 @@ import {
   Share2,
   MessageSquare,
   Video,
-  Screen,
+  Monitor,
   Mic,
   MicOff,
   VideoOff,
@@ -181,7 +180,7 @@ export function RealTimeCollaboration() {
                   Start Video Call
                 </Button>
                 <Button className="w-full bg-green-600 hover:bg-green-700 flex items-center gap-2">
-                  <Screen className="w-4 h-4" />
+                  <Monitor className="w-4 h-4" />
                   Share Screen
                 </Button>
                 <Button className="w-full bg-purple-600 hover:bg-purple-700 flex items-center gap-2">
@@ -229,18 +228,18 @@ export function RealTimeCollaboration() {
           <Card className="bg-gradient-to-br from-gray-800/50 to-gray-900/50 border border-gray-600/50">
             <CardHeader>
               <CardTitle className="text-white flex items-center gap-2">
-                <Screen className="w-5 h-5 text-green-400" />
+                <Monitor className="w-5 h-5 text-green-400" />
                 Screen Sharing
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-6">
               <div className="bg-gray-900/50 rounded-xl p-8 text-center border border-gray-600/30">
-                <Screen className="w-16 h-16 text-green-400 mx-auto mb-4" />
+                <Monitor className="w-16 h-16 text-green-400 mx-auto mb-4" />
                 <h3 className="text-xl font-bold text-white mb-2">Share Your Screen</h3>
                 <p className="text-gray-400 mb-6">Let team members see your work in real-time</p>
                 <div className="flex justify-center gap-4">
                   <Button className="bg-green-600 hover:bg-green-700">
-                    <Screen className="w-4 h-4 mr-2" />
+                    <Monitor className="w-4 h-4 mr-2" />
                     Share Entire Screen
                   </Button>
                   <Button variant="outline" className="border-gray-600 text-gray-300">
