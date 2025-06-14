@@ -1,4 +1,3 @@
-
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -23,6 +22,8 @@ import {
 } from "lucide-react";
 
 import { useState } from "react";
+
+import { ProSuiteWidget } from "./ProSuiteWidget";
 
 interface WelcomeScreenProps {
   onStartChat: () => void;
@@ -98,6 +99,10 @@ export function WelcomeScreen({ onStartChat }: WelcomeScreenProps) {
   return (
     <div className="flex-1 flex items-center justify-center p-4 bg-gradient-to-br from-blue-900 via-purple-900 to-fuchsia-900">
       <div className="w-full max-w-3xl mx-auto flex flex-col items-center">
+        
+        {/* === NEW: Pro Suite Widget (Full Pro features, badges, gamified etc.) === */}
+        <ProSuiteWidget />
+
         {/* Progress Bar Section */}
         <div className="w-full flex items-center mb-4 relative">
           <div className="flex-1">
