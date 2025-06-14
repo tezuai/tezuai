@@ -1,0 +1,40 @@
+
+import { Button } from "@/components/ui/button";
+import { FileText, Code, Brain } from "lucide-react";
+
+const templates = [
+  {
+    icon: FileText,
+    label: "कहानी लिखवाएं",
+    prompt: "Mujhe ek creative story likho"
+  },
+  {
+    icon: Code,
+    label: "कोड मदद",
+    prompt: "Ek code example bana ke dikhao"
+  },
+  {
+    icon: Brain,
+    label: "समझाओ (Explain)",
+    prompt: "Mujhe deep explanation do"
+  }
+];
+
+export function QuickTemplates({ onTemplate }: { onTemplate: (prompt: string) => void }) {
+  return (
+    <div className="flex gap-3 mt-3">
+      {templates.map((t, i) => (
+        <Button
+          key={i}
+          variant="outline"
+          size="sm"
+          onClick={() => onTemplate(t.prompt)}
+          className="flex items-center gap-1 border-gray-500 hover:bg-blue-50 text-gray-700"
+        >
+          <t.icon className="w-4 h-4" />
+          <span className="text-xs">{t.label}</span>
+        </Button>
+      ))}
+    </div>
+  );
+}
