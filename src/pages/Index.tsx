@@ -29,6 +29,7 @@ import { QuickTemplates } from "@/components/QuickTemplates";
 import { FunFacts } from "@/components/FunFacts";
 import { AppGallery } from "@/components/AppGallery";
 import { OnboardingHindi } from "@/components/OnboardingHindi";
+import { HeaderBar } from "@/components/HeaderBar";
 
 const Index = () => {
   const [selectedConversation, setSelectedConversation] = useState<string | null>(null);
@@ -310,6 +311,8 @@ const Index = () => {
           onAuthStateChange={handleAuthStateChange}
         >
           <div className={`min-h-screen flex flex-col w-full bg-gradient-to-br ${appTheme}`}>
+            {/* === NEW: Stylish HeaderBar / Branding === */}
+            <HeaderBar />
             {/* Onboarding Hindi Overlay */}
             {showHindiOnboarding && <OnboardingHindi onFinish={handleHindiOnboardingFinish}/>}
             <OnboardingTips />
