@@ -55,6 +55,12 @@ const Index = () => {
   const [appTheme, setAppTheme] = useState("from-blue-900 via-blue-800 to-purple-900");
   const [showHindiOnboarding, setShowHindiOnboarding] = useState(false);
 
+  // Move this useEffect block up here, before any conditional returns!
+  useEffect(() => {
+    const done = localStorage.getItem("tezu-ai-onboarding-done");
+    if (!done) setShowHindiOnboarding(true);
+  }, []);
+
   // Check if user is returning (has localStorage data)
   useEffect(() => {
     const hasUsedBefore = localStorage.getItem('tezu-ai-assistant-used');
@@ -287,12 +293,6 @@ const Index = () => {
       />
     );
   }
-
-  // Show Hindi onboarding overlay only first time
-  useEffect(() => {
-    const done = localStorage.getItem("tezu-ai-onboarding-done");
-    if (!done) setShowHindiOnboarding(true);
-  }, []);
 
   function handleHindiOnboardingFinish() {
     setShowHindiOnboarding(false);
