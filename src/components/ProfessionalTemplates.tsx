@@ -118,12 +118,12 @@ export function ProfessionalTemplates() {
 
   const filteredTemplates = featuredTemplates.filter(template => {
     const matchesSearch = template.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                         template.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                         template.tags.some(tag => tag.toLowerCase().includes(searchQuery.toLowerCase()));
-    
-    const matchesCategory = selectedCategory === "all" || 
-                           template.category.toLowerCase() === selectedCategory;
-    
+      template.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      template.tags.some(tag => tag.toLowerCase().includes(searchQuery.toLowerCase()));
+
+    const matchesCategory = selectedCategory === "all" ||
+      template.category.toLowerCase() === selectedCategory;
+
     return matchesSearch && matchesCategory;
   });
 
@@ -207,7 +207,7 @@ export function ProfessionalTemplates() {
             ))}
           </div>
 
-          {/* Templates Grid */}
+          {/* Templates Grid and Tab Contents */}
           <div className="flex-1">
             <TabsContent value="featured" className="mt-0">
               <div className="grid md:grid-cols-2 gap-6">
@@ -283,11 +283,10 @@ export function ProfessionalTemplates() {
                 </p>
                 <Button
                   className="bg-blue-600 hover:bg-blue-700"
--                  onClick={() => document.querySelector('button[value="featured"]')?.click()}
-+                  onClick={() => {
-+                    const btn = document.querySelector('button[value="featured"]');
-+                    if (btn && btn instanceof HTMLButtonElement) btn.click();
-+                  }}
+                  onClick={() => {
+                    const btn = document.querySelector('button[value="featured"]');
+                    if (btn && btn instanceof HTMLButtonElement) btn.click();
+                  }}
                 >
                   View Featured Templates
                 </Button>
@@ -303,11 +302,10 @@ export function ProfessionalTemplates() {
                 </p>
                 <Button
                   className="bg-green-600 hover:bg-green-700"
--                  onClick={() => document.querySelector('button[value="featured"]')?.click()}
-+                  onClick={() => {
-+                    const btn = document.querySelector('button[value="featured"]');
-+                    if (btn && btn instanceof HTMLButtonElement) btn.click();
-+                  }}
+                  onClick={() => {
+                    const btn = document.querySelector('button[value="featured"]');
+                    if (btn && btn instanceof HTMLButtonElement) btn.click();
+                  }}
                 >
                   View Featured Templates
                 </Button>
@@ -323,11 +321,10 @@ export function ProfessionalTemplates() {
                 </p>
                 <Button
                   className="bg-red-600 hover:bg-red-700"
--                  onClick={() => document.querySelector('button[value="featured"]')?.click()}
-+                  onClick={() => {
-+                    const btn = document.querySelector('button[value="featured"]');
-+                    if (btn && btn instanceof HTMLButtonElement) btn.click();
-+                  }}
+                  onClick={() => {
+                    const btn = document.querySelector('button[value="featured"]');
+                    if (btn && btn instanceof HTMLButtonElement) btn.click();
+                  }}
                 >
                   Explore Templates
                 </Button>
