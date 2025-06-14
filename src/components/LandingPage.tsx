@@ -44,6 +44,7 @@ import {
   CloudLightning,
   Briefcase
 } from "lucide-react";
+import { BoredomBusterWidget } from "./BoredomBusterWidget";
 
 interface LandingPageProps {
   onStartChat: () => void;
@@ -197,7 +198,7 @@ export function LandingPage({ onStartChat }: LandingPageProps) {
         {/* Glass layer for contrast */}
         <div className="absolute inset-0 bg-gradient-to-r from-blue-900/25 via-fuchsia-700/10 to-pink-900/10 pointer-events-none" />
         <div className="relative max-w-3xl mx-auto px-4 py-16 sm:py-20 text-center space-y-8">
-          <Badge className="bg-gradient-to-r from-yellow-400 via-fuchsia-300 to-purple-500 text-white px-10 py-4 text-lg font-black animate-bounce drop-shadow-xl tracking-widest mb-5 border-2 border-yellow-400 shadow-purple-200/40">
+          <Badge className="bg-gradient-to-r from-yellow-400 via-fuchsia-300 to-teal-400 text-white px-10 py-4 text-lg font-black animate-bounce drop-shadow-xl tracking-widest mb-5 border-2 border-yellow-400 shadow-purple-200/40">
             👑 Shahi Tezu AI Pro - India's Most Advanced
           </Badge>
           {/* New Animated Main Logo & Brand */}
@@ -557,6 +558,9 @@ export function LandingPage({ onStartChat }: LandingPageProps) {
           </Tabs>
         </DialogContent>
       </Dialog>
+
+      {/* Yahan par ham Boredom Buster dikhate hain */}
+      <BoredomBusterWidget />
     </div>
   );
 }
