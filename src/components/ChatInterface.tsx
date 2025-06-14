@@ -1,4 +1,3 @@
-
 import { useState, useRef, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -67,21 +66,13 @@ export function ChatInterface({ conversation, onUpdateConversation, allConversat
 
   // Enhanced AI response system with proper Hindi/English support
   const generateTezuResponse = (userMessage: string): string => {
+    // DEBUG LOG
+    console.log("Tezu AI received user message:", userMessage);
+    if (!userMessage) {
+      return "😓 अभी जवाब नहीं आया, कृपया फिर से कोशिश करें। (No input sent to AI)";
+    }
     const responses = [
-      `🙏 Namaste! Main Tezu AI hun, aapka personal assistant. "${userMessage}" - iske baare mein main aapki madad kar sakta hun. 
-
-📚 **Analysis**: Aapka sawal interesting hai! Let me break it down:
-- Main Hindi aur English dono languages mein fluent hun
-- Creative writing, coding, analysis - sab kuch kar sakta hun
-- Real-time responses with detailed explanations
-
-💡 **Solution**: 
-1. Pehle main aapke question ko samjhta hun
-2. Phir comprehensive answer deta hun
-3. Examples aur practical tips bhi include karta hun
-
-Kya aur koi specific help chahiye? Main ready hun! 🚀`,
-
+      `🙏 Namaste! Main Tezu AI hun...`,
       `हैलो जी! 🌟 Tezu AI यहाँ present! "${userMessage}" - बहुत बढ़िया सवाल है!
 
 🔍 **Detailed Response**:
@@ -98,9 +89,7 @@ Kya aur koi specific help chahiye? Main ready hun! 🚀`,
 🎯 **Next Steps**: Batayiye aur kya specific help chahiye? Main comprehensive solutions provide kar sakta hun!`,
 
       `Excellent question! 💼 Main Tezu AI, aapka professional assistant hun.
-
 🧠 **Intelligent Response to "${userMessage}"**:
-
 **Technical Capabilities:**
 - Advanced AI models integration
 - Multi-language processing
@@ -124,57 +113,80 @@ Kya aur koi specific help chahiye? Main ready hun! 🚀`,
 
 Kya specific area mein help chahiye? Main detailed guidance de sakta hun! 🚀✨`
     ];
-
-    return responses[Math.floor(Math.random() * responses.length)];
+    const resp = responses[Math.floor(Math.random() * responses.length)];
+    if (!resp) {
+      // fallback if for any weird reason, no response
+      return "😓 Tezu AI abhi busy है, कृपया दोबारा पूछें!";
+    }
+    return resp;
   };
 
   const handleSendMessage = async () => {
-    if ((!input.trim() && attachedFiles.length === 0) || isLoading) return;
+    if ((!input.trim() && attachedFiles.length === 0) || isLoading) {
+      console.log("handleSendMessage: Empty input or loading, message not sent.");
+      return;
+    }
 
-    const userMessage: Message = {
-      id: Date.now().toString(),
-      role: "user",
-      content: input.trim() || "📎 File attachment",
-      timestamp: new Date(),
-      attachments: attachedFiles.length > 0 ? [...attachedFiles] : undefined,
-    };
-
-    const updatedConversation = {
-      ...conversation,
-      messages: [...conversation.messages, userMessage],
-      title: conversation.messages.length === 0 ? input.slice(0, 50) + "..." : conversation.title,
-    };
-
-    onUpdateConversation(updatedConversation);
-    setInput("");
-    setAttachedFiles([]);
-    setIsLoading(true);
-
-    // Simulate AI response with proper delay
-    setTimeout(() => {
-      const tezuResponse = generateTezuResponse(userMessage.content);
-      
-      const aiMessage: Message = {
-        id: (Date.now() + 1).toString(),
-        role: "assistant",
-        content: tezuResponse,
+    try {
+      const userMessage: Message = {
+        id: Date.now().toString(),
+        role: "user",
+        content: input.trim() || "📎 File attachment",
         timestamp: new Date(),
-        model: "Tezu AI Pro",
+        attachments: attachedFiles.length > 0 ? [...attachedFiles] : undefined,
       };
 
-      const finalConversation = {
-        ...updatedConversation,
-        messages: [...updatedConversation.messages, aiMessage],
+      const updatedConversation = {
+        ...conversation,
+        messages: [...conversation.messages, userMessage],
+        title: conversation.messages.length === 0 ? input.slice(0, 50) + "..." : conversation.title,
       };
 
-      onUpdateConversation(finalConversation);
-      setIsLoading(false);
+      onUpdateConversation(updatedConversation);
+      setInput("");
+      setAttachedFiles([]);
+      setIsLoading(true);
 
+      // Simulate AI response with proper delay
+      setTimeout(() => {
+        let tezuResponse;
+        try {
+          tezuResponse = generateTezuResponse(userMessage.content);
+        } catch (e) {
+          console.error("Tezu AI error:", e);
+          tezuResponse = "😓 Tezu AI में कोई दिक्कत आ गई (AI Error). कृपया फिर से कोशिश करें!";
+        }
+
+        const aiMessage: Message = {
+          id: (Date.now() + 1).toString(),
+          role: "assistant",
+          content: tezuResponse,
+          timestamp: new Date(),
+          model: "Tezu AI Pro",
+        };
+
+        const finalConversation = {
+          ...updatedConversation,
+          messages: [...updatedConversation.messages, aiMessage],
+        };
+
+        onUpdateConversation(finalConversation);
+        setIsLoading(false);
+
+        toast({
+          title: "✅ Tezu AI Response Ready!",
+          description: "Professional answer generated successfully",
+        });
+      }, 2000);
+    } catch (err) {
+      console.error("Error occurred while sending or receiving message:", err);
       toast({
-        title: "✅ Tezu AI Response Ready!",
-        description: "Professional answer generated successfully",
+        title: "❌ Error",
+        description: "Kuch galat ho gaya! कृपया फिर से कोशिश करें।",
+        variant: "destructive"
       });
-    }, 2000);
+      setIsLoading(false);
+    }
   };
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
