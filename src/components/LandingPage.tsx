@@ -183,61 +183,63 @@ export function LandingPage({ onStartChat }: LandingPageProps) {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#18144a] via-[#4e2661] to-[#1f254e] relative overflow-hidden">
+    <div className="min-h-screen bg-gradient-to-br from-[#241350] via-[#7f41de] to-[#1b0d2a] relative overflow-hidden">
       {/* Enhanced Animated Background */}
-      <div className="absolute inset-0 opacity-35 pointer-events-none">
-        <div className="absolute top-8 left-12 w-96 h-96 bg-gradient-to-tr from-[#3eb7fa] to-[#7280ff] rounded-full blur-3xl animate-pulse"></div>
-        <div className="absolute top-24 right-10 w-80 h-80 bg-gradient-to-br from-[#b075ff] via-fuchsia-400 to-[#ff95ce] rounded-full blur-2xl animate-pulse animation-delay-2000"></div>
-        <div className="absolute bottom-8 left-1/4 w-72 h-72 bg-gradient-to-r from-yellow-400 via-orange-400 to-pink-400 rounded-full blur-2xl animate-pulse animation-delay-4000"></div>
-        <div className="absolute bottom-20 right-1/3 w-64 h-64 bg-gradient-to-br from-green-500 to-teal-400 rounded-full blur-2xl animate-pulse animation-delay-6000"></div>
+      <div className="absolute inset-0 opacity-30 pointer-events-none">
+        <div className="absolute top-6 left-10 w-[410px] h-96 bg-gradient-to-br from-[#ffd700] via-[#a259f2] to-[#fe9fff] rounded-full blur-3xl animate-pulse"></div>
+        <div className="absolute top-24 right-14 w-[340px] h-64 bg-gradient-to-tr from-[#a882ff] via-fuchsia-400 to-[#ffb1fc] rounded-full blur-2xl animate-pulse animation-delay-2000"></div>
+        <div className="absolute bottom-8 left-1/5 w-[260px] h-64 bg-gradient-to-r from-yellow-400 via-orange-400 to-pink-400 rounded-full blur-2xl animate-pulse animation-delay-4000"></div>
+        <div className="absolute bottom-20 right-1/3 w-56 h-56 bg-gradient-to-br from-purple-400 to-fuchsia-300 rounded-full blur-2xl animate-pulse animation-delay-6000"></div>
       </div>
 
       {/* Hero Section */}
       <div className="relative z-20">
-        <div className="absolute inset-0 bg-gradient-to-r from-blue-900/20 via-fuchsia-700/10 to-pink-900/10 pointer-events-none" />
-        <div className="relative max-w-3xl mx-auto px-4 py-20 text-center space-y-7">
-          <Badge className="bg-gradient-to-r from-fuchsia-500 via-blue-600 to-yellow-400 text-white px-8 py-4 text-lg font-black animate-bounce shadow-fuchsia-400/50 drop-shadow-xl tracking-widest mb-6">
-            🚀 India's Most Advanced AI Assistant - Professional Edition
+        {/* Glass layer for contrast */}
+        <div className="absolute inset-0 bg-gradient-to-r from-blue-900/25 via-fuchsia-700/10 to-pink-900/10 pointer-events-none" />
+        <div className="relative max-w-3xl mx-auto px-4 py-16 sm:py-20 text-center space-y-8">
+          <Badge className="bg-gradient-to-r from-yellow-400 via-fuchsia-300 to-purple-500 text-white px-10 py-4 text-lg font-black animate-bounce drop-shadow-xl tracking-widest mb-5 border-2 border-yellow-400 shadow-purple-200/40">
+            👑 Shahi Tezu AI Pro - India's Most Advanced
           </Badge>
-          
-          {/* Stylish Animated Logo */}
-          <h1 className="text-5xl md:text-7xl font-bold mb-2">
-            <span className="bg-gradient-to-tr from-[#01f7ff] via-[#8e54e9] to-[#fd99fe] bg-clip-text text-transparent drop-shadow-[0_5px_40px_rgba(149,99,254,0.7)] animate-gradient-x">
-              Tezu <span className="font-black">AI</span> <span className="text-sm md:text-2xl font-black ml-1 gradient-text bg-gradient-to-r from-yellow-200 via-fuchsia-500 to-purple-400 bg-clip-text text-transparent tracking-tight">Pro</span>
+          {/* New Animated Main Logo & Brand */}
+          <h1 className="text-6xl md:text-8xl font-extrabold flex flex-col gap-1 items-center justify-center mb-2">
+            <span className="bg-gradient-to-tr from-[#ffd700] via-[#a259f2] to-[#fe9fff] bg-clip-text text-transparent drop-shadow-[0_7px_70px_rgba(255,215,0,0.5)] animate-gradient-x font-black tracking-widest glowing text-shadow-xl">
+              Tezu <span className="font-black drop-shadow">AI</span>{" "}
+              <span className="font-black text-yellow-400 text-3xl md:text-5xl align-super ml-1">Pro</span>
+            </span>
+            {/* Hindi logo below */}
+            <span className="text-sm md:text-2xl font-black bg-gradient-to-r from-yellow-400 via-pink-400 to-purple-400 bg-clip-text text-transparent mt-1 tracking-widest animate-gradient-x shadow-fuchsia-100">
+              <span className="font-serif">तेज़ू ए.आई. <span className="font-extrabold">प्रो</span></span>
             </span>
           </h1>
-          <div className="text-xl md:text-3xl font-extrabold bg-gradient-to-r from-yellow-400 via-fuchsia-400 to-blue-400 bg-clip-text text-transparent drop-shadow-md mb-2 animate-gradient-x tracking-wider">
+          <div className="text-2xl md:text-4xl font-bold bg-gradient-to-r from-yellow-400 via-fuchsia-300 to-blue-400 bg-clip-text text-transparent drop-shadow-lg mb-2 animate-gradient-x tracking-wide">
             Professional <span className="font-extrabold">Enterprise</span>
           </div>
-          <p className="text-lg md:text-2xl text-fuchsia-200 max-w-2xl mx-auto leading-relaxed font-semibold drop-shadow mb-6">
-            15+ AI Models <span className="mx-1 text-fuchsia-400">•</span> Workflow Automation <span className="mx-1 text-fuchsia-400">•</span> Custom Training <span className="mx-1 text-fuchsia-400">•</span> Business Intelligence
+          <p className="text-lg md:text-2xl text-fuchsia-100 max-w-2xl mx-auto leading-relaxed font-semibold drop-shadow mb-6">
+            15+ AI Models <span className="mx-1 text-fuchsia-400">•</span> Workflow Automation <span className="mx-1 text-fuchsia-400">•</span> Custom Training <span className="mx-1 text-fuchsia-400">•</span> <span className="text-yellow-400">Shahi Business Intelligence</span>
             <br />
-            <span className="text-transparent bg-gradient-to-r from-cyan-300 via-fuchsia-400 to-yellow-300 bg-clip-text font-bold animate-gradient-x">
-              Professional Features से Business को{" "}
-              <span className="underline decoration-wavy decoration-2 decoration-fuchsia-500">Next Level</span> पर ले जाएं!
+            <span className="text-transparent bg-gradient-to-r from-yellow-200 via-fuchsia-400 to-blue-200 bg-clip-text font-bold animate-gradient-x">
+              Shahi Professional Features से Business को{" "}
+              <span className="underline decoration-wavy decoration-2 decoration-yellow-400">Next Level</span> पर ले जाएं!
             </span>
           </p>
-
+          {/* CTA Button group */}
           <div className="flex flex-col sm:flex-row gap-6 justify-center items-center mb-8">
+            {/* Royal badges */}
             <div className="flex gap-3 mb-4 sm:mb-0">
-              <Badge className="bg-gradient-to-r from-green-500/90 to-fuchsia-400/90 text-white px-4 py-2 font-bold animate-pulse shadow" >
-                <Shield className="w-4 h-4 mr-2" /> 100% Secure & Private
+              <Badge className="bg-gradient-to-r from-yellow-400/90 to-fuchsia-400/90 text-purple-800 px-4 py-2 font-bold animate-pulse shadow border-yellow-400 shadow-fuchsia-200/40" >
+                ️<Sparkles className="w-4 h-4 mr-2 text-yellow-500" /> Shahi Secure & Private
               </Badge>
-              <Badge className="bg-gradient-to-r from-blue-300/90 to-fuchsia-400/90 text-white px-4 py-2 font-bold animate-pulse shadow" >
-                <Zap className="w-4 h-4 mr-2" /> Lightning Fast
-              </Badge>
-              <Badge className="bg-gradient-to-r from-fuchsia-500/90 to-pink-400/90 text-white px-4 py-2 font-bold animate-pulse shadow" >
-                <Sparkles className="w-4 h-4 mr-2" /> AI Powered
+              <Badge className="bg-gradient-to-r from-blue-300/90 to-fuchsia-400/90 text-white px-4 py-2 font-bold animate-pulse shadow border-blue-400 shadow-blue-200/40" >
+                <Sparkles className="w-4 h-4 mr-2 text-blue-500" /> Lightning Fast
               </Badge>
             </div>
             <Button
               onClick={onStartChat}
               size="lg"
-              className="bg-gradient-to-r from-blue-600 via-fuchsia-600 to-pink-600 hover:from-blue-700 hover:via-fuchsia-700 hover:to-pink-700 text-xl px-14 py-7 rounded-full shadow-2xl hover:scale-105 transition-all duration-300 font-bold tracking-widest"
+              className="bg-gradient-to-br from-yellow-400 via-fuchsia-500 to-purple-600 hover:from-yellow-500 hover:via-fuchsia-600 hover:to-purple-700 text-xl px-14 py-7 rounded-full shadow-2xl hover:scale-105 transition-all duration-400 font-bold tracking-wider ring-2 ring-yellow-300 border-2 border-purple-500"
             >
-              <Rocket className="w-7 h-7 mr-4" />
-              Start Professional AI Journey
-              <ArrowRight className="w-7 h-7 ml-4" />
+              <Sparkles className="w-7 h-7 mr-4 text-yellow-300" />
+              Start Shahi AI Journey
             </Button>
           </div>
         </div>
