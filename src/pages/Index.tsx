@@ -20,6 +20,16 @@ import { ProfessionalTemplates } from "@/components/ProfessionalTemplates";
 import { AdvancedAnalytics } from "@/components/AdvancedAnalytics";
 import { FloatingActions } from "@/components/FloatingActions";
 
+// ADD NEW IMPORTS
+import { ThemePicker } from "@/components/ThemePicker";
+import { OnboardingTips } from "@/components/OnboardingTips";
+import { ChatReactions } from "@/components/ChatReactions";
+import { ProgressBar } from "@/components/ProgressBar";
+import { QuickTemplates } from "@/components/QuickTemplates";
+import { FunFacts } from "@/components/FunFacts";
+import { AppGallery } from "@/components/AppGallery";
+import { OnboardingHindi } from "@/components/OnboardingHindi";
+
 const Index = () => {
   const [selectedConversation, setSelectedConversation] = useState<string | null>(null);
   const [conversations, setConversations] = useState<any[]>([]);
@@ -41,6 +51,9 @@ const Index = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [currentUser, setCurrentUser] = useState<UserSession | null>(null);
   const [requireAuth, setRequireAuth] = useState(false);
+  const [showThemePicker, setShowThemePicker] = useState(false);
+  const [appTheme, setAppTheme] = useState("from-blue-900 via-blue-800 to-purple-900");
+  const [showHindiOnboarding, setShowHindiOnboarding] = useState(false);
 
   // Check if user is returning (has localStorage data)
   useEffect(() => {
@@ -275,6 +288,20 @@ const Index = () => {
     );
   }
 
+  // Show Hindi onboarding overlay only first time
+  useEffect(() => {
+    const done = localStorage.getItem("tezu-ai-onboarding-done");
+    if (!done) setShowHindiOnboarding(true);
+  }, []);
+
+  function handleHindiOnboardingFinish() {
+    setShowHindiOnboarding(false);
+    localStorage.setItem("tezu-ai-onboarding-done", "yes");
+  }
+
+  // ThemePicker controls
+  function handleThemeChange(cls: string) { setAppTheme(cls); }
+
   return (
     <SubscriptionProvider>
       <SidebarProvider>
@@ -282,7 +309,11 @@ const Index = () => {
           requireAuth={requireAuth}
           onAuthStateChange={handleAuthStateChange}
         >
-          <div className="min-h-screen flex flex-col w-full bg-gradient-to-br from-gray-900 via-blue-900 to-purple-900">
+          <div className={`min-h-screen flex flex-col w-full bg-gradient-to-br ${appTheme}`}>
+            {/* Onboarding Hindi Overlay */}
+            {showHindiOnboarding && <OnboardingHindi onFinish={handleHindiOnboardingFinish}/>}
+            <OnboardingTips />
+            <FunFacts />
             <div className="flex flex-1">
               {(['chat', 'analytics', 'ai-model-switcher', 'collaboration', 'custom-training', 'templates', 'advanced-analytics'].includes(currentView)) && (
                 <Sidebar
@@ -301,7 +332,33 @@ const Index = () => {
                   currentUser={currentUser}
                 />
               )}
-              <main className="flex-1 flex flex-col">
+              <main className="flex-1 flex flex-col p-2 sm:p-4">
+                {/* Theme/Color Picker trigger */}
+                <div className="flex justify-end mb-2">
+                  <button
+                    className="bg-gradient-to-r from-purple-500 to-blue-500 text-white px-3 py-1 rounded shadow hover:scale-105"
+                    onClick={() => setShowThemePicker(true)}
+                  >🎨 थीम बदलें</button>
+                </div>
+                {showThemePicker && (
+                  <ThemePicker
+                    open={showThemePicker}
+                    onClose={() => setShowThemePicker(false)}
+                    onChange={handleThemeChange}
+                  />
+                )}
+
+                {/* Progress Bar, QuickTemplates, Reactions */}
+                <ProgressBar value={selectedConversation ? 80 : 25} max={100} />
+                <QuickTemplates onTemplate={(prompt) => alert(`Selected: ${prompt}`)} />
+                <ChatReactions />
+
+                {/* SmartTemplates, Gallery etc. */}
+                {currentView === "templates" && (
+                  <>
+                    <AppGallery />
+                  </>
+                )}
                 {currentView === 'subscription' ? (
                   <SubscriptionPage onBack={() => setCurrentView('chat')} />
                 ) : currentView === 'privacy' ? (
@@ -353,13 +410,12 @@ const Index = () => {
               </main>
             </div>
             <Footer />
-            {/* ADD Floating Actions for all routes */}
             <FloatingActions />
           </div>
         </SmartAuthGuard>
       </SidebarProvider>
     </SubscriptionProvider>
   );
-};
+}
 
 export default Index;
