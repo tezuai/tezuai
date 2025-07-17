@@ -44,14 +44,13 @@ export class SecureNotificationService {
       });
 
       if (response.ok) {
-        console.log(`✅ Email OTP sent to ${email}: ${otp}`);
         return { success: true, otp };
       } else {
         throw new Error('Email service failed');
       }
     } catch (error) {
-      console.log(`📧 Demo: Email OTP for ${email}: ${this.generateOTP()}`);
-      return { success: true, otp: '123456' }; // Demo fallback
+      // Fallback for development
+      return { success: true, otp: '123456' };
     }
   }
 
@@ -76,14 +75,13 @@ export class SecureNotificationService {
       });
 
       if (response.ok) {
-        console.log(`✅ SMS OTP sent to ${phone}: ${otp}`);
         return { success: true, otp };
       } else {
         throw new Error('SMS service failed');
       }
     } catch (error) {
-      console.log(`📱 Demo: SMS OTP for ${phone}: ${this.generateOTP()}`);
-      return { success: true, otp: '654321' }; // Demo fallback
+      // Fallback for development
+      return { success: true, otp: '654321' };
     }
   }
 

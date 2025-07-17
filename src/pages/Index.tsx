@@ -30,6 +30,9 @@ import { FunFacts } from "@/components/FunFacts";
 import { AppGallery } from "@/components/AppGallery";
 import { OnboardingHindi } from "@/components/OnboardingHindi";
 import { HeaderBar } from "@/components/HeaderBar";
+import { NewsEngine } from "@/components/NewsEngine";
+import { SmartProductivitySuite } from "@/components/SmartProductivitySuite";
+import { SecurityCenter } from "@/components/SecurityCenter";
 
 const Index = () => {
   const [selectedConversation, setSelectedConversation] = useState<string | null>(null);
@@ -46,6 +49,9 @@ const Index = () => {
     | 'custom-training'
     | 'templates'
     | 'advanced-analytics'
+    | 'news-engine'
+    | 'productivity-suite'
+    | 'security-center'
   >('chat');
   const [showLanding, setShowLanding] = useState(true);
   const [showOnboarding, setShowOnboarding] = useState(false);
@@ -229,6 +235,9 @@ const Index = () => {
       | 'custom-training'
       | 'templates'
       | 'advanced-analytics'
+      | 'news-engine'
+      | 'productivity-suite'
+      | 'security-center'
   ) => {
     // Check if view requires authentication
     const authRequiredViews = [
@@ -240,7 +249,9 @@ const Index = () => {
       'collaboration',
       'custom-training',
       'templates',
-      'advanced-analytics'
+      'advanced-analytics',
+      'productivity-suite',
+      'security-center'
     ];
     
     if (authRequiredViews.includes(view) && !isAuthenticated) {
@@ -318,7 +329,7 @@ const Index = () => {
             <OnboardingTips />
             <FunFacts />
             <div className="flex flex-1">
-              {(['chat', 'analytics', 'ai-model-switcher', 'collaboration', 'custom-training', 'templates', 'advanced-analytics'].includes(currentView)) && (
+              {(['chat', 'analytics', 'ai-model-switcher', 'collaboration', 'custom-training', 'templates', 'advanced-analytics', 'news-engine', 'productivity-suite', 'security-center'].includes(currentView)) && (
                 <Sidebar
                   conversations={conversations}
                   selectedConversation={selectedConversation}
@@ -352,7 +363,9 @@ const Index = () => {
                 )}
 
                 {/* Progress Bar, QuickTemplates, Reactions */}
-                <ProgressBar value={selectedConversation ? 80 : 25} max={100} />
+                <ProgressBar value={selectedConversation ? 
+                  Math.min(100, (conversations.length * 10) + (currentUser ? 40 : 0)) : 25
+                } max={100} />
                 <QuickTemplates onTemplate={(prompt) => alert(`Selected: ${prompt}`)} />
                 <ChatReactions />
 
@@ -401,6 +414,12 @@ const Index = () => {
                   <div className="p-6">
                     <AdvancedAnalytics />
                   </div>
+                ) : currentView === 'news-engine' ? (
+                  <NewsEngine />
+                ) : currentView === 'productivity-suite' ? (
+                  <SmartProductivitySuite />
+                ) : currentView === 'security-center' ? (
+                  <SecurityCenter />
                 ) : selectedConversation && currentConversation ? (
                   <ChatInterface
                     conversation={currentConversation}

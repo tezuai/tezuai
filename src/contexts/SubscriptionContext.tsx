@@ -84,7 +84,7 @@ export function SubscriptionProvider({ children }: { children: ReactNode }) {
       }));
     }
     
-    console.log(`Upgraded to ${planId} plan with enhanced features`);
+    // Plan upgrade completed successfully
   };
 
   const checkFeatureAccess = (feature: string): boolean => {

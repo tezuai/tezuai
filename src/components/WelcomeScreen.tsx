@@ -91,8 +91,12 @@ const quickActions = [
 ];
 
 export function WelcomeScreen({ onStartChat }: WelcomeScreenProps) {
-  // Progress state (hardcoded at 80% for demo, ideally dynamic)
-  const progressValue = 80;
+  // Dynamic progress calculation based on user activity
+  const [progressValue, setProgressValue] = useState(() => {
+    const completedTasks = localStorage.getItem('tezu-ai-completed-tasks') || '0';
+    const totalFeatures = localStorage.getItem('tezu-ai-features-explored') || '0';
+    return Math.min(100, parseInt(completedTasks) * 10 + parseInt(totalFeatures) * 5);
+  });
 
   // For floating CTA animation (pulse)
   const [askHover, setAskHover] = useState(false);

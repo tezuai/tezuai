@@ -66,8 +66,6 @@ export function ChatInterface({ conversation, onUpdateConversation, allConversat
 
   // Enhanced AI response system with proper Hindi/English support
   const generateTezuResponse = (userMessage: string): string => {
-    // DEBUG LOG
-    console.log("Tezu AI received user message:", userMessage);
     if (!userMessage) {
       return "😓 अभी जवाब नहीं आया, कृपया फिर से कोशिश करें। (No input sent to AI)";
     }
@@ -123,7 +121,6 @@ Kya specific area mein help chahiye? Main detailed guidance de sakta hun! 🚀�
 
   const handleSendMessage = async () => {
     if ((!input.trim() && attachedFiles.length === 0) || isLoading) {
-      console.log("handleSendMessage: Empty input or loading, message not sent.");
       return;
     }
 
