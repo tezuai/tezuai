@@ -33,6 +33,10 @@ import { HeaderBar } from "@/components/HeaderBar";
 import { NewsEngine } from "@/components/NewsEngine";
 import { SmartProductivitySuite } from "@/components/SmartProductivitySuite";
 import { SecurityCenter } from "@/components/SecurityCenter";
+import { ThemeGallery } from "@/components/ThemeGallery";
+import { AIMarketplace } from "@/components/AIMarketplace";
+import { WorkflowAutomation } from "@/components/WorkflowAutomation";
+import { BusinessIntelligence } from "@/components/BusinessIntelligence";
 
 const Index = () => {
   const [selectedConversation, setSelectedConversation] = useState<string | null>(null);
@@ -52,6 +56,10 @@ const Index = () => {
     | 'news-engine'
     | 'productivity-suite'
     | 'security-center'
+    | 'theme-gallery'
+    | 'ai-marketplace'
+    | 'workflow-automation'
+    | 'business-intelligence'
   >('chat');
   const [showLanding, setShowLanding] = useState(true);
   const [showOnboarding, setShowOnboarding] = useState(false);
@@ -238,6 +246,10 @@ const Index = () => {
       | 'news-engine'
       | 'productivity-suite'
       | 'security-center'
+      | 'theme-gallery'
+      | 'ai-marketplace'
+      | 'workflow-automation'
+      | 'business-intelligence'
   ) => {
     // Check if view requires authentication
     const authRequiredViews = [
@@ -251,7 +263,11 @@ const Index = () => {
       'templates',
       'advanced-analytics',
       'productivity-suite',
-      'security-center'
+      'security-center',
+      'theme-gallery',
+      'ai-marketplace',
+      'workflow-automation',
+      'business-intelligence'
     ];
     
     if (authRequiredViews.includes(view) && !isAuthenticated) {
@@ -329,7 +345,7 @@ const Index = () => {
             <OnboardingTips />
             <FunFacts />
             <div className="flex flex-1">
-              {(['chat', 'analytics', 'ai-model-switcher', 'collaboration', 'custom-training', 'templates', 'advanced-analytics', 'news-engine', 'productivity-suite', 'security-center'].includes(currentView)) && (
+              {(['chat', 'analytics', 'ai-model-switcher', 'collaboration', 'custom-training', 'templates', 'advanced-analytics', 'news-engine', 'productivity-suite', 'security-center', 'theme-gallery', 'ai-marketplace', 'workflow-automation', 'business-intelligence'].includes(currentView)) && (
                 <Sidebar
                   conversations={conversations}
                   selectedConversation={selectedConversation}
@@ -420,6 +436,14 @@ const Index = () => {
                   <SmartProductivitySuite />
                 ) : currentView === 'security-center' ? (
                   <SecurityCenter />
+                ) : currentView === 'theme-gallery' ? (
+                  <ThemeGallery />
+                ) : currentView === 'ai-marketplace' ? (
+                  <AIMarketplace />
+                ) : currentView === 'workflow-automation' ? (
+                  <WorkflowAutomation />
+                ) : currentView === 'business-intelligence' ? (
+                  <BusinessIntelligence />
                 ) : selectedConversation && currentConversation ? (
                   <ChatInterface
                     conversation={currentConversation}

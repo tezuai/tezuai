@@ -55,7 +55,14 @@ interface SidebarProps {
     | "collaboration"
     | "custom-training"
     | "templates"
-    | "advanced-analytics";
+    | "advanced-analytics"
+    | "news-engine"
+    | "productivity-suite"
+    | "security-center"
+    | "theme-gallery"
+    | "ai-marketplace"
+    | "workflow-automation"
+    | "business-intelligence";
   onViewChange: (
     view:
       | "chat"
@@ -69,6 +76,13 @@ interface SidebarProps {
       | "custom-training"
       | "templates"
       | "advanced-analytics"
+      | "news-engine"
+      | "productivity-suite"
+      | "security-center"
+      | "theme-gallery"
+      | "ai-marketplace"
+      | "workflow-automation"
+      | "business-intelligence"
   ) => void;
   onLogout: () => void;
   isAuthenticated?: boolean;
@@ -188,6 +202,48 @@ export function Sidebar({
       icon: Layers,
       view: "advanced-analytics" as const,
       badge: "Pro"
+    },
+    {
+      title: "News Engine",
+      icon: FileText,
+      view: "news-engine" as const,
+      badge: "New"
+    },
+    {
+      title: "Productivity Suite",
+      icon: BarChart3,
+      view: "productivity-suite" as const,
+      badge: "Pro"
+    },
+    {
+      title: "Security Center",
+      icon: Lock,
+      view: "security-center" as const,
+      badge: "Pro"
+    },
+    {
+      title: "Theme Gallery",
+      icon: Layers,
+      view: "theme-gallery" as const,
+      badge: "New"
+    },
+    {
+      title: "AI Marketplace",
+      icon: Brain,
+      view: "ai-marketplace" as const,
+      badge: "Pro"
+    },
+    {
+      title: "Workflow Automation",
+      icon: Bot,
+      view: "workflow-automation" as const,
+      badge: "Pro"
+    },
+    {
+      title: "Business Intelligence",
+      icon: BarChart3,
+      view: "business-intelligence" as const,
+      badge: "Enterprise"
     },
     {
       title: "AI Assistant",
