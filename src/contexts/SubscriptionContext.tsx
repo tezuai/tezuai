@@ -35,7 +35,12 @@ interface SubscriptionContextType {
 const SubscriptionContext = createContext<SubscriptionContextType | undefined>(undefined);
 
 export function SubscriptionProvider({ children }: { children: ReactNode }) {
-  const [currentPlan, setCurrentPlan] = useState<string>('free');
+  const [currentPlan, setCurrentPlan] = useState<string>(() => {
+    // Check if user is authenticated and auto-set to enterprise
+    const savedPlan = localStorage.getItem('tezu-ai-plan');
+    const isAuth = localStorage.getItem('tezu-ai-authenticated');
+    return isAuth === 'true' ? (savedPlan || 'enterprise') : 'free';
+  });
   const [usage, setUsage] = useState({
     messagesUsed: 0,
     messagesLimit: 10,

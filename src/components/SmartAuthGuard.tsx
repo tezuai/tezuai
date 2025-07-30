@@ -97,11 +97,12 @@ export function SmartAuthGuard({ children, requireAuth = false, onAuthStateChang
       level: 'Premium'
     };
 
-    // Store session with 24-hour expiry
-    const expiry = new Date().getTime() + (24 * 60 * 60 * 1000);
+    // Store session with 7-day expiry for persistent login
+    const expiry = new Date().getTime() + (7 * 24 * 60 * 60 * 1000);
     localStorage.setItem('tezu-ai-session', JSON.stringify(newSession));
     localStorage.setItem('tezu-ai-session-expiry', expiry.toString());
     localStorage.setItem('tezu-ai-authenticated', 'true');
+    localStorage.setItem('tezu-ai-plan', 'enterprise'); // Auto-unlock all features
 
     setUserSession(newSession);
     setIsAuthenticated(true);
