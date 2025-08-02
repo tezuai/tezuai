@@ -37,6 +37,11 @@ import { ThemeGallery } from "@/components/ThemeGallery";
 import { AIMarketplace } from "@/components/AIMarketplace";
 import { WorkflowAutomation } from "@/components/WorkflowAutomation";
 import { BusinessIntelligence } from "@/components/BusinessIntelligence";
+import { MultimodalAI } from "@/components/MultimodalAI";
+import { RealtimeKnowledgeEngine } from "@/components/RealtimeKnowledgeEngine";
+import { AgenticAI } from "@/components/AgenticAI";
+import { CreativeStudio } from "@/components/CreativeStudio";
+import { SmartLearning } from "@/components/SmartLearning";
 
 const Index = () => {
   const [selectedConversation, setSelectedConversation] = useState<string | null>(null);
@@ -60,6 +65,11 @@ const Index = () => {
     | 'ai-marketplace'
     | 'workflow-automation'
     | 'business-intelligence'
+    | 'multimodal-ai'
+    | 'realtime-knowledge'
+    | 'agentic-ai'
+    | 'creative-studio'
+    | 'smart-learning'
   >('chat');
   const [showLanding, setShowLanding] = useState(true);
   const [showOnboarding, setShowOnboarding] = useState(false);
@@ -444,6 +454,16 @@ const Index = () => {
                   <WorkflowAutomation />
                 ) : currentView === 'business-intelligence' ? (
                   <BusinessIntelligence />
+                ) : currentView === 'multimodal-ai' ? (
+                  <MultimodalAI />
+                ) : currentView === 'realtime-knowledge' ? (
+                  <RealtimeKnowledgeEngine />
+                ) : currentView === 'agentic-ai' ? (
+                  <AgenticAI />
+                ) : currentView === 'creative-studio' ? (
+                  <CreativeStudio />
+                ) : currentView === 'smart-learning' ? (
+                  <SmartLearning />
                 ) : selectedConversation && currentConversation ? (
                   <ChatInterface
                     conversation={currentConversation}
