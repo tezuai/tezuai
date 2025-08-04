@@ -5,6 +5,7 @@
 
 @layer base {
   :root {
+    /* Advanced Professional Color System */
     --background: 222.2 84% 4.9%;
     --foreground: 210 40% 98%;
 
@@ -33,6 +34,24 @@
     --input: 217.2 32.6% 17.5%;
     --ring: 212.7 26.8% 83.9%;
     
+    /* Enhanced Design Tokens */
+    --gradient-primary: linear-gradient(135deg, hsl(262 80% 50%), hsl(292 84% 61%));
+    --gradient-secondary: linear-gradient(135deg, hsl(217 91% 60%), hsl(262 80% 50%));
+    --gradient-accent: linear-gradient(135deg, hsl(47 96% 53%), hsl(24 95% 53%));
+    --gradient-royal: linear-gradient(135deg, hsl(262 80% 50%), hsl(292 84% 61%), hsl(325 84% 65%));
+    --gradient-cyber: linear-gradient(135deg, hsl(271 81% 56%), hsl(312 73% 55%), hsl(195 100% 50%));
+    --gradient-ocean: linear-gradient(135deg, hsl(217 91% 60%), hsl(212 84% 49%), hsl(195 100% 39%));
+    --gradient-sunset: linear-gradient(135deg, hsl(14 100% 57%), hsl(34 100% 50%), hsl(47 96% 53%));
+    --gradient-forest: linear-gradient(135deg, hsl(142 69% 58%), hsl(158 64% 52%), hsl(173 58% 39%));
+    --gradient-neon: linear-gradient(135deg, hsl(292 84% 61%), hsl(312 73% 55%), hsl(195 100% 50%));
+    
+    /* Professional Shadow System */
+    --shadow-elegant: 0 10px 30px -10px hsl(var(--primary) / 0.3);
+    --shadow-glow: 0 0 40px hsl(292 84% 61% / 0.4);
+    --shadow-intense: 0 20px 60px -10px hsl(292 84% 61% / 0.5);
+    --shadow-royal: 0 15px 35px -8px hsl(262 80% 50% / 0.4);
+    
+    /* Advanced Sidebar Colors */
     --sidebar-background: 240 5.9% 10%;
     --sidebar-foreground: 240 4.8% 95.9%;
     --sidebar-primary: 224.3 76.3% 48%;
@@ -42,7 +61,35 @@
     --sidebar-border: 240 3.7% 15.9%;
     --sidebar-ring: 217.2 91.2% 59.8%;
 
+    /* Enhanced Animation Variables */
+    --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-bounce: all 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+    --animation-duration: 0.3s;
+    
     --radius: 0.5rem;
+  }
+
+  /* Light Mode Support */
+  .light {
+    --background: 0 0% 100%;
+    --foreground: 222.2 84% 4.9%;
+    --card: 0 0% 100%;
+    --card-foreground: 222.2 84% 4.9%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 222.2 84% 4.9%;
+    --primary: 262 80% 50%;
+    --primary-foreground: 210 40% 98%;
+    --secondary: 210 40% 96%;
+    --secondary-foreground: 222.2 47.4% 11.2%;
+    --muted: 210 40% 96%;
+    --muted-foreground: 215.4 16.3% 46.9%;
+    --accent: 210 40% 96%;
+    --accent-foreground: 222.2 47.4% 11.2%;
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 210 40% 98%;
+    --border: 214.3 31.8% 91.4%;
+    --input: 214.3 31.8% 91.4%;
+    --ring: 262 80% 50%;
   }
 }
 
@@ -76,12 +123,13 @@
 }
 
 @layer components {
+  /* Advanced Component Styles */
   .story-link {
     @apply relative inline-block after:content-[''] after:absolute after:w-full after:scale-x-0 after:h-0.5 after:bottom-0 after:left-0 after:bg-primary after:origin-bottom-right after:transition-transform after:duration-300 hover:after:scale-x-100 hover:after:origin-bottom-left;
   }
   
   .hover-scale {
-    @apply transition-transform duration-200 hover:scale-105;
+    @apply transition-transform duration-200 hover:scale-105 hover:shadow-lg;
   }
   
   .pulse {
@@ -89,10 +137,79 @@
   }
 
   .glass-effect {
-    @apply bg-white/10 backdrop-blur-sm border border-white/20;
+    @apply bg-white/10 backdrop-blur-sm border border-white/20 shadow-xl;
   }
 
   .gradient-text {
     @apply bg-gradient-to-r from-blue-400 via-purple-400 to-pink-400 bg-clip-text text-transparent;
   }
+
+  /* Professional Button Variants */
+  .btn-royal {
+    @apply bg-gradient-to-r from-purple-600 via-pink-600 to-blue-600 hover:from-purple-700 hover:via-pink-700 hover:to-blue-700 text-white font-semibold px-6 py-3 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300;
+  }
+
+  .btn-cyber {
+    @apply bg-gradient-to-r from-cyan-500 via-purple-500 to-pink-500 hover:from-cyan-600 hover:via-purple-600 hover:to-pink-600 text-white font-semibold px-6 py-3 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300;
+  }
+
+  .btn-golden {
+    @apply bg-gradient-to-r from-yellow-400 via-amber-500 to-orange-500 hover:from-yellow-500 hover:via-amber-600 hover:to-orange-600 text-black font-semibold px-6 py-3 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300;
+  }
+
+  /* Professional Card Styles */
+  .card-premium {
+    @apply bg-gradient-to-br from-gray-900/95 to-gray-800/95 backdrop-blur-xl border border-gray-700/50 rounded-2xl p-6 shadow-2xl hover:shadow-[0_0_40px_rgba(168,85,247,0.4)] transition-all duration-500;
+  }
+
+  .card-glow {
+    @apply relative overflow-hidden before:absolute before:inset-0 before:bg-gradient-to-r before:from-purple-500/20 before:via-pink-500/20 before:to-blue-500/20 before:opacity-0 hover:before:opacity-100 before:transition-opacity before:duration-500;
+  }
+
+  /* Enhanced Input Styles */
+  .input-premium {
+    @apply bg-gray-800/50 border-gray-600 text-white placeholder-gray-400 focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20 rounded-xl transition-all duration-300;
+  }
+
+  /* Professional Typography */
+  .text-royal {
+    @apply bg-gradient-to-r from-purple-400 via-pink-400 to-blue-400 bg-clip-text text-transparent font-bold;
+  }
+
+  .text-cyber {
+    @apply bg-gradient-to-r from-cyan-400 via-purple-400 to-pink-400 bg-clip-text text-transparent font-bold;
+  }
+
+  .text-golden {
+    @apply bg-gradient-to-r from-yellow-400 via-amber-400 to-orange-400 bg-clip-text text-transparent font-bold;
+  }
+
+  /* Advanced Animation Classes */
+  .float-animation {
+    @apply animate-[float_3s_ease-in-out_infinite];
+  }
+
+  .rotate-slow {
+    @apply animate-[spin_8s_linear_infinite];
+  }
+
+  .glow-pulse {
+    @apply animate-[glow_2s_ease-in-out_infinite_alternate];
+  }
+}
+
+/* Custom Keyframes */
+@keyframes float {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-10px); }
+}
+
+@keyframes glow {
+  from { box-shadow: 0 0 20px rgba(168, 85, 247, 0.5); }
+  to { box-shadow: 0 0 30px rgba(168, 85, 247, 0.8); }
+}
+
+@keyframes gradient-x {
+  0%, 100% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
 }

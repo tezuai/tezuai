@@ -339,59 +339,146 @@ Kya specific area mein help chahiye? Main detailed guidance de sakta hun! 🚀�
           </div>
         </ScrollArea>
 
-        {/* Input */}
-        <div className="p-4 border-t border-gray-700/50 bg-gray-900/95 backdrop-blur-xl">
+        {/* Enhanced Professional Input Section */}
+        <div className="p-6 border-t border-gray-700/50 bg-gradient-to-r from-gray-900/98 via-purple-900/10 to-gray-900/98 backdrop-blur-xl">
           <div className="max-w-4xl mx-auto">
-            <div className="flex items-end gap-3">
-              <div className="flex-1 relative">
-                <Input
-                  value={input}
-                  onChange={(e) => setInput(e.target.value)}
-                  onKeyPress={handleKeyPress}
-                  placeholder="Ask Tezu AI anything... (Hindi/English) 💬"
-                  className="pr-12 py-4 text-lg bg-gray-800/50 border-gray-600 text-white placeholder-gray-400 focus:border-blue-500 resize-none rounded-xl"
-                  disabled={isLoading}
-                />
-                <Button
-                  size="sm"
-                  variant="ghost"
-                  onClick={() => {}}
-                  className="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-white"
-                >
-                  <Paperclip className="w-4 h-4" />
-                </Button>
+            {/* Attachment Preview */}
+            {attachedFiles.length > 0 && (
+              <div className="mb-4 p-3 bg-gray-800/50 rounded-xl border border-gray-600">
+                <div className="text-sm text-gray-300 mb-2">Attached Files:</div>
+                <div className="flex flex-wrap gap-2">
+                  {attachedFiles.map((file, index) => (
+                    <div key={index} className="flex items-center gap-2 bg-gray-700/50 px-3 py-1 rounded-lg">
+                      <Paperclip className="w-3 h-3" />
+                      <span className="text-xs">{file.name}</span>
+                      <button 
+                        onClick={() => setAttachedFiles(files => files.filter((_, i) => i !== index))}
+                        className="text-red-400 hover:text-red-300"
+                      >
+                        ×
+                      </button>
+                    </div>
+                  ))}
+                </div>
               </div>
-              <Button
-                onClick={() => setIsRecording(!isRecording)}
-                variant={isRecording ? "destructive" : "outline"}
-                size="lg"
-                className={`${
-                  isRecording
-                    ? "bg-red-600 hover:bg-red-700"
-                    : "border-gray-600 text-gray-400 hover:text-white hover:bg-gray-700/50"
-                } rounded-xl`}
-              >
-                {isRecording ? <Square className="w-5 h-5" /> : <Mic className="w-5 h-5" />}
-              </Button>
-              <Button
-                onClick={handleSendMessage}
-                disabled={(!input.trim() && attachedFiles.length === 0) || isLoading}
-                size="lg"
-                className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white disabled:opacity-50 disabled:cursor-not-allowed rounded-xl px-6"
-              >
-                <Send className="w-5 h-5" />
-              </Button>
-            </div>
-            <div className="flex items-center justify-between mt-3 text-sm text-gray-400">
-              <span>Press Enter to send, Shift+Enter for new line</span>
-              <div className="flex items-center gap-4">
-                <span>{input.length}/4000</span>
-                <div className="flex items-center gap-1">
-                  <div className="w-2 h-2 bg-green-400 rounded-full"></div>
-                  <span>Online & Ready</span>
+            )}
+
+            {/* Main Input Container */}
+            <div className="relative bg-gradient-to-r from-gray-800/50 via-gray-800/60 to-gray-800/50 rounded-2xl border border-gray-600/50 shadow-2xl hover:border-purple-500/50 transition-all duration-300">
+              <div className="flex items-end gap-3 p-4">
+                {/* Text Input Area */}
+                <div className="flex-1 relative">
+                  <Input
+                    value={input}
+                    onChange={(e) => setInput(e.target.value)}
+                    onKeyPress={handleKeyPress}
+                    placeholder="Ask Tezu AI anything... Hindi/English में कुछ भी पूछें 💬✨"
+                    className="input-premium text-lg py-4 pr-16 min-h-[56px] border-0 bg-transparent placeholder:text-gray-400 focus:ring-0 focus:outline-none text-white"
+                    disabled={isLoading}
+                  />
+                  
+                  {/* Attachment Button */}
+                  <Button
+                    size="sm"
+                    variant="ghost"
+                    onClick={() => {}}
+                    className="absolute right-12 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-purple-400 hover:bg-purple-500/10 rounded-xl transition-all"
+                  >
+                    <Paperclip className="w-5 h-5" />
+                  </Button>
+
+                  {/* Character Count Indicator */}
+                  <div className="absolute right-2 top-1/2 transform -translate-y-1/2">
+                    <div className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-medium ${
+                      input.length > 3500 ? 'bg-red-500/20 text-red-400' : 
+                      input.length > 3000 ? 'bg-yellow-500/20 text-yellow-400' : 
+                      'bg-gray-600/50 text-gray-400'
+                    }`}>
+                      {input.length > 0 && Math.round((input.length / 4000) * 100)}
+                    </div>
+                  </div>
+                </div>
+
+                {/* Action Buttons */}
+                <div className="flex gap-2">
+                  {/* Voice Recording Button */}
+                  <Button
+                    onClick={() => setIsRecording(!isRecording)}
+                    variant={isRecording ? "destructive" : "outline"}
+                    size="lg"
+                    className={`${
+                      isRecording
+                        ? "bg-red-600 hover:bg-red-700 border-red-500 shadow-red-500/50"
+                        : "border-gray-600 text-gray-400 hover:text-white hover:bg-purple-500/20 hover:border-purple-500"
+                    } rounded-xl transition-all duration-300 shadow-lg h-14 w-14 p-0`}
+                  >
+                    {isRecording ? (
+                      <Square className="w-6 h-6 animate-pulse" />
+                    ) : (
+                      <Mic className="w-6 h-6" />
+                    )}
+                  </Button>
+
+                  {/* Send Button */}
+                  <Button
+                    onClick={handleSendMessage}
+                    disabled={(!input.trim() && attachedFiles.length === 0) || isLoading}
+                    size="lg"
+                    className={`
+                      btn-royal h-14 px-8 shadow-2xl transition-all duration-300 
+                      ${(!input.trim() && attachedFiles.length === 0) || isLoading 
+                        ? 'opacity-50 cursor-not-allowed' 
+                        : 'hover:scale-105 hover:shadow-purple-500/50'
+                      }
+                    `}
+                  >
+                    {isLoading ? (
+                      <div className="w-6 h-6 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                    ) : (
+                      <Send className="w-6 h-6" />
+                    )}
+                  </Button>
                 </div>
               </div>
             </div>
+
+            {/* Status Bar */}
+            <div className="flex items-center justify-between mt-4 text-sm text-gray-400">
+              <div className="flex items-center gap-4">
+                <span className="text-gray-500">Press Enter to send, Shift+Enter for new line</span>
+                <div className="flex items-center gap-6">
+                  <div className="flex items-center gap-2">
+                    <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
+                    <span className="text-green-400 font-medium">AI Ready & Online</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Shield className="w-4 h-4 text-blue-400" />
+                    <span className="text-blue-400">Secure & Encrypted</span>
+                  </div>
+                </div>
+              </div>
+              
+              <div className="flex items-center gap-4">
+                <span className={`${
+                  input.length > 3500 ? 'text-red-400' : 
+                  input.length > 3000 ? 'text-yellow-400' : 
+                  'text-gray-400'
+                }`}>
+                  {input.length}/4000
+                </span>
+                <div className="text-purple-400 font-medium">⚡ Ultra Fast</div>
+              </div>
+            </div>
+
+            {/* Advanced Features Hint */}
+            {input.length === 0 && (
+              <div className="mt-3 text-center">
+                <div className="inline-flex items-center gap-2 px-4 py-2 bg-purple-500/10 border border-purple-500/20 rounded-full text-purple-300 text-sm">
+                  <Sparkles className="w-4 h-4" />
+                  <span>Try voice input, file uploads, or advanced AI commands</span>
+                </div>
+              </div>
+            )}
           </div>
         </div>
       </div>

@@ -12,7 +12,7 @@ import { AdvancedUserSettings } from "@/components/AdvancedUserSettings";
 import { ProfessionalAIAssistant } from "@/components/ProfessionalAIAssistant";
 import { SidebarProvider } from "@/components/ui/sidebar";
 import { SubscriptionProvider } from "@/contexts/SubscriptionContext";
-import { Footer } from "@/components/Footer";
+import { ProfessionalFooter } from "@/components/ProfessionalFooter";
 import { AIModelSwitcher } from "@/components/AIModelSwitcher";
 import { RealTimeCollaboration } from "@/components/RealTimeCollaboration";
 import { CustomAITraining } from "@/components/CustomAITraining";
@@ -47,6 +47,7 @@ import { PredictiveIntelligence } from "@/components/PredictiveIntelligence";
 import { EmotionalAI } from "@/components/EmotionalAI";
 import { PolyglotAI } from "@/components/PolyglotAI";
 import { CulturalAI } from "@/components/CulturalAI";
+import { EnhancedThemeCustomizer } from "@/components/EnhancedThemeCustomizer";
 
 const Index = () => {
   const [selectedConversation, setSelectedConversation] = useState<string | null>(null);
@@ -495,7 +496,7 @@ const Index = () => {
                 )}
               </main>
             </div>
-            <Footer />
+            <ProfessionalFooter />
             <FloatingActions />
           </div>
         </SmartAuthGuard>
