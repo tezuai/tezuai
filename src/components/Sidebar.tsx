@@ -23,7 +23,11 @@ import {
   Users,
   Layers,
   FileText,
-  Cpu
+  Cpu,
+  Shield,
+  TrendingUp,
+  Heart,
+  Globe
 } from "lucide-react";
 import {
   DropdownMenu,
@@ -67,7 +71,12 @@ interface SidebarProps {
     | "realtime-knowledge"
     | "agentic-ai"
     | "creative-studio"
-    | "smart-learning";
+    | "smart-learning"
+    | "advanced-security"
+    | "predictive-intelligence"
+    | "emotional-ai"
+    | "polyglot-ai"
+    | "cultural-ai";
   onViewChange: (
     view:
       | "chat"
@@ -93,6 +102,11 @@ interface SidebarProps {
       | "agentic-ai"
       | "creative-studio"
       | "smart-learning"
+      | "advanced-security"
+      | "predictive-intelligence"
+      | "emotional-ai"
+      | "polyglot-ai"
+      | "cultural-ai"
   ) => void;
   onLogout: () => void;
   isAuthenticated?: boolean;
@@ -284,6 +298,36 @@ export function Sidebar({
       icon: Brain,
       view: "smart-learning" as const,
       badge: "AI+"
+    },
+    {
+      title: "Advanced Security",
+      icon: Shield,
+      view: "advanced-security" as const,
+      badge: "Ultra Safe"
+    },
+    {
+      title: "Predictive Intelligence",
+      icon: TrendingUp,
+      view: "predictive-intelligence" as const,
+      badge: "Future AI"
+    },
+    {
+      title: "Emotional AI",
+      icon: Heart,
+      view: "emotional-ai" as const,
+      badge: "Empathy+"
+    },
+    {
+      title: "Polyglot AI",
+      icon: Globe,
+      view: "polyglot-ai" as const,
+      badge: "12+ Languages"
+    },
+    {
+      title: "Cultural AI",
+      icon: Users,
+      view: "cultural-ai" as const,
+      badge: "Global Aware"
     },
     {
       title: "AI Assistant",

@@ -42,6 +42,11 @@ import { RealtimeKnowledgeEngine } from "@/components/RealtimeKnowledgeEngine";
 import { AgenticAI } from "@/components/AgenticAI";
 import { CreativeStudio } from "@/components/CreativeStudio";
 import { SmartLearning } from "@/components/SmartLearning";
+import { AdvancedSecurity } from "@/components/AdvancedSecurity";
+import { PredictiveIntelligence } from "@/components/PredictiveIntelligence";
+import { EmotionalAI } from "@/components/EmotionalAI";
+import { PolyglotAI } from "@/components/PolyglotAI";
+import { CulturalAI } from "@/components/CulturalAI";
 
 const Index = () => {
   const [selectedConversation, setSelectedConversation] = useState<string | null>(null);
@@ -70,6 +75,11 @@ const Index = () => {
     | 'agentic-ai'
     | 'creative-studio'
     | 'smart-learning'
+    | 'advanced-security'
+    | 'predictive-intelligence'
+    | 'emotional-ai'
+    | 'polyglot-ai'
+    | 'cultural-ai'
   >('chat');
   const [showLanding, setShowLanding] = useState(true);
   const [showOnboarding, setShowOnboarding] = useState(false);
@@ -464,6 +474,16 @@ const Index = () => {
                   <CreativeStudio />
                 ) : currentView === 'smart-learning' ? (
                   <SmartLearning />
+                ) : currentView === 'advanced-security' ? (
+                  <AdvancedSecurity />
+                ) : currentView === 'predictive-intelligence' ? (
+                  <PredictiveIntelligence />
+                ) : currentView === 'emotional-ai' ? (
+                  <EmotionalAI />
+                ) : currentView === 'polyglot-ai' ? (
+                  <PolyglotAI />
+                ) : currentView === 'cultural-ai' ? (
+                  <CulturalAI />
                 ) : selectedConversation && currentConversation ? (
                   <ChatInterface
                     conversation={currentConversation}
