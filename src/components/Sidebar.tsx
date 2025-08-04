@@ -62,7 +62,12 @@ interface SidebarProps {
     | "theme-gallery"
     | "ai-marketplace"
     | "workflow-automation"
-    | "business-intelligence";
+    | "business-intelligence"
+    | "multimodal-ai"
+    | "realtime-knowledge"
+    | "agentic-ai"
+    | "creative-studio"
+    | "smart-learning";
   onViewChange: (
     view:
       | "chat"
@@ -83,6 +88,11 @@ interface SidebarProps {
       | "ai-marketplace"
       | "workflow-automation"
       | "business-intelligence"
+      | "multimodal-ai"
+      | "realtime-knowledge"
+      | "agentic-ai"
+      | "creative-studio"
+      | "smart-learning"
   ) => void;
   onLogout: () => void;
   isAuthenticated?: boolean;
@@ -244,6 +254,36 @@ export function Sidebar({
       icon: BarChart3,
       view: "business-intelligence" as const,
       badge: "Enterprise"
+    },
+    {
+      title: "Multimodal AI",
+      icon: Brain,
+      view: "multimodal-ai" as const,
+      badge: "Ultra Pro"
+    },
+    {
+      title: "Realtime Knowledge",
+      icon: FileText,
+      view: "realtime-knowledge" as const,
+      badge: "Live"
+    },
+    {
+      title: "Agentic AI",
+      icon: Cpu,
+      view: "agentic-ai" as const,
+      badge: "Auto"
+    },
+    {
+      title: "Creative Studio",
+      icon: Layers,
+      view: "creative-studio" as const,
+      badge: "Pro"
+    },
+    {
+      title: "Smart Learning",
+      icon: Brain,
+      view: "smart-learning" as const,
+      badge: "AI+"
     },
     {
       title: "AI Assistant",
