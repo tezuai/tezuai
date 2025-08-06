@@ -186,34 +186,40 @@ export function Sidebar({
   // Add new professional features to the navigation items
   const navigationItems = [
     {
+      title: "Smart Dashboard",
+      icon: BarChart3,
+      view: "smart-dashboard" as const,
+      badge: "New"
+    },
+    {
       title: "Chat",
       icon: MessageSquare,
       view: "chat" as const,
       badge: null
     },
     {
+      title: "Quantum AI",
+      icon: Zap,
+      view: "quantum-ai" as const,
+      badge: "Pro"
+    },
+    {
+      title: "AI Research Lab",
+      icon: Brain,
+      view: "ai-research-lab" as const,
+      badge: "Beta"
+    },
+    {
+      title: "Legal Compliance",
+      icon: Shield,
+      view: "compliance-center" as const,
+      badge: "Enterprise"
+    },
+    {
       title: "Analytics",
-      icon: BarChart3,
+      icon: TrendingUp,
       view: "analytics" as const,
       badge: null
-    },
-    {
-      title: "AI Model Switcher",
-      icon: Brain,
-      view: "ai-model-switcher" as const,
-      badge: "Pro"
-    },
-    {
-      title: "Collaboration",
-      icon: Users,
-      view: "collaboration" as const,
-      badge: "Pro"
-    },
-    {
-      title: "Custom AI Training",
-      icon: Cpu,
-      view: "custom-training" as const,
-      badge: "Pro"
     },
     {
       title: "Templates",

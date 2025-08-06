@@ -48,6 +48,10 @@ import { EmotionalAI } from "@/components/EmotionalAI";
 import { PolyglotAI } from "@/components/PolyglotAI";
 import { CulturalAI } from "@/components/CulturalAI";
 import { EnhancedThemeCustomizer } from "@/components/EnhancedThemeCustomizer";
+import { SmartDashboard } from "@/components/SmartDashboard";
+import { QuantumAI } from "@/components/QuantumAI";
+import { AIResearchLab } from "@/components/AIResearchLab";
+import { ComplianceCenter } from "@/components/ComplianceCenter";
 
 const Index = () => {
   const [selectedConversation, setSelectedConversation] = useState<string | null>(null);
@@ -485,6 +489,14 @@ const Index = () => {
                   <PolyglotAI />
                 ) : currentView === 'cultural-ai' ? (
                   <CulturalAI />
+                ) : currentView === 'smart-dashboard' ? (
+                  <SmartDashboard />
+                ) : currentView === 'quantum-ai' ? (
+                  <QuantumAI />
+                ) : currentView === 'ai-research-lab' ? (
+                  <AIResearchLab />
+                ) : currentView === 'compliance-center' ? (
+                  <ComplianceCenter />
                 ) : selectedConversation && currentConversation ? (
                   <ChatInterface
                     conversation={currentConversation}
