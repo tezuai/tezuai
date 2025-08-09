@@ -1,8 +1,8 @@
 // Centralized view type for the entire app
 // Keep this in sync with all available views used across Sidebar and Index
-export type ViewName =
+export type ViewName = 
   | 'chat'
-  | 'analytics'
+  | 'analytics' 
   | 'subscription'
   | 'privacy'
   | 'settings'
@@ -32,4 +32,8 @@ export type ViewName =
   | 'smart-dashboard'
   | 'quantum-ai'
   | 'ai-research-lab'
-  | 'compliance-center';
+  | 'compliance-center'
+  | 'seo-manager'
+  | 'algorithm-optimizer'
+  | 'customization-studio'
+  | 'media-hub';

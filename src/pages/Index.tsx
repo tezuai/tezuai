@@ -52,6 +52,10 @@ import { SmartDashboard } from "@/components/SmartDashboard";
 import { QuantumAI } from "@/components/QuantumAI";
 import { AIResearchLab } from "@/components/AIResearchLab";
 import { ComplianceCenter } from "@/components/ComplianceCenter";
+import { AdvancedSEOManager } from "@/components/AdvancedSEOManager";
+import { AlgorithmOptimizer } from "@/components/AlgorithmOptimizer";
+import { CustomizationStudio } from "@/components/CustomizationStudio";
+import { AdvancedMediaHub } from "@/components/AdvancedMediaHub";
 import type { ViewName } from "@/types/views";
 
 const Index = () => {
