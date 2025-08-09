@@ -52,40 +52,12 @@ import { SmartDashboard } from "@/components/SmartDashboard";
 import { QuantumAI } from "@/components/QuantumAI";
 import { AIResearchLab } from "@/components/AIResearchLab";
 import { ComplianceCenter } from "@/components/ComplianceCenter";
+import type { ViewName } from "@/types/views";
 
 const Index = () => {
   const [selectedConversation, setSelectedConversation] = useState<string | null>(null);
   const [conversations, setConversations] = useState<any[]>([]);
-  const [currentView, setCurrentView] = useState<
-    | 'chat'
-    | 'analytics'
-    | 'subscription'
-    | 'privacy'
-    | 'settings'
-    | 'ai-assistant'
-    | 'ai-model-switcher'
-    | 'collaboration'
-    | 'custom-training'
-    | 'templates'
-    | 'advanced-analytics'
-    | 'news-engine'
-    | 'productivity-suite'
-    | 'security-center'
-    | 'theme-gallery'
-    | 'ai-marketplace'
-    | 'workflow-automation'
-    | 'business-intelligence'
-    | 'multimodal-ai'
-    | 'realtime-knowledge'
-    | 'agentic-ai'
-    | 'creative-studio'
-    | 'smart-learning'
-    | 'advanced-security'
-    | 'predictive-intelligence'
-    | 'emotional-ai'
-    | 'polyglot-ai'
-    | 'cultural-ai'
-  >('chat');
+  const [currentView, setCurrentView] = useState<ViewName>('chat');
   const [showLanding, setShowLanding] = useState(true);
   const [showOnboarding, setShowOnboarding] = useState(false);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -255,27 +227,7 @@ const Index = () => {
     }
   };
 
-  const handleViewChange = (
-    view:
-      | 'chat'
-      | 'analytics'
-      | 'subscription'
-      | 'privacy'
-      | 'settings'
-      | 'ai-assistant'
-      | 'ai-model-switcher'
-      | 'collaboration'
-      | 'custom-training'
-      | 'templates'
-      | 'advanced-analytics'
-      | 'news-engine'
-      | 'productivity-suite'
-      | 'security-center'
-      | 'theme-gallery'
-      | 'ai-marketplace'
-      | 'workflow-automation'
-      | 'business-intelligence'
-  ) => {
+  const handleViewChange = (view: ViewName) => {
     // Check if view requires authentication
     const authRequiredViews = [
       'subscription', 

@@ -27,7 +27,8 @@ import {
   Shield,
   TrendingUp,
   Heart,
-  Globe
+  Globe,
+  Zap
 } from "lucide-react";
 import {
   DropdownMenu,
@@ -38,6 +39,7 @@ import {
 import { useSidebar } from "@/components/ui/sidebar";
 import { useToast } from "@/hooks/use-toast";
 import { ThemeToggle } from "@/components/ThemeToggle";
+import type { ViewName } from "@/types/views";
 
 interface SidebarProps {
   conversations?: any[];
@@ -48,66 +50,8 @@ interface SidebarProps {
   onDeleteConversation: (id: string) => void;
   onArchiveConversation: (id: string) => void;
   onDuplicateConversation: (conversation: any) => void;
-  currentView?:
-    | "chat"
-    | "analytics"
-    | "subscription"
-    | "privacy"
-    | "settings"
-    | "ai-assistant"
-    | "ai-model-switcher"
-    | "collaboration"
-    | "custom-training"
-    | "templates"
-    | "advanced-analytics"
-    | "news-engine"
-    | "productivity-suite"
-    | "security-center"
-    | "theme-gallery"
-    | "ai-marketplace"
-    | "workflow-automation"
-    | "business-intelligence"
-    | "multimodal-ai"
-    | "realtime-knowledge"
-    | "agentic-ai"
-    | "creative-studio"
-    | "smart-learning"
-    | "advanced-security"
-    | "predictive-intelligence"
-    | "emotional-ai"
-    | "polyglot-ai"
-    | "cultural-ai";
-  onViewChange: (
-    view:
-      | "chat"
-      | "analytics"
-      | "subscription"
-      | "privacy"
-      | "settings"
-      | "ai-assistant"
-      | "ai-model-switcher"
-      | "collaboration"
-      | "custom-training"
-      | "templates"
-      | "advanced-analytics"
-      | "news-engine"
-      | "productivity-suite"
-      | "security-center"
-      | "theme-gallery"
-      | "ai-marketplace"
-      | "workflow-automation"
-      | "business-intelligence"
-      | "multimodal-ai"
-      | "realtime-knowledge"
-      | "agentic-ai"
-      | "creative-studio"
-      | "smart-learning"
-      | "advanced-security"
-      | "predictive-intelligence"
-      | "emotional-ai"
-      | "polyglot-ai"
-      | "cultural-ai"
-  ) => void;
+  currentView?: ViewName;
+  onViewChange: (view: ViewName) => void;
   onLogout: () => void;
   isAuthenticated?: boolean;
   currentUser?: any;
