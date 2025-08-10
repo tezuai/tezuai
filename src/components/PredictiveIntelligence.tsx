@@ -1,173 +1,193 @@
-import { useState, useEffect } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import React, { useState, useEffect } from 'react';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Progress } from "@/components/ui/progress";
 import { 
   TrendingUp, 
   Brain, 
-  Target, 
   Zap, 
-  Activity,
+  Target, 
+  Globe, 
+  Users, 
   BarChart3,
-  Lightbulb,
-  Compass,
+  PieChart,
+  Activity,
+  Sparkles,
+  Eye,
   Clock,
-  Star
-} from "lucide-react";
+  AlertTriangle,
+  CheckCircle,
+  ArrowUpRight
+} from 'lucide-react';
 
-interface Prediction {
-  id: string;
-  title: string;
-  description: string;
-  confidence: number;
-  timeframe: string;
-  category: "market" | "technology" | "behavior" | "trend";
-  impact: "low" | "medium" | "high";
-}
-
-interface Insight {
-  type: string;
-  message: string;
-  confidence: number;
-  actionable: boolean;
-}
-
-export function PredictiveIntelligence() {
-  const [predictions, setPredictions] = useState<Prediction[]>([
-    {
-      id: "1",
-      title: "AI Technology Adoption Surge",
-      description: "Massive increase in AI adoption across industries expected",
-      confidence: 94,
-      timeframe: "Next 6 months",
-      category: "technology",
-      impact: "high"
-    },
-    {
-      id: "2", 
-      title: "Remote Work Preference Shift",
-      description: "Hybrid work models will become the dominant preference",
-      confidence: 87,
-      timeframe: "Next 12 months",
-      category: "behavior",
-      impact: "high"
-    },
-    {
-      id: "3",
-      title: "Voice Interface Revolution",
-      description: "Voice-based interactions will overtake text in AI applications",
-      confidence: 82,
-      timeframe: "Next 18 months",
-      category: "trend",
-      impact: "medium"
-    },
-    {
-      id: "4",
-      title: "Sustainable Tech Growth",
-      description: "Green technology investments will double in emerging markets",
-      confidence: 79,
-      timeframe: "Next 24 months",
-      category: "market",
-      impact: "high"
-    }
-  ]);
-
-  const [realTimeInsights, setRealTimeInsights] = useState<Insight[]>([
-    {
-      type: "Market Trend",
-      message: "AI chatbot usage increased 340% in the last week",
-      confidence: 95,
-      actionable: true
-    },
-    {
-      type: "User Behavior",
-      message: "Users prefer voice commands during evening hours",
-      confidence: 88,
-      actionable: true
-    },
-    {
-      type: "Technology Shift",
-      message: "Multimodal AI requests growing exponentially",
-      confidence: 92,
-      actionable: false
-    }
-  ]);
-
+const PredictiveIntelligence = () => {
+  const [predictions, setPredictions] = useState<any[]>([]);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
-
-  const getCategoryColor = (category: string) => {
-    switch (category) {
-      case "market": return "bg-green-500/20 text-green-400";
-      case "technology": return "bg-blue-500/20 text-blue-400";
-      case "behavior": return "bg-purple-500/20 text-purple-400";
-      case "trend": return "bg-yellow-500/20 text-yellow-400";
-      default: return "bg-gray-500/20 text-gray-400";
-    }
-  };
-
-  const getImpactColor = (impact: string) => {
-    switch (impact) {
-      case "high": return "text-red-400";
-      case "medium": return "text-yellow-400";
-      case "low": return "text-green-400";
-      default: return "text-gray-400";
-    }
-  };
-
-  const runPredictiveAnalysis = () => {
-    setIsAnalyzing(true);
-    setTimeout(() => {
-      setIsAnalyzing(false);
-      // Simulate new predictions
-      const newPrediction: Prediction = {
-        id: Date.now().toString(),
-        title: "Personalized AI Assistants Boom",
-        description: "Custom AI personalities will become mainstream",
-        confidence: Math.floor(Math.random() * 20) + 80,
-        timeframe: "Next 3 months",
-        category: "technology",
-        impact: "high"
-      };
-      setPredictions(prev => [newPrediction, ...prev.slice(0, 3)]);
-    }, 3000);
-  };
+  const [accuracy, setAccuracy] = useState(97.8);
 
   useEffect(() => {
+    // Simulate real-time predictions
     const interval = setInterval(() => {
-      // Update confidence scores and add new insights
-      setPredictions(prev => prev.map(p => ({
-        ...p,
-        confidence: Math.max(70, Math.min(99, p.confidence + (Math.random() - 0.5) * 3))
-      })));
-    }, 5000);
-
+      setAccuracy(prev => Math.min(99.9, prev + Math.random() * 0.1));
+    }, 3000);
     return () => clearInterval(interval);
   }, []);
 
+  const generatePredictions = async () => {
+    setIsAnalyzing(true);
+    
+    // Simulate AI prediction generation
+    await new Promise(resolve => setTimeout(resolve, 2000));
+    
+    const newPredictions = [
+      {
+        id: 1,
+        type: 'Market Trend',
+        prediction: 'AI sector में 300% growth next 6 months में',
+        confidence: 94.5,
+        timeframe: '6 months',
+        impact: 'High',
+        status: 'positive'
+      },
+      {
+        id: 2,
+        type: 'User Behavior',
+        prediction: 'Voice AI usage 250% बढ़ेगा next quarter में',
+        confidence: 89.2,
+        timeframe: '3 months',
+        impact: 'Medium',
+        status: 'positive'
+      },
+      {
+        id: 3,
+        type: 'Technology',
+        prediction: 'Quantum computing mainstream होगा 2 years में',
+        confidence: 87.8,
+        timeframe: '2 years',
+        impact: 'Revolutionary',
+        status: 'neutral'
+      },
+      {
+        id: 4,
+        type: 'Business',
+        prediction: 'Remote work tools demand spike next month',
+        confidence: 92.1,
+        timeframe: '1 month',
+        impact: 'High',
+        status: 'positive'
+      }
+    ];
+    
+    setPredictions(newPredictions);
+    setIsAnalyzing(false);
+  };
+
+  const metrics = [
+    {
+      title: 'Prediction Accuracy',
+      value: `${accuracy.toFixed(1)}%`,
+      change: '+2.3%',
+      icon: Target,
+      color: 'text-green-500'
+    },
+    {
+      title: 'Data Points Analyzed',
+      value: '2.4M',
+      change: '+15%',
+      icon: BarChart3,
+      color: 'text-blue-500'
+    },
+    {
+      title: 'Real-time Insights',
+      value: '847',
+      change: '+23%',
+      icon: Activity,
+      color: 'text-purple-500'
+    },
+    {
+      title: 'Future Models',
+      value: '156',
+      change: '+8%',
+      icon: Brain,
+      color: 'text-orange-500'
+    }
+  ];
+
+  const categories = [
+    {
+      name: 'Market Analysis',
+      icon: TrendingUp,
+      description: 'Stock market, crypto, trends की भविष्यवाणी',
+      accuracy: 96.2
+    },
+    {
+      name: 'User Behavior',
+      icon: Users,
+      description: 'User patterns और behavior prediction',
+      accuracy: 94.8
+    },
+    {
+      name: 'Technology Trends',
+      icon: Zap,
+      description: 'Tech innovations और future developments',
+      accuracy: 91.5
+    },
+    {
+      name: 'Business Intelligence',
+      icon: Globe,
+      description: 'Business growth और market opportunities',
+      accuracy: 93.7
+    }
+  ];
+
   return (
     <div className="space-y-6 p-6">
-      <div className="text-center mb-8">
-        <h2 className="text-2xl font-bold text-white mb-2">🔮 Predictive Intelligence Engine</h2>
-        <p className="text-gray-400">Advanced AI-powered forecasting and trend analysis</p>
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-3xl font-bold gradient-text">🔮 Predictive Intelligence</h1>
+          <p className="text-muted-foreground">DeepSeek से भी advanced future prediction capabilities</p>
+        </div>
+        <Badge variant="secondary" className="bg-gradient-to-r from-blue-500 to-purple-500 text-white">
+          <Sparkles className="w-4 h-4 mr-1" />
+          Future AI
+        </Badge>
       </div>
 
-      {/* Predictive Analysis Control */}
-      <Card className="bg-gradient-to-r from-blue-500/10 to-purple-500/10 border-blue-500/20">
-        <CardContent className="p-6">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <Brain className="w-8 h-8 text-blue-400" />
-              <div>
-                <h3 className="text-lg font-semibold text-white">Neural Prediction Engine</h3>
-                <p className="text-sm text-gray-400">AI-powered future insights and trend forecasting</p>
+      {/* Key Metrics */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        {metrics.map((metric, index) => (
+          <Card key={index} className="hover:shadow-lg transition-all">
+            <CardContent className="pt-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm font-medium text-muted-foreground">{metric.title}</p>
+                  <p className="text-2xl font-bold">{metric.value}</p>
+                  <p className={`text-sm flex items-center ${metric.color}`}>
+                    <ArrowUpRight className="w-4 h-4 mr-1" />
+                    {metric.change}
+                  </p>
+                </div>
+                <metric.icon className={`w-8 h-8 ${metric.color}`} />
               </div>
-            </div>
-            <Button 
-              onClick={runPredictiveAnalysis}
-              disabled={isAnalyzing}
-              className="bg-blue-500 hover:bg-blue-600 text-white"
-            >
+            </CardContent>
+          </Card>
+        ))}
+      </div>
+
+      <Tabs defaultValue="predictions" className="w-full">
+        <TabsList className="grid w-full grid-cols-4">
+          <TabsTrigger value="predictions">Predictions</TabsTrigger>
+          <TabsTrigger value="analysis">Analysis</TabsTrigger>
+          <TabsTrigger value="models">AI Models</TabsTrigger>
+          <TabsTrigger value="insights">Insights</TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="predictions" className="space-y-4">
+          <div className="flex justify-between items-center">
+            <h3 className="text-lg font-semibold">Future Predictions</h3>
+            <Button onClick={generatePredictions} disabled={isAnalyzing}>
               {isAnalyzing ? (
                 <>
                   <Activity className="w-4 h-4 mr-2 animate-spin" />
@@ -175,125 +195,168 @@ export function PredictiveIntelligence() {
                 </>
               ) : (
                 <>
-                  <Zap className="w-4 h-4 mr-2" />
-                  Run Analysis
+                  <Brain className="w-4 h-4 mr-2" />
+                  Generate New Predictions
                 </>
               )}
             </Button>
           </div>
-        </CardContent>
-      </Card>
 
-      {/* Real-Time Insights */}
-      <Card className="bg-gray-800/50 border-gray-700">
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2 text-white">
-            <Lightbulb className="w-5 h-5 text-yellow-400" />
-            Real-Time Intelligence Insights
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-3">
-          {realTimeInsights.map((insight, index) => (
-            <div key={index} className="flex items-center gap-3 p-3 bg-gray-700/30 rounded-lg">
-              <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
-              <div className="flex-1">
-                <div className="flex items-center gap-2 mb-1">
-                  <span className="text-sm font-medium text-white">{insight.type}</span>
-                  <Badge variant="outline" className="text-xs">
-                    {insight.confidence}% confident
-                  </Badge>
-                  {insight.actionable && (
-                    <Badge className="bg-green-500/20 text-green-400 text-xs">
-                      Actionable
-                    </Badge>
-                  )}
-                </div>
-                <p className="text-sm text-gray-400">{insight.message}</p>
-              </div>
-            </div>
-          ))}
-        </CardContent>
-      </Card>
-
-      {/* Predictions Grid */}
-      <div className="grid gap-4">
-        <h3 className="text-lg font-semibold text-white flex items-center gap-2">
-          <Target className="w-5 h-5 text-purple-400" />
-          Future Predictions & Forecasts
-        </h3>
-        
-        {predictions.map((prediction) => (
-          <Card key={prediction.id} className="bg-gray-800/50 border-gray-700 hover:bg-gray-800/70 transition-colors">
-            <CardContent className="p-4">
-              <div className="flex items-start justify-between mb-3">
-                <div className="flex-1">
-                  <div className="flex items-center gap-2 mb-2">
-                    <h4 className="font-semibold text-white">{prediction.title}</h4>
-                    <Badge className={getCategoryColor(prediction.category)}>
-                      {prediction.category}
-                    </Badge>
-                  </div>
-                  <p className="text-sm text-gray-400 mb-3">{prediction.description}</p>
-                  
-                  <div className="flex items-center gap-4 text-xs">
-                    <div className="flex items-center gap-1">
-                      <Clock className="w-3 h-3 text-blue-400" />
-                      <span className="text-gray-300">{prediction.timeframe}</span>
+          <div className="grid gap-4">
+            {predictions.map((prediction) => (
+              <Card key={prediction.id} className="hover:shadow-md transition-all">
+                <CardContent className="pt-6">
+                  <div className="flex items-start justify-between">
+                    <div className="flex-1">
+                      <div className="flex items-center space-x-2 mb-2">
+                        <Badge variant="outline">{prediction.type}</Badge>
+                        <Badge 
+                          variant={prediction.status === 'positive' ? 'default' : 'secondary'}
+                          className={prediction.status === 'positive' ? 'bg-green-500' : ''}
+                        >
+                          {prediction.impact} Impact
+                        </Badge>
+                      </div>
+                      <p className="font-medium mb-2">{prediction.prediction}</p>
+                      <div className="flex items-center space-x-4 text-sm text-muted-foreground">
+                        <div className="flex items-center">
+                          <Clock className="w-4 h-4 mr-1" />
+                          {prediction.timeframe}
+                        </div>
+                        <div className="flex items-center">
+                          <Target className="w-4 h-4 mr-1" />
+                          {prediction.confidence}% confidence
+                        </div>
+                      </div>
                     </div>
-                    <div className="flex items-center gap-1">
-                      <Star className={`w-3 h-3 ${getImpactColor(prediction.impact)}`} />
-                      <span className={getImpactColor(prediction.impact)}>
-                        {prediction.impact.charAt(0).toUpperCase() + prediction.impact.slice(1)} Impact
-                      </span>
+                    <div className="text-right">
+                      <div className={`text-2xl font-bold ${
+                        prediction.status === 'positive' ? 'text-green-500' : 
+                        prediction.status === 'negative' ? 'text-red-500' : 'text-blue-500'
+                      }`}>
+                        {prediction.confidence}%
+                      </div>
+                      <Progress value={prediction.confidence} className="w-20 mt-1" />
                     </div>
                   </div>
-                </div>
-                
-                <div className="text-right">
-                  <div className="text-lg font-bold text-white mb-1">
-                    {prediction.confidence}%
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        </TabsContent>
+
+        <TabsContent value="analysis" className="space-y-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {categories.map((category, index) => (
+              <Card key={index} className="hover:shadow-lg transition-all">
+                <CardHeader>
+                  <div className="flex items-center space-x-2">
+                    <category.icon className="w-6 h-6 text-primary" />
+                    <CardTitle className="text-lg">{category.name}</CardTitle>
                   </div>
-                  <div className="w-16">
-                    <Progress value={prediction.confidence} className="h-2" />
+                  <CardDescription>{category.description}</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-2">
+                    <div className="flex justify-between">
+                      <span className="text-sm font-medium">Accuracy</span>
+                      <span className="text-sm font-bold text-green-500">{category.accuracy}%</span>
+                    </div>
+                    <Progress value={category.accuracy} className="w-full" />
                   </div>
-                  <span className="text-xs text-gray-400">Confidence</span>
-                </div>
+                  <Button variant="outline" className="w-full mt-4">
+                    <Eye className="w-4 h-4 mr-2" />
+                    View Details
+                  </Button>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        </TabsContent>
+
+        <TabsContent value="models" className="space-y-4">
+          <Card>
+            <CardHeader>
+              <CardTitle>Advanced AI Models</CardTitle>
+              <CardDescription>Quantum-enhanced prediction models</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                {[
+                  { name: 'Quantum Predictor v3.0', accuracy: 99.2, status: 'Active' },
+                  { name: 'Neural Trend Analyzer', accuracy: 97.8, status: 'Training' },
+                  { name: 'DeepFuture Engine', accuracy: 96.5, status: 'Active' },
+                  { name: 'Probability Matrix AI', accuracy: 95.1, status: 'Standby' }
+                ].map((model, index) => (
+                  <div key={index} className="flex items-center justify-between p-3 border rounded-lg">
+                    <div>
+                      <p className="font-medium">{model.name}</p>
+                      <p className="text-sm text-muted-foreground">Accuracy: {model.accuracy}%</p>
+                    </div>
+                    <Badge variant={model.status === 'Active' ? 'default' : 'secondary'}>
+                      {model.status}
+                    </Badge>
+                  </div>
+                ))}
               </div>
             </CardContent>
           </Card>
-        ))}
-      </div>
+        </TabsContent>
 
-      {/* Analytics Dashboard */}
-      <Card className="bg-gray-800/50 border-gray-700">
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2 text-white">
-            <BarChart3 className="w-5 h-5 text-green-400" />
-            Predictive Analytics Dashboard
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
+        <TabsContent value="insights" className="space-y-4">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div className="text-center p-4 bg-gradient-to-br from-blue-500/10 to-cyan-500/10 rounded-lg">
-              <TrendingUp className="w-8 h-8 text-blue-400 mx-auto mb-2" />
-              <div className="text-2xl font-bold text-white">94.2%</div>
-              <p className="text-sm text-gray-400">Prediction Accuracy</p>
-            </div>
-            
-            <div className="text-center p-4 bg-gradient-to-br from-green-500/10 to-emerald-500/10 rounded-lg">
-              <Compass className="w-8 h-8 text-green-400 mx-auto mb-2" />
-              <div className="text-2xl font-bold text-white">12,847</div>
-              <p className="text-sm text-gray-400">Data Points Analyzed</p>
-            </div>
-            
-            <div className="text-center p-4 bg-gradient-to-br from-purple-500/10 to-pink-500/10 rounded-lg">
-              <Brain className="w-8 h-8 text-purple-400 mx-auto mb-2" />
-              <div className="text-2xl font-bold text-white">156</div>
-              <p className="text-sm text-gray-400">Active Predictions</p>
-            </div>
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center">
+                  <AlertTriangle className="w-5 h-5 mr-2 text-yellow-500" />
+                  Alerts
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-2">
+                  <p className="text-sm">Market volatility spike predicted</p>
+                  <p className="text-sm">New tech trend emerging</p>
+                  <p className="text-sm">User behavior shift detected</p>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center">
+                  <CheckCircle className="w-5 h-5 mr-2 text-green-500" />
+                  Opportunities
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-2">
+                  <p className="text-sm">AI market expansion window</p>
+                  <p className="text-sm">New user segment identified</p>
+                  <p className="text-sm">Technology adoption curve peak</p>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center">
+                  <Brain className="w-5 h-5 mr-2 text-purple-500" />
+                  Recommendations
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-2">
+                  <p className="text-sm">Increase AI model capacity</p>
+                  <p className="text-sm">Focus on mobile AI features</p>
+                  <p className="text-sm">Expand voice AI capabilities</p>
+                </div>
+              </CardContent>
+            </Card>
           </div>
-        </CardContent>
-      </Card>
+        </TabsContent>
+      </Tabs>
     </div>
   );
-}
+};
+
+export default PredictiveIntelligence;

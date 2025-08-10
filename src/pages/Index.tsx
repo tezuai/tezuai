@@ -37,14 +37,14 @@ import { ThemeGallery } from "@/components/ThemeGallery";
 import { AIMarketplace } from "@/components/AIMarketplace";
 import { WorkflowAutomation } from "@/components/WorkflowAutomation";
 import { BusinessIntelligence } from "@/components/BusinessIntelligence";
-import { MultimodalAI } from "@/components/MultimodalAI";
+import MultimodalAI from "@/components/MultimodalAI";
 import { RealtimeKnowledgeEngine } from "@/components/RealtimeKnowledgeEngine";
-import { AgenticAI } from "@/components/AgenticAI";
+import AgenticAI from "@/components/AgenticAI";
 import { CreativeStudio } from "@/components/CreativeStudio";
 import { SmartLearning } from "@/components/SmartLearning";
 import { AdvancedSecurity } from "@/components/AdvancedSecurity";
-import { PredictiveIntelligence } from "@/components/PredictiveIntelligence";
-import { EmotionalAI } from "@/components/EmotionalAI";
+import PredictiveIntelligence from "@/components/PredictiveIntelligence";
+import EmotionalAI from "@/components/EmotionalAI";
 import { PolyglotAI } from "@/components/PolyglotAI";
 import { CulturalAI } from "@/components/CulturalAI";
 import { EnhancedThemeCustomizer } from "@/components/EnhancedThemeCustomizer";
@@ -256,7 +256,11 @@ const Index = () => {
       'advanced-seo',
       'algorithm-optimizer',
       'customization-studio',
-      'advanced-media'
+      'advanced-media',
+      'multimodal-ai',
+      'predictive-intelligence',
+      'emotional-ai',
+      'agentic-ai'
     ];
     
     if (authRequiredViews.includes(view) && !isAuthenticated) {
@@ -334,7 +338,7 @@ const Index = () => {
             <OnboardingTips />
             <FunFacts />
             <div className="flex flex-1">
-              {(['chat', 'analytics', 'ai-model-switcher', 'collaboration', 'custom-training', 'templates', 'advanced-analytics', 'news-engine', 'productivity-suite', 'security-center', 'theme-gallery', 'ai-marketplace', 'workflow-automation', 'business-intelligence', 'smart-dashboard', 'quantum-ai', 'ai-research-lab', 'compliance-center', 'advanced-seo', 'algorithm-optimizer', 'customization-studio', 'advanced-media'].includes(currentView)) && (
+              {(['chat', 'analytics', 'ai-model-switcher', 'collaboration', 'custom-training', 'templates', 'advanced-analytics', 'news-engine', 'productivity-suite', 'security-center', 'theme-gallery', 'ai-marketplace', 'workflow-automation', 'business-intelligence', 'smart-dashboard', 'quantum-ai', 'ai-research-lab', 'compliance-center', 'advanced-seo', 'algorithm-optimizer', 'customization-studio', 'advanced-media', 'multimodal-ai', 'predictive-intelligence', 'emotional-ai', 'agentic-ai'].includes(currentView)) && (
                 <Sidebar
                   conversations={conversations}
                   selectedConversation={selectedConversation}

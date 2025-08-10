@@ -326,6 +326,30 @@ export function Sidebar({
       icon: FileText,
       view: "advanced-media" as const,
       badge: "Creative+"
+    },
+    {
+      title: "🧠 Multimodal AI",
+      icon: Brain,
+      view: "multimodal-ai" as const,
+      badge: "GPT-5+"
+    },
+    {
+      title: "🔮 Predictive AI",
+      icon: TrendingUp,
+      view: "predictive-intelligence" as const,
+      badge: "Future"
+    },
+    {
+      title: "💖 Emotional AI",
+      icon: Heart,
+      view: "emotional-ai" as const,
+      badge: "EQ"
+    },
+    {
+      title: "🤖 Agentic AI",
+      icon: Bot,
+      view: "agentic-ai" as const,
+      badge: "Auto"
     }
   ];
 

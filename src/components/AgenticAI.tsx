@@ -1,508 +1,461 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import React, { useState, useEffect } from 'react';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
-import { ScrollArea } from "@/components/ui/scroll-area";
-import { toast } from "sonner";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Input } from "@/components/ui/input";
 import { 
   Bot, 
   Brain, 
-  Target, 
   Zap, 
-  CheckCircle, 
-  Play,
-  Pause,
-  RotateCcw,
-  Settings,
-  Activity,
-  TrendingUp,
-  AlertTriangle,
-  Clock,
+  Target, 
+  Users, 
+  Globe, 
   Cpu,
-  Network,
-  Database,
-  Shield
-} from "lucide-react";
+  Activity,
+  CheckCircle,
+  Clock,
+  ArrowRight,
+  Sparkles,
+  Cog,
+  Eye,
+  MessageSquare,
+  TrendingUp,
+  Shield,
+  Rocket
+} from 'lucide-react';
+import { toast } from "sonner";
 
-interface AgentTask {
-  id: string;
-  title: string;
-  description: string;
-  status: 'planning' | 'executing' | 'completed' | 'failed' | 'paused';
-  progress: number;
-  priority: 'low' | 'medium' | 'high' | 'critical';
-  estimatedTime: string;
-  steps: TaskStep[];
-  dependencies?: string[];
-}
+const AgenticAI = () => {
+  const [activeAgents, setActiveAgents] = useState(12);
+  const [tasksCompleted, setTasksCompleted] = useState(1847);
+  const [autonomyLevel, setAutonomyLevel] = useState(87);
+  const [newTask, setNewTask] = useState('');
+  const [agents, setAgents] = useState<any[]>([]);
 
-interface TaskStep {
-  id: string;
-  action: string;
-  status: 'pending' | 'running' | 'completed' | 'failed';
-  result?: string;
-  confidence: number;
-}
+  useEffect(() => {
+    // Initialize AI agents
+    const initialAgents = [
+      {
+        id: 1,
+        name: 'Research Agent Alpha',
+        type: 'Research',
+        status: 'Active',
+        task: 'Market analysis और competitor research',
+        progress: 78,
+        efficiency: 94.5,
+        specialty: 'Data Analysis'
+      },
+      {
+        id: 2,
+        name: 'Creative Agent Beta',
+        type: 'Creative',
+        status: 'Working',
+        task: 'Content generation और design creation',
+        progress: 92,
+        efficiency: 89.2,
+        specialty: 'Content Creation'
+      },
+      {
+        id: 3,
+        name: 'Problem Solver Gamma',
+        type: 'Problem Solving',
+        status: 'Active',
+        task: 'Complex algorithm optimization',
+        progress: 65,
+        efficiency: 96.8,
+        specialty: 'Logic & Reasoning'
+      },
+      {
+        id: 4,
+        name: 'Communication Agent Delta',
+        type: 'Communication',
+        status: 'Standby',
+        task: 'Multi-language customer support',
+        progress: 100,
+        efficiency: 91.7,
+        specialty: 'Language Processing'
+      }
+    ];
+    setAgents(initialAgents);
 
-interface AgentCapability {
-  name: string;
-  description: string;
-  enabled: boolean;
-  performance: number;
-  icon: any;
-}
+    // Simulate real-time updates
+    const interval = setInterval(() => {
+      setTasksCompleted(prev => prev + Math.floor(Math.random() * 3));
+      setAutonomyLevel(prev => Math.min(99, prev + Math.random() * 0.5));
+    }, 5000);
 
-export const AgenticAI = () => {
-  const [tasks, setTasks] = useState<AgentTask[]>([]);
-  const [activeAgents, setActiveAgents] = useState(0);
-  const [agentGoal, setAgentGoal] = useState('');
-  const [isAgentRunning, setIsAgentRunning] = useState(false);
-  const [agentPerformance, setAgentPerformance] = useState({
-    tasksCompleted: 0,
-    successRate: 0,
-    avgResponseTime: 0,
-    autonomyLevel: 0
-  });
+    return () => clearInterval(interval);
+  }, []);
 
-  const [capabilities, setCapabilities] = useState<AgentCapability[]>([
+  const deployNewAgent = async () => {
+    if (!newTask.trim()) return;
+
+    const newAgent = {
+      id: agents.length + 1,
+      name: `Custom Agent ${agents.length + 1}`,
+      type: 'Custom',
+      status: 'Initializing',
+      task: newTask,
+      progress: 0,
+      efficiency: 85 + Math.random() * 15,
+      specialty: 'Multi-Purpose'
+    };
+
+    setAgents(prev => [...prev, newAgent]);
+    setActiveAgents(prev => prev + 1);
+    setNewTask('');
+    
+    toast.success('New AI Agent deployed successfully!');
+
+    // Simulate agent initialization
+    setTimeout(() => {
+      setAgents(prev => prev.map(agent => 
+        agent.id === newAgent.id 
+          ? { ...agent, status: 'Active', progress: Math.floor(Math.random() * 30) + 10 }
+          : agent
+      ));
+    }, 2000);
+  };
+
+  const agentCapabilities = [
     {
-      name: 'स्वचालित निर्णय लेना',
-      description: 'बिना मानवीय हस्तक्षेप के निर्णय',
-      enabled: true,
-      performance: 94,
+      name: 'Autonomous Learning',
+      description: 'Self-improving algorithms और continuous learning',
+      level: 95,
       icon: Brain
     },
     {
-      name: 'लक्ष्य निर्धारण',
-      description: 'खुद से लक्ष्य बनाना और पूरा करना',
-      enabled: true,
-      performance: 89,
+      name: 'Decision Making',
+      description: 'Independent decision making without human intervention',
+      level: 89,
       icon: Target
     },
     {
-      name: 'IoT नियंत्रण',
-      description: 'स्मार्ट डिवाइस को कंट्रोल करना',
-      enabled: true,
-      performance: 92,
-      icon: Network
+      name: 'Task Planning',
+      description: 'Complex multi-step task planning और execution',
+      level: 92,
+      icon: Cog
     },
     {
-      name: 'डेटा विश्लेषण',
-      description: 'वास्तविक समय डेटा एनालिसिस',
-      enabled: true,
-      performance: 96,
-      icon: Database
+      name: 'Adaptive Behavior',
+      description: 'Environment के अनुसार behavior adaptation',
+      level: 87,
+      icon: Activity
+    }
+  ];
+
+  const metrics = [
+    {
+      title: 'Active Agents',
+      value: activeAgents.toString(),
+      change: '+3',
+      icon: Bot,
+      color: 'text-blue-500'
     },
     {
-      name: 'सुरक्षा निगरानी',
-      description: 'स्वचालित सुरक्षा चेकिंग',
-      enabled: true,
-      performance: 98,
-      icon: Shield
+      title: 'Tasks Completed',
+      value: tasksCompleted.toLocaleString(),
+      change: '+127',
+      icon: CheckCircle,
+      color: 'text-green-500'
     },
     {
-      name: 'प्रदर्शन अनुकूलन',
-      description: 'खुद को बेहतर बनाना',
-      enabled: true,
-      performance: 91,
-      icon: TrendingUp
+      title: 'Autonomy Level',
+      value: `${autonomyLevel.toFixed(1)}%`,
+      change: '+2.1%',
+      icon: Rocket,
+      color: 'text-purple-500'
+    },
+    {
+      title: 'Efficiency Rate',
+      value: '96.2%',
+      change: '+1.8%',
+      icon: TrendingUp,
+      color: 'text-orange-500'
     }
-  ]);
-
-  const intervalRef = useRef<NodeJS.Timeout | null>(null);
-
-  useEffect(() => {
-    if (isAgentRunning) {
-      intervalRef.current = setInterval(() => {
-        // Simulate agent task execution
-        setTasks(prevTasks => 
-          prevTasks.map(task => {
-            if (task.status === 'executing' && task.progress < 100) {
-              const newProgress = Math.min(task.progress + Math.random() * 15, 100);
-              const newStatus = newProgress === 100 ? 'completed' : 'executing';
-              
-              if (newStatus === 'completed') {
-                setAgentPerformance(prev => ({
-                  ...prev,
-                  tasksCompleted: prev.tasksCompleted + 1,
-                  successRate: Math.min(prev.successRate + 1, 99),
-                  autonomyLevel: Math.min(prev.autonomyLevel + 2, 100)
-                }));
-              }
-              
-              return { ...task, progress: newProgress, status: newStatus };
-            }
-            return task;
-          })
-        );
-
-        // Update active agents count
-        setActiveAgents(prev => Math.min(prev + Math.floor(Math.random() * 3), 25));
-        
-        // Update performance metrics
-        setAgentPerformance(prev => ({
-          ...prev,
-          avgResponseTime: Math.random() * 50 + 100,
-          autonomyLevel: Math.min(prev.autonomyLevel + 0.5, 100)
-        }));
-      }, 2000);
-    } else {
-      if (intervalRef.current) {
-        clearInterval(intervalRef.current);
-      }
-    }
-
-    return () => {
-      if (intervalRef.current) {
-        clearInterval(intervalRef.current);
-      }
-    };
-  }, [isAgentRunning]);
-
-  const createAutonomousTask = async () => {
-    if (!agentGoal.trim()) return;
-
-    const newTask: AgentTask = {
-      id: Date.now().toString(),
-      title: `एजेंट टास्क: ${agentGoal}`,
-      description: `स्वचालित रूप से "${agentGoal}" को पूरा करने के लिए AI एजेंट काम कर रहा है`,
-      status: 'planning',
-      progress: 0,
-      priority: 'high',
-      estimatedTime: `${Math.floor(Math.random() * 10) + 5} मिनट`,
-      steps: [
-        {
-          id: '1',
-          action: 'लक्ष्य विश्लेषण और योजना बनाना',
-          status: 'pending',
-          confidence: 95
-        },
-        {
-          id: '2', 
-          action: 'आवश्यक रिसोर्स की पहचान',
-          status: 'pending',
-          confidence: 88
-        },
-        {
-          id: '3',
-          action: 'कार्य निष्पादन रणनीति',
-          status: 'pending',
-          confidence: 92
-        },
-        {
-          id: '4',
-          action: 'परिणाम का मूल्यांकन',
-          status: 'pending',
-          confidence: 90
-        }
-      ]
-    };
-
-    setTasks(prev => [newTask, ...prev]);
-    setAgentGoal('');
-    
-    // Start task execution after a short delay
-    setTimeout(() => {
-      setTasks(prev => 
-        prev.map(task => 
-          task.id === newTask.id 
-            ? { ...task, status: 'executing' }
-            : task
-        )
-      );
-    }, 1000);
-
-    toast.success("स्वचालित AI एजेंट शुरू किया गया!");
-  };
-
-  const toggleAgent = () => {
-    setIsAgentRunning(!isAgentRunning);
-    toast.success(isAgentRunning ? "AI एजेंट रोक दिया गया" : "AI एजेंट चालू किया गया");
-  };
-
-  const getPriorityColor = (priority: string) => {
-    switch (priority) {
-      case 'critical': return 'bg-red-500';
-      case 'high': return 'bg-orange-500';
-      case 'medium': return 'bg-yellow-500';
-      case 'low': return 'bg-green-500';
-      default: return 'bg-blue-500';
-    }
-  };
-
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case 'completed': return 'text-green-400';
-      case 'executing': return 'text-blue-400';
-      case 'failed': return 'text-red-400';
-      case 'paused': return 'text-yellow-400';
-      default: return 'text-gray-400';
-    }
-  };
+  ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-blue-900 to-purple-900 p-6">
-      <div className="max-w-7xl mx-auto space-y-6">
-        {/* Header */}
-        <Card className="bg-white/10 backdrop-blur-md border-white/20">
-          <CardHeader>
-            <CardTitle className="text-2xl text-white flex items-center gap-3">
-              <Bot className="h-8 w-8 text-blue-400" />
-              एजेंटिक AI सिस्टम
-              <Badge className={`${isAgentRunning ? 'bg-green-500 animate-pulse' : 'bg-gray-500'} text-white`}>
-                {isAgentRunning ? 'Active' : 'Standby'}
-              </Badge>
-            </CardTitle>
-          </CardHeader>
-        </Card>
-
-        {/* Performance Dashboard */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          <Card className="bg-gradient-to-br from-blue-500/20 to-cyan-500/20 border-blue-300/30">
-            <CardContent className="p-4 text-center">
-              <Activity className="h-8 w-8 mx-auto text-blue-400 mb-2" />
-              <div className="text-2xl font-bold text-white">{activeAgents}</div>
-              <div className="text-blue-200 text-sm">Active Agents</div>
-            </CardContent>
-          </Card>
-
-          <Card className="bg-gradient-to-br from-green-500/20 to-emerald-500/20 border-green-300/30">
-            <CardContent className="p-4 text-center">
-              <CheckCircle className="h-8 w-8 mx-auto text-green-400 mb-2" />
-              <div className="text-2xl font-bold text-white">{agentPerformance.tasksCompleted}</div>
-              <div className="text-green-200 text-sm">Tasks Done</div>
-            </CardContent>
-          </Card>
-
-          <Card className="bg-gradient-to-br from-purple-500/20 to-pink-500/20 border-purple-300/30">
-            <CardContent className="p-4 text-center">
-              <TrendingUp className="h-8 w-8 mx-auto text-purple-400 mb-2" />
-              <div className="text-2xl font-bold text-white">{agentPerformance.successRate.toFixed(1)}%</div>
-              <div className="text-purple-200 text-sm">Success Rate</div>
-            </CardContent>
-          </Card>
-
-          <Card className="bg-gradient-to-br from-orange-500/20 to-red-500/20 border-orange-300/30">
-            <CardContent className="p-4 text-center">
-              <Cpu className="h-8 w-8 mx-auto text-orange-400 mb-2" />
-              <div className="text-2xl font-bold text-white">{agentPerformance.autonomyLevel.toFixed(0)}%</div>
-              <div className="text-orange-200 text-sm">Autonomy</div>
-            </CardContent>
-          </Card>
+    <div className="space-y-6 p-6">
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-3xl font-bold gradient-text">🤖 Agentic AI System</h1>
+          <p className="text-muted-foreground">Autonomous AI agents जो independently काम करते हैं</p>
         </div>
+        <Badge variant="secondary" className="bg-gradient-to-r from-cyan-500 to-blue-500 text-white">
+          <Sparkles className="w-4 h-4 mr-1" />
+          Autonomous
+        </Badge>
+      </div>
 
-        {/* Agent Control Panel */}
-        <Card className="bg-white/10 backdrop-blur-md border-white/20">
-          <CardContent className="p-6">
-            <div className="flex gap-4 mb-6">
-              <Input
-                placeholder="AI एजेंट को कोई लक्ष्य दें... (यह खुद से काम पूरा करेगा)"
-                value={agentGoal}
-                onChange={(e) => setAgentGoal(e.target.value)}
-                onKeyPress={(e) => e.key === 'Enter' && createAutonomousTask()}
-                className="bg-white/10 text-white placeholder-white/70 border-white/20"
-              />
-              <Button
-                onClick={createAutonomousTask}
-                className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700"
-              >
-                <Target className="h-4 w-4 mr-2" />
-                Deploy Agent
-              </Button>
-              <Button
-                onClick={toggleAgent}
-                variant={isAgentRunning ? "destructive" : "default"}
-                className="flex items-center gap-2"
-              >
-                {isAgentRunning ? <Pause className="h-4 w-4" /> : <Play className="h-4 w-4" />}
-                {isAgentRunning ? 'Stop' : 'Start'}
-              </Button>
-            </div>
-
-            {/* Capabilities Grid */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
-              {capabilities.map((capability, index) => {
-                const IconComponent = capability.icon;
-                return (
-                  <Card key={index} className="bg-white/5 border-white/10">
-                    <CardContent className="p-4">
-                      <div className="flex items-center gap-3 mb-3">
-                        <IconComponent className="h-6 w-6 text-blue-400" />
-                        <div className="flex-1">
-                          <h4 className="text-white font-semibold text-sm">{capability.name}</h4>
-                          <p className="text-white/70 text-xs">{capability.description}</p>
-                        </div>
-                        <Badge className={capability.enabled ? 'bg-green-500' : 'bg-gray-500'}>
-                          {capability.enabled ? 'ON' : 'OFF'}
-                        </Badge>
-                      </div>
-                      <div className="space-y-1">
-                        <div className="flex justify-between text-xs">
-                          <span className="text-white/70">Performance</span>
-                          <span className="text-white">{capability.performance}%</span>
-                        </div>
-                        <Progress value={capability.performance} className="h-2" />
-                      </div>
-                    </CardContent>
-                  </Card>
-                );
-              })}
-            </div>
-          </CardContent>
-        </Card>
-
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          {/* Active Tasks */}
-          <Card className="bg-white/10 backdrop-blur-md border-white/20">
-            <CardHeader>
-              <CardTitle className="text-white flex items-center gap-2">
-                <Bot className="h-5 w-5 text-blue-400" />
-                स्वचालित कार्य ({tasks.length})
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <ScrollArea className="h-96">
-                <div className="space-y-4">
-                  {tasks.length === 0 ? (
-                    <div className="text-center py-8">
-                      <Bot className="h-12 w-12 mx-auto text-blue-400/50 mb-4" />
-                      <p className="text-white/70">कोई लक्ष्य दें और AI एजेंट काम शुरू करेगा</p>
-                    </div>
-                  ) : (
-                    tasks.map((task) => (
-                      <Card key={task.id} className="bg-white/5 border-white/10">
-                        <CardContent className="p-4">
-                          <div className="flex items-start justify-between mb-3">
-                            <div className="flex-1">
-                              <h4 className="text-white font-semibold text-sm mb-1">{task.title}</h4>
-                              <p className="text-white/70 text-xs mb-2">{task.description}</p>
-                              <div className="flex items-center gap-2 mb-3">
-                                <Badge className={`${getPriorityColor(task.priority)} text-white text-xs`}>
-                                  {task.priority}
-                                </Badge>
-                                <Badge className="bg-gray-500/20 text-gray-300 text-xs">
-                                  <Clock className="h-3 w-3 mr-1" />
-                                  {task.estimatedTime}
-                                </Badge>
-                              </div>
-                            </div>
-                            <div className={`${getStatusColor(task.status)}`}>
-                              {task.status === 'executing' && <Activity className="h-4 w-4 animate-pulse" />}
-                              {task.status === 'completed' && <CheckCircle className="h-4 w-4" />}
-                              {task.status === 'failed' && <AlertTriangle className="h-4 w-4" />}
-                              {task.status === 'planning' && <Brain className="h-4 w-4" />}
-                            </div>
-                          </div>
-                          
-                          <div className="space-y-1 mb-3">
-                            <div className="flex justify-between text-xs">
-                              <span className="text-white/70">Progress</span>
-                              <span className="text-white">{task.progress.toFixed(0)}%</span>
-                            </div>
-                            <Progress value={task.progress} className="h-2" />
-                          </div>
-
-                          <div className="space-y-2">
-                            {task.steps.map((step, stepIndex) => (
-                              <div key={step.id} className="flex items-center gap-2 text-xs">
-                                <div className={`w-2 h-2 rounded-full ${
-                                  step.status === 'completed' ? 'bg-green-400' :
-                                  step.status === 'running' ? 'bg-blue-400 animate-pulse' :
-                                  step.status === 'failed' ? 'bg-red-400' :
-                                  'bg-gray-400'
-                                }`} />
-                                <span className="text-white/70 flex-1">{step.action}</span>
-                                <Badge className="bg-blue-500/20 text-blue-300 text-xs">
-                                  {step.confidence}%
-                                </Badge>
-                              </div>
-                            ))}
-                          </div>
-                        </CardContent>
-                      </Card>
-                    ))
-                  )}
-                </div>
-              </ScrollArea>
-            </CardContent>
-          </Card>
-
-          {/* Agent Analytics */}
-          <Card className="bg-white/10 backdrop-blur-md border-white/20">
-            <CardHeader>
-              <CardTitle className="text-white flex items-center gap-2">
-                <TrendingUp className="h-5 w-5 text-green-400" />
-                Agent Performance Analytics
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-6">
+      {/* Key Metrics */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        {metrics.map((metric, index) => (
+          <Card key={index} className="hover:shadow-lg transition-all">
+            <CardContent className="pt-6">
+              <div className="flex items-center justify-between">
                 <div>
-                  <h4 className="text-white font-semibold mb-3">Real-time Metrics</h4>
-                  <div className="space-y-3">
-                    <div>
-                      <div className="flex justify-between text-sm mb-1">
-                        <span className="text-white/70">Task Success Rate</span>
-                        <span className="text-white">{agentPerformance.successRate.toFixed(1)}%</span>
-                      </div>
-                      <Progress value={agentPerformance.successRate} className="h-2" />
-                    </div>
-                    
-                    <div>
-                      <div className="flex justify-between text-sm mb-1">
-                        <span className="text-white/70">Autonomy Level</span>
-                        <span className="text-white">{agentPerformance.autonomyLevel.toFixed(0)}%</span>
-                      </div>
-                      <Progress value={agentPerformance.autonomyLevel} className="h-2" />
-                    </div>
-
-                    <div>
-                      <div className="flex justify-between text-sm mb-1">
-                        <span className="text-white/70">Response Time</span>
-                        <span className="text-white">{agentPerformance.avgResponseTime.toFixed(0)}ms</span>
-                      </div>
-                      <Progress value={Math.max(0, 100 - agentPerformance.avgResponseTime/10)} className="h-2" />
-                    </div>
-                  </div>
-                </div>
-
-                <div>
-                  <h4 className="text-white font-semibold mb-3">Agent Capabilities Status</h4>
-                  <div className="grid grid-cols-2 gap-2">
-                    {capabilities.slice(0, 4).map((cap, index) => {
-                      const IconComponent = cap.icon;
-                      return (
-                        <div key={index} className="bg-white/5 rounded-lg p-3">
-                          <div className="flex items-center gap-2 mb-2">
-                            <IconComponent className="h-4 w-4 text-blue-400" />
-                            <span className="text-white text-xs font-medium">{cap.name}</span>
-                          </div>
-                          <Progress value={cap.performance} className="h-1" />
-                        </div>
-                      );
-                    })}
-                  </div>
-                </div>
-
-                <div className="bg-gradient-to-r from-green-500/20 to-blue-500/20 rounded-lg p-4 border border-green-300/30">
-                  <div className="flex items-center gap-2 mb-2">
-                    <Zap className="h-5 w-5 text-green-400" />
-                    <span className="text-white font-semibold">AI Agent Status</span>
-                  </div>
-                  <p className="text-green-200 text-sm">
-                    {isAgentRunning ? 
-                      "स्वचालित AI एजेंट सक्रिय है और निरंतर कार्य कर रहा है" :
-                      "AI एजेंट स्टैंडबाई मोड में है"
-                    }
+                  <p className="text-sm font-medium text-muted-foreground">{metric.title}</p>
+                  <p className="text-2xl font-bold">{metric.value}</p>
+                  <p className={`text-sm flex items-center ${metric.color}`}>
+                    <TrendingUp className="w-4 h-4 mr-1" />
+                    {metric.change}
                   </p>
                 </div>
+                <metric.icon className={`w-8 h-8 ${metric.color}`} />
               </div>
             </CardContent>
           </Card>
-        </div>
+        ))}
       </div>
+
+      <Tabs defaultValue="agents" className="w-full">
+        <TabsList className="grid w-full grid-cols-4">
+          <TabsTrigger value="agents">AI Agents</TabsTrigger>
+          <TabsTrigger value="capabilities">Capabilities</TabsTrigger>
+          <TabsTrigger value="tasks">Task Manager</TabsTrigger>
+          <TabsTrigger value="analytics">Analytics</TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="agents" className="space-y-4">
+          {/* Agent Deployment */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center">
+                <Bot className="w-5 h-5 mr-2" />
+                Deploy New AI Agent
+              </CardTitle>
+              <CardDescription>
+                नया autonomous AI agent create करें specific task के लिए
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="flex space-x-2">
+                <Input
+                  placeholder="Agent को कौन सा task assign करना चाहते हैं?"
+                  value={newTask}
+                  onChange={(e) => setNewTask(e.target.value)}
+                  className="flex-1"
+                />
+                <Button onClick={deployNewAgent} disabled={!newTask.trim()}>
+                  <Rocket className="w-4 h-4 mr-2" />
+                  Deploy
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Active Agents */}
+          <div className="grid gap-4">
+            {agents.map((agent) => (
+              <Card key={agent.id} className="hover:shadow-md transition-all">
+                <CardContent className="pt-6">
+                  <div className="flex items-start justify-between">
+                    <div className="flex-1">
+                      <div className="flex items-center space-x-2 mb-2">
+                        <h4 className="font-semibold">{agent.name}</h4>
+                        <Badge 
+                          variant={agent.status === 'Active' ? 'default' : 'secondary'}
+                          className={agent.status === 'Active' ? 'bg-green-500' : ''}
+                        >
+                          {agent.status}
+                        </Badge>
+                        <Badge variant="outline">{agent.type}</Badge>
+                      </div>
+                      <p className="text-sm text-muted-foreground mb-3">{agent.task}</p>
+                      <div className="space-y-2">
+                        <div className="flex justify-between text-sm">
+                          <span>Progress</span>
+                          <span className="font-medium">{agent.progress}%</span>
+                        </div>
+                        <Progress value={agent.progress} className="w-full" />
+                        <div className="flex justify-between text-sm">
+                          <span>Efficiency</span>
+                          <span className="font-medium text-green-500">{agent.efficiency.toFixed(1)}%</span>
+                        </div>
+                      </div>
+                    </div>
+                    <div className="text-right ml-4">
+                      <Badge variant="outline" className="mb-2">
+                        {agent.specialty}
+                      </Badge>
+                      <div className="flex space-x-1">
+                        <Button size="sm" variant="outline">
+                          <Eye className="w-4 h-4" />
+                        </Button>
+                        <Button size="sm" variant="outline">
+                          <Cog className="w-4 h-4" />
+                        </Button>
+                      </div>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        </TabsContent>
+
+        <TabsContent value="capabilities" className="space-y-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {agentCapabilities.map((capability, index) => (
+              <Card key={index} className="hover:shadow-lg transition-all">
+                <CardHeader className="pb-3">
+                  <div className="flex items-center space-x-2">
+                    <capability.icon className="w-6 h-6 text-primary" />
+                    <CardTitle className="text-lg">{capability.name}</CardTitle>
+                  </div>
+                  <CardDescription>{capability.description}</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-2">
+                    <div className="flex justify-between">
+                      <span className="text-sm font-medium">Capability Level</span>
+                      <span className="text-sm font-bold text-primary">{capability.level}%</span>
+                    </div>
+                    <Progress value={capability.level} className="w-full" />
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+
+          <Card>
+            <CardHeader>
+              <CardTitle>Advanced Agentic Features</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                {[
+                  { name: 'Self-Modification', desc: 'Code और behavior को खुद modify करना' },
+                  { name: 'Goal Setting', desc: 'Long-term goals set करना और achieve करना' },
+                  { name: 'Resource Management', desc: 'Computing resources का optimal use' },
+                  { name: 'Inter-Agent Communication', desc: 'Agents के बीच intelligent communication' },
+                  { name: 'Swarm Intelligence', desc: 'Multiple agents coordination और collaboration' },
+                  { name: 'Ethical Decision Making', desc: 'Moral और ethical considerations' }
+                ].map((feature, index) => (
+                  <div key={index} className="p-3 border rounded-lg">
+                    <h4 className="font-medium text-sm mb-1">{feature.name}</h4>
+                    <p className="text-xs text-muted-foreground">{feature.desc}</p>
+                  </div>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="tasks" className="space-y-4">
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center">
+                <CheckCircle className="w-5 h-5 mr-2" />
+                Autonomous Task Management
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                {[
+                  { task: 'Market research और competitor analysis', agent: 'Research Agent Alpha', priority: 'High', eta: '2 hours' },
+                  { task: 'Content creation for social media', agent: 'Creative Agent Beta', priority: 'Medium', eta: '1 hour' },
+                  { task: 'Database optimization और performance tuning', agent: 'Problem Solver Gamma', priority: 'High', eta: '3 hours' },
+                  { task: 'Customer support automation setup', agent: 'Communication Agent Delta', priority: 'Low', eta: '4 hours' }
+                ].map((item, index) => (
+                  <div key={index} className="flex items-center justify-between p-3 border rounded-lg">
+                    <div className="flex-1">
+                      <p className="font-medium text-sm">{item.task}</p>
+                      <p className="text-xs text-muted-foreground">Assigned to: {item.agent}</p>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <Badge variant={item.priority === 'High' ? 'destructive' : item.priority === 'Medium' ? 'default' : 'secondary'}>
+                        {item.priority}
+                      </Badge>
+                      <div className="flex items-center text-xs text-muted-foreground">
+                        <Clock className="w-3 h-3 mr-1" />
+                        {item.eta}
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="analytics" className="space-y-4">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-lg">Performance Metrics</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-3">
+                  <div className="flex justify-between">
+                    <span className="text-sm">Success Rate</span>
+                    <span className="font-bold text-green-500">98.7%</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-sm">Avg Response Time</span>
+                    <span className="font-bold">1.2s</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-sm">Resource Utilization</span>
+                    <span className="font-bold text-blue-500">74%</span>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-lg">Learning Progress</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-3">
+                  <div>
+                    <div className="flex justify-between text-sm mb-1">
+                      <span>Pattern Recognition</span>
+                      <span>94%</span>
+                    </div>
+                    <Progress value={94} />
+                  </div>
+                  <div>
+                    <div className="flex justify-between text-sm mb-1">
+                      <span>Decision Accuracy</span>
+                      <span>89%</span>
+                    </div>
+                    <Progress value={89} />
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-lg">System Health</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm">CPU Usage</span>
+                    <Badge variant="secondary">67%</Badge>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm">Memory</span>
+                    <Badge variant="secondary">45%</Badge>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm">Network</span>
+                    <Badge className="bg-green-500">Optimal</Badge>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        </TabsContent>
+      </Tabs>
     </div>
   );
 };
+
+export default AgenticAI;
