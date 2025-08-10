@@ -248,7 +248,15 @@ const Index = () => {
       'theme-gallery',
       'ai-marketplace',
       'workflow-automation',
-      'business-intelligence'
+      'business-intelligence',
+      'smart-dashboard',
+      'quantum-ai',
+      'ai-research-lab',
+      'compliance-center',
+      'advanced-seo',
+      'algorithm-optimizer',
+      'customization-studio',
+      'advanced-media'
     ];
     
     if (authRequiredViews.includes(view) && !isAuthenticated) {
@@ -326,7 +334,7 @@ const Index = () => {
             <OnboardingTips />
             <FunFacts />
             <div className="flex flex-1">
-              {(['chat', 'analytics', 'ai-model-switcher', 'collaboration', 'custom-training', 'templates', 'advanced-analytics', 'news-engine', 'productivity-suite', 'security-center', 'theme-gallery', 'ai-marketplace', 'workflow-automation', 'business-intelligence'].includes(currentView)) && (
+              {(['chat', 'analytics', 'ai-model-switcher', 'collaboration', 'custom-training', 'templates', 'advanced-analytics', 'news-engine', 'productivity-suite', 'security-center', 'theme-gallery', 'ai-marketplace', 'workflow-automation', 'business-intelligence', 'smart-dashboard', 'quantum-ai', 'ai-research-lab', 'compliance-center', 'advanced-seo', 'algorithm-optimizer', 'customization-studio', 'advanced-media'].includes(currentView)) && (
                 <Sidebar
                   conversations={conversations}
                   selectedConversation={selectedConversation}
@@ -453,6 +461,14 @@ const Index = () => {
                   <AIResearchLab />
                 ) : currentView === 'compliance-center' ? (
                   <ComplianceCenter />
+                ) : currentView === 'advanced-seo' ? (
+                  <AdvancedSEOManager />
+                ) : currentView === 'algorithm-optimizer' ? (
+                  <AlgorithmOptimizer />
+                ) : currentView === 'customization-studio' ? (
+                  <CustomizationStudio />
+                ) : currentView === 'advanced-media' ? (
+                  <AdvancedMediaHub />
                 ) : selectedConversation && currentConversation ? (
                   <ChatInterface
                     conversation={currentConversation}

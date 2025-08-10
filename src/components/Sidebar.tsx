@@ -302,6 +302,30 @@ export function Sidebar({
       icon: CreditCard,
       view: "subscription" as const,
       badge: null
+    },
+    {
+      title: "🔍 Advanced SEO",
+      icon: TrendingUp,
+      view: "advanced-seo" as const,
+      badge: "Power+"
+    },
+    {
+      title: "⚡ Algorithm Optimizer",
+      icon: Cpu,
+      view: "algorithm-optimizer" as const,
+      badge: "Quantum"
+    },
+    {
+      title: "🎨 Customization Studio",
+      icon: Layers,
+      view: "customization-studio" as const,
+      badge: "Pro+"
+    },
+    {
+      title: "🎬 Advanced Media Hub",
+      icon: FileText,
+      view: "advanced-media" as const,
+      badge: "Creative+"
     }
   ];
 

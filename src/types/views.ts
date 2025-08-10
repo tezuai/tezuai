@@ -33,7 +33,7 @@ export type ViewName =
   | 'quantum-ai'
   | 'ai-research-lab'
   | 'compliance-center'
-  | 'seo-manager'
+  | 'advanced-seo'
   | 'algorithm-optimizer'
   | 'customization-studio'
-  | 'media-hub';
+  | 'advanced-media';
