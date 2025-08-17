@@ -56,6 +56,7 @@ import { AdvancedSEOManager } from "@/components/AdvancedSEOManager";
 import { AlgorithmOptimizer } from "@/components/AlgorithmOptimizer";
 import { CustomizationStudio } from "@/components/CustomizationStudio";
 import { AdvancedMediaHub } from "@/components/AdvancedMediaHub";
+import { QuantumAI } from "@/components/QuantumAI";
 import type { ViewName } from "@/types/views";
 
 const Index = () => {
