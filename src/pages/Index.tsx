@@ -38,7 +38,6 @@ import { AIMarketplace } from "@/components/AIMarketplace";
 import { WorkflowAutomation } from "@/components/WorkflowAutomation";
 import { BusinessIntelligence } from "@/components/BusinessIntelligence";
 import MultimodalAI from "@/components/MultimodalAI";
-import { RealtimeKnowledgeEngine } from "@/components/RealtimeKnowledgeEngine";
 import AgenticAI from "@/components/AgenticAI";
 import { CreativeStudio } from "@/components/CreativeStudio";
 import { SmartLearning } from "@/components/SmartLearning";
@@ -46,7 +45,6 @@ import { AdvancedSecurity } from "@/components/AdvancedSecurity";
 import PredictiveIntelligence from "@/components/PredictiveIntelligence";
 import EmotionalAI from "@/components/EmotionalAI";
 import { PolyglotAI } from "@/components/PolyglotAI";
-import { CulturalAI } from "@/components/CulturalAI";
 import { EnhancedThemeCustomizer } from "@/components/EnhancedThemeCustomizer";
 import { SmartDashboard } from "@/components/SmartDashboard";
 import { QuantumAI } from "@/components/QuantumAI";
@@ -56,7 +54,9 @@ import { AdvancedSEOManager } from "@/components/AdvancedSEOManager";
 import { AlgorithmOptimizer } from "@/components/AlgorithmOptimizer";
 import { CustomizationStudio } from "@/components/CustomizationStudio";
 import { AdvancedMediaHub } from "@/components/AdvancedMediaHub";
-import { QuantumAI } from "@/components/QuantumAI";
+import { VideoLearningHub } from "@/components/VideoLearningHub";
+import { CulturalAI } from "@/components/CulturalAI";
+import { RealtimeKnowledgeEngine } from "@/components/RealtimeKnowledgeEngine";
 import type { ViewName } from "@/types/views";
 
 const Index = () => {
@@ -474,6 +474,12 @@ const Index = () => {
                   <CustomizationStudio />
                 ) : currentView === 'advanced-media' ? (
                   <AdvancedMediaHub />
+                ) : currentView === 'video-learning' ? (
+                  <VideoLearningHub />
+                ) : currentView === 'cultural-ai' ? (
+                  <CulturalAI />
+                ) : currentView === 'realtime-knowledge' ? (
+                  <RealtimeKnowledgeEngine />
                 ) : selectedConversation && currentConversation ? (
                   <ChatInterface
                     conversation={currentConversation}

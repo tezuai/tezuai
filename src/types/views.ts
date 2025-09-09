@@ -37,4 +37,6 @@ export type ViewName =
   | 'algorithm-optimizer'
   | 'customization-studio'
   | 'advanced-media'
-  | 'video-learning';
+  | 'video-learning'
+  | 'cultural-ai'
+  | 'realtime-knowledge';

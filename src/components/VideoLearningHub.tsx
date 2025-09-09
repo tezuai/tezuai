@@ -1,360 +1,304 @@
-
-import { useState, useRef, useEffect } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import React, { useState, useEffect } from 'react';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Progress } from "@/components/ui/progress";
-import { ScrollArea } from "@/components/ui/scroll-area";
 import { 
-  Play, 
-  Pause, 
-  Square, 
-  SkipForward, 
-  SkipBack,
-  Volume2,
-  VolumeX,
-  Maximize,
+  Play,
+  Video,
   BookOpen,
-  CheckCircle,
+  Award,
   Clock,
+  Users,
   Star,
-  Trophy,
-  PlayCircle
-} from "lucide-react";
-import { useToast } from "@/hooks/use-toast";
-
-interface VideoTutorial {
-  id: string;
-  title: string;
-  description: string;
-  duration: string;
-  difficulty: 'beginner' | 'intermediate' | 'advanced';
-  category: string;
-  thumbnailUrl: string;
-  videoUrl: string;
-  completed: boolean;
-  progress: number;
-  topics: string[];
-}
-
-const videoTutorials: VideoTutorial[] = [
-  {
-    id: '1',
-    title: 'Tezu AI se Kaise Baat Karein',
-    description: 'Basic conversation techniques aur commands sikhiye',
-    duration: '5:30',
-    difficulty: 'beginner',
-    category: 'Getting Started',
-    thumbnailUrl: '/api/placeholder/300/200',
-    videoUrl: 'https://example.com/video1.mp4',
-    completed: false,
-    progress: 0,
-    topics: ['Basic Chat', 'Commands', 'Tips']
-  },
-  {
-    id: '2',
-    title: 'Advanced AI Features',
-    description: 'Personality modes, templates aur memory features',
-    duration: '8:45',
-    difficulty: 'intermediate',
-    category: 'Advanced Features',
-    thumbnailUrl: '/api/placeholder/300/200',
-    videoUrl: 'https://example.com/video2.mp4',
-    completed: false,
-    progress: 0,
-    topics: ['Personalities', 'Templates', 'Memory']
-  },
-  {
-    id: '3',
-    title: 'Voice Commands & Language Settings',
-    description: 'Voice chat aur multi-language support ka use',
-    duration: '6:20',
-    difficulty: 'intermediate',
-    category: 'Voice & Language',
-    thumbnailUrl: '/api/placeholder/300/200',
-    videoUrl: 'https://example.com/video3.mp4',
-    completed: false,
-    progress: 0,
-    topics: ['Voice Chat', 'Languages', 'Settings']
-  },
-  {
-    id: '4',
-    title: 'File Upload & Analysis',
-    description: 'Documents, images aur files analyze karna',
-    duration: '7:15',
-    difficulty: 'advanced',
-    category: 'File Processing',
-    thumbnailUrl: '/api/placeholder/300/200',
-    videoUrl: 'https://example.com/video4.mp4',
-    completed: false,
-    progress: 0,
-    topics: ['File Upload', 'Analysis', 'Export']
-  },
-  {
-    id: '5',
-    title: 'Collaboration & Sharing',
-    description: 'Team work aur conversation sharing',
-    duration: '4:50',
-    difficulty: 'advanced',
-    category: 'Collaboration',
-    thumbnailUrl: '/api/placeholder/300/200',
-    videoUrl: 'https://example.com/video5.mp4',
-    completed: false,
-    progress: 0,
-    topics: ['Team Chat', 'Sharing', 'Export']
-  }
-];
+  Download,
+  Share,
+  Bookmark
+} from 'lucide-react';
+import { toast } from "sonner";
 
 interface VideoLearningHubProps {
-  onTutorialComplete: (tutorialId: string) => void;
+  onTutorialComplete?: () => void;
 }
 
-export function VideoLearningHub({ onTutorialComplete }: VideoLearningHubProps) {
-  const [selectedVideo, setSelectedVideo] = useState<VideoTutorial | null>(null);
-  const [isPlaying, setIsPlaying] = useState(false);
-  const [isMuted, setIsMuted] = useState(false);
-  const [currentTime, setCurrentTime] = useState(0);
-  const [duration, setDuration] = useState(0);
-  const [completedVideos, setCompletedVideos] = useState<Set<string>>(new Set());
-  const [selectedCategory, setSelectedCategory] = useState<string>('all');
-  const videoRef = useRef<HTMLVideoElement>(null);
-  const { toast } = useToast();
+export const VideoLearningHub: React.FC<VideoLearningHubProps> = ({ 
+  onTutorialComplete 
+}) => {
+  const [watchProgress, setWatchProgress] = useState(67);
+  const [completedCourses, setCompletedCourses] = useState([
+    { title: 'AI Fundamentals', progress: 100, duration: '2h 30m' },
+    { title: 'Machine Learning Basics', progress: 85, duration: '4h 15m' },
+    { title: 'Deep Learning Advanced', progress: 45, duration: '6h 45m' }
+  ]);
 
-  const categories = ['all', 'Getting Started', 'Advanced Features', 'Voice & Language', 'File Processing', 'Collaboration'];
-
-  const filteredVideos = selectedCategory === 'all' 
-    ? videoTutorials 
-    : videoTutorials.filter(video => video.category === selectedCategory);
-
-  const getDifficultyColor = (difficulty: string) => {
-    switch(difficulty) {
-      case 'beginner': return 'bg-green-500/20 text-green-400';
-      case 'intermediate': return 'bg-yellow-500/20 text-yellow-400';
-      case 'advanced': return 'bg-red-500/20 text-red-400';
-      default: return 'bg-gray-500/20 text-gray-400';
+  const featuredVideos = [
+    {
+      id: 1,
+      title: 'AI का भविष्य - Future of Artificial Intelligence',
+      instructor: 'Dr. Rajesh Kumar',
+      duration: '45 mins',
+      rating: 4.9,
+      viewers: '10.2K',
+      thumbnail: '🤖'
+    },
+    {
+      id: 2,
+      title: 'Machine Learning for Beginners',
+      instructor: 'Priya Sharma',
+      duration: '1h 20m',
+      rating: 4.8,
+      viewers: '8.7K',
+      thumbnail: '🧠'
+    },
+    {
+      id: 3,
+      title: 'Neural Networks Explained',
+      instructor: 'Amit Singh',
+      duration: '55 mins',
+      rating: 4.7,
+      viewers: '6.5K',
+      thumbnail: '🕸️'
     }
-  };
+  ];
 
-  const handleVideoSelect = (video: VideoTutorial) => {
-    setSelectedVideo(video);
-    setIsPlaying(false);
-    setCurrentTime(0);
-    
-    // Simulate video loading
-    setTimeout(() => {
-      setDuration(parseInt(video.duration.split(':')[0]) * 60 + parseInt(video.duration.split(':')[1]));
-    }, 500);
-  };
+  const categories = [
+    { name: 'AI Basics', count: 24, icon: '🤖' },
+    { name: 'Machine Learning', count: 18, icon: '🧠' },
+    { name: 'Deep Learning', count: 15, icon: '🕸️' },
+    { name: 'Computer Vision', count: 12, icon: '👀' },
+    { name: 'NLP', count: 9, icon: '💬' },
+    { name: 'Robotics', count: 7, icon: '🤖' }
+  ];
 
-  const togglePlayPause = () => {
-    setIsPlaying(!isPlaying);
-    if (videoRef.current) {
-      if (isPlaying) {
-        videoRef.current.pause();
-      } else {
-        videoRef.current.play();
-      }
-    }
-  };
-
-  const handleTimeUpdate = () => {
-    if (videoRef.current) {
-      setCurrentTime(videoRef.current.currentTime);
-      
-      // Check if video is 90% complete
-      const progress = (videoRef.current.currentTime / videoRef.current.duration) * 100;
-      if (progress >= 90 && selectedVideo && !completedVideos.has(selectedVideo.id)) {
-        setCompletedVideos(prev => new Set([...prev, selectedVideo.id]));
-        onTutorialComplete(selectedVideo.id);
-        toast({
-          title: "Tutorial Completed! 🎉",
-          description: `You've completed: ${selectedVideo.title}`,
-        });
-      }
-    }
-  };
-
-  const formatTime = (seconds: number) => {
-    const mins = Math.floor(seconds / 60);
-    const secs = Math.floor(seconds % 60);
-    return `${mins}:${secs.toString().padStart(2, '0')}`;
-  };
-
-  const skip = (seconds: number) => {
-    if (videoRef.current) {
-      videoRef.current.currentTime += seconds;
+  const startVideo = (videoTitle: string) => {
+    toast.success(`▶️ Starting: ${videoTitle}`);
+    if (onTutorialComplete) {
+      onTutorialComplete();
     }
   };
 
   return (
-    <div className="space-y-4">
-      <div className="text-center mb-6">
-        <h3 className="text-lg font-bold text-white mb-2">🎥 Learn Tezu AI</h3>
-        <p className="text-sm text-gray-400">Interactive video tutorials to master AI features</p>
+    <div className="space-y-6 p-6">
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-3xl font-bold gradient-text">🎥 Video Learning Hub</h1>
+          <p className="text-muted-foreground">AI और technology की comprehensive video library</p>
+        </div>
+        <Badge variant="secondary" className="bg-gradient-to-r from-purple-500 to-pink-500 text-white">
+          <Video className="w-4 h-4 mr-1" />
+          Premium Content
+        </Badge>
       </div>
 
-      {/* Category Filter */}
-      <div className="flex flex-wrap gap-2 mb-4">
-        {categories.map((category) => (
-          <Button
-            key={category}
-            variant={selectedCategory === category ? "default" : "outline"}
-            size="sm"
-            onClick={() => setSelectedCategory(category)}
-            className={`text-xs ${
-              selectedCategory === category 
-                ? 'bg-blue-600 text-white' 
-                : 'border-gray-600 text-gray-300 hover:bg-gray-700'
-            }`}
-          >
-            {category === 'all' ? 'All Tutorials' : category}
-          </Button>
-        ))}
-      </div>
+      <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+        <div className="lg:col-span-3">
+          <Tabs defaultValue="featured" className="w-full">
+            <TabsList className="grid w-full grid-cols-4">
+              <TabsTrigger value="featured">Featured</TabsTrigger>
+              <TabsTrigger value="mycourses">My Courses</TabsTrigger>
+              <TabsTrigger value="live">Live</TabsTrigger>
+              <TabsTrigger value="trending">Trending</TabsTrigger>
+            </TabsList>
 
-      {/* Video Player */}
-      {selectedVideo && (
-        <Card className="bg-gray-800/50 border-gray-700 mb-4">
-          <CardHeader>
-            <CardTitle className="text-lg text-white flex items-center gap-2">
-              <PlayCircle className="w-5 h-5" />
-              {selectedVideo.title}
-            </CardTitle>
-            <p className="text-sm text-gray-400">{selectedVideo.description}</p>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            {/* Video Display */}
-            <div className="relative bg-black rounded-lg overflow-hidden aspect-video">
-              <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-blue-500/20 to-purple-500/20">
-                <div className="text-center">
-                  <PlayCircle className="w-16 h-16 text-white/80 mb-2 mx-auto" />
-                  <p className="text-white/80 text-sm">Click play to start tutorial</p>
-                </div>
-              </div>
-              
-              {/* Simulated video element */}
-              <video
-                ref={videoRef}
-                className="w-full h-full opacity-0"
-                onTimeUpdate={handleTimeUpdate}
-                onLoadedMetadata={() => setDuration(videoRef.current?.duration || 0)}
-              />
-            </div>
-
-            {/* Video Controls */}
-            <div className="space-y-2">
-              <div className="flex items-center gap-2">
-                <Button size="sm" onClick={togglePlayPause} className="bg-blue-600 hover:bg-blue-700">
-                  {isPlaying ? <Pause className="w-4 h-4" /> : <Play className="w-4 h-4" />}
-                </Button>
-                
-                <Button size="sm" variant="outline" onClick={() => skip(-10)} className="border-gray-600">
-                  <SkipBack className="w-4 h-4" />
-                </Button>
-                
-                <Button size="sm" variant="outline" onClick={() => skip(10)} className="border-gray-600">
-                  <SkipForward className="w-4 h-4" />
-                </Button>
-                
-                <Button size="sm" variant="outline" onClick={() => setIsMuted(!isMuted)} className="border-gray-600">
-                  {isMuted ? <VolumeX className="w-4 h-4" /> : <Volume2 className="w-4 h-4" />}
-                </Button>
-
-                <div className="flex-1 flex items-center gap-2 text-sm text-gray-400">
-                  <span>{formatTime(currentTime)}</span>
-                  <Progress value={(currentTime / duration) * 100} className="flex-1" />
-                  <span>{formatTime(duration)}</span>
-                </div>
-
-                <Button size="sm" variant="outline" className="border-gray-600">
-                  <Maximize className="w-4 h-4" />
-                </Button>
-              </div>
-            </div>
-
-            {/* Video Topics */}
-            <div className="flex flex-wrap gap-1">
-              {selectedVideo.topics.map((topic, index) => (
-                <Badge key={index} variant="secondary" className="text-xs bg-blue-500/20 text-blue-400">
-                  {topic}
-                </Badge>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
-      )}
-
-      {/* Tutorial List */}
-      <ScrollArea className="h-64">
-        <div className="space-y-3">
-          {filteredVideos.map((video) => {
-            const isCompleted = completedVideos.has(video.id);
-            
-            return (
-              <Card
-                key={video.id}
-                className={`cursor-pointer transition-all duration-200 border-2 ${
-                  selectedVideo?.id === video.id
-                    ? 'border-blue-500 bg-blue-500/10'
-                    : 'border-gray-600 hover:border-gray-500 bg-gray-800/50'
-                } ${isCompleted ? 'border-green-500/50 bg-green-500/5' : ''}`}
-                onClick={() => handleVideoSelect(video)}
-              >
-                <CardContent className="p-4">
-                  <div className="flex items-start gap-3">
-                    <div className="relative">
-                      <div className="w-20 h-12 bg-gradient-to-br from-blue-500/20 to-purple-500/20 rounded flex items-center justify-center">
-                        {isCompleted ? (
-                          <CheckCircle className="w-6 h-6 text-green-400" />
-                        ) : (
-                          <Play className="w-4 h-4 text-white/80" />
-                        )}
+            <TabsContent value="featured" className="space-y-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {featuredVideos.map((video) => (
+                  <Card key={video.id} className="hover:shadow-lg transition-shadow">
+                    <CardHeader>
+                      <div className="flex items-center space-x-4">
+                        <div className="text-4xl">{video.thumbnail}</div>
+                        <div className="flex-1">
+                          <CardTitle className="text-lg">{video.title}</CardTitle>
+                          <CardDescription>by {video.instructor}</CardDescription>
+                        </div>
                       </div>
-                      <Badge className="absolute -top-1 -right-1 text-xs bg-gray-700 text-white">
-                        {video.duration}
-                      </Badge>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="flex items-center justify-between mb-4">
+                        <div className="flex items-center space-x-4 text-sm text-muted-foreground">
+                          <span className="flex items-center">
+                            <Clock className="w-4 h-4 mr-1" />
+                            {video.duration}
+                          </span>
+                          <span className="flex items-center">
+                            <Users className="w-4 h-4 mr-1" />
+                            {video.viewers}
+                          </span>
+                          <span className="flex items-center">
+                            <Star className="w-4 h-4 mr-1 text-yellow-500" />
+                            {video.rating}
+                          </span>
+                        </div>
+                      </div>
+                      <div className="flex space-x-2">
+                        <Button 
+                          className="flex-1" 
+                          onClick={() => startVideo(video.title)}
+                        >
+                          <Play className="w-4 h-4 mr-2" />
+                          Watch Now
+                        </Button>
+                        <Button variant="outline" size="icon">
+                          <Bookmark className="w-4 h-4" />
+                        </Button>
+                        <Button variant="outline" size="icon">
+                          <Share className="w-4 h-4" />
+                        </Button>
+                      </div>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+            </TabsContent>
+
+            <TabsContent value="mycourses" className="space-y-4">
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center">
+                    <BookOpen className="w-6 h-6 mr-2 text-blue-500" />
+                    Your Learning Progress
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-4">
+                    {completedCourses.map((course, index) => (
+                      <div key={index} className="space-y-2">
+                        <div className="flex justify-between items-center">
+                          <h4 className="font-medium">{course.title}</h4>
+                          <span className="text-sm text-muted-foreground">{course.duration}</span>
+                        </div>
+                        <Progress value={course.progress} className="h-2" />
+                        <div className="flex justify-between text-sm text-muted-foreground">
+                          <span>{course.progress}% Complete</span>
+                          {course.progress === 100 && (
+                            <Badge variant="secondary" className="text-xs">
+                              <Award className="w-3 h-3 mr-1" />
+                              Completed
+                            </Badge>
+                          )}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </CardContent>
+              </Card>
+            </TabsContent>
+
+            <TabsContent value="live" className="space-y-4">
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center">
+                    <div className="w-3 h-3 bg-red-500 rounded-full mr-2 animate-pulse"></div>
+                    Live Sessions
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-3">
+                    <div className="flex items-center justify-between p-4 border rounded-lg">
+                      <div>
+                        <h4 className="font-semibold">Advanced AI Workshop</h4>
+                        <p className="text-sm text-muted-foreground">Starting in 15 minutes</p>
+                      </div>
+                      <Button size="sm">
+                        <Play className="w-4 h-4 mr-1" />
+                        Join Live
+                      </Button>
                     </div>
-                    
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-2 mb-1">
-                        <h4 className="font-semibold text-white text-sm">{video.title}</h4>
-                        {isCompleted && (
-                          <Trophy className="w-4 h-4 text-yellow-400" />
-                        )}
+                    <div className="flex items-center justify-between p-4 border rounded-lg">
+                      <div>
+                        <h4 className="font-semibold">Q&A with Experts</h4>
+                        <p className="text-sm text-muted-foreground">Live now - 245 viewers</p>
                       </div>
-                      
-                      <p className="text-xs text-gray-400 mb-2">{video.description}</p>
-                      
-                      <div className="flex items-center gap-2">
-                        <Badge className={`text-xs ${getDifficultyColor(video.difficulty)}`}>
-                          {video.difficulty}
-                        </Badge>
-                        <Badge variant="outline" className="text-xs border-gray-600 text-gray-300">
-                          {video.category}
-                        </Badge>
-                      </div>
+                      <Button size="sm" variant="outline">
+                        <Play className="w-4 h-4 mr-1" />
+                        Watch
+                      </Button>
                     </div>
                   </div>
                 </CardContent>
               </Card>
-            );
-          })}
-        </div>
-      </ScrollArea>
+            </TabsContent>
 
-      {/* Learning Progress */}
-      <div className="mt-4 p-3 bg-gradient-to-r from-purple-500/10 to-pink-500/10 rounded-lg border border-purple-500/20">
-        <div className="flex items-center gap-2 mb-1">
-          <Star className="w-4 h-4 text-purple-400" />
-          <span className="text-sm font-medium text-purple-400">Learning Progress</span>
+            <TabsContent value="trending" className="space-y-4">
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center">
+                    <Star className="w-6 h-6 mr-2 text-yellow-500" />
+                    Trending This Week
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-3">
+                    {[1, 2, 3, 4, 5].map((rank) => (
+                      <div key={rank} className="flex items-center space-x-3 p-2 hover:bg-accent rounded-lg">
+                        <div className="w-8 h-8 bg-primary text-primary-foreground rounded-full flex items-center justify-center text-sm font-bold">
+                          {rank}
+                        </div>
+                        <div className="flex-1">
+                          <h4 className="font-medium">Trending Video Title {rank}</h4>
+                          <p className="text-sm text-muted-foreground">2.{rank}M views</p>
+                        </div>
+                        <Button variant="ghost" size="sm">
+                          <Play className="w-4 h-4" />
+                        </Button>
+                      </div>
+                    ))}
+                  </div>
+                </CardContent>
+              </Card>
+            </TabsContent>
+          </Tabs>
         </div>
-        <div className="flex items-center gap-2">
-          <Progress value={(completedVideos.size / videoTutorials.length) * 100} className="flex-1" />
-          <span className="text-xs text-gray-300">
-            {completedVideos.size}/{videoTutorials.length}
-          </span>
+
+        <div className="space-y-6">
+          <Card>
+            <CardHeader>
+              <CardTitle>Categories</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-2">
+                {categories.map((category, index) => (
+                  <Button key={index} variant="ghost" className="w-full justify-start">
+                    <span className="mr-2">{category.icon}</span>
+                    {category.name}
+                    <Badge variant="secondary" className="ml-auto">
+                      {category.count}
+                    </Badge>
+                  </Button>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader>
+              <CardTitle>Learning Stats</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                <div>
+                  <div className="flex justify-between text-sm mb-1">
+                    <span>Weekly Progress</span>
+                    <span>{watchProgress}%</span>
+                  </div>
+                  <Progress value={watchProgress} />
+                </div>
+                <div className="text-center space-y-2">
+                  <div className="text-2xl font-bold">12h 45m</div>
+                  <p className="text-sm text-muted-foreground">Total Watch Time</p>
+                </div>
+                <div className="text-center space-y-2">
+                  <div className="text-2xl font-bold">7</div>
+                  <p className="text-sm text-muted-foreground">Courses Completed</p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
         </div>
       </div>
     </div>
   );
-}
+};
+
+export default VideoLearningHub;
