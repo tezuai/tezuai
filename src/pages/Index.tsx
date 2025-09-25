@@ -254,14 +254,16 @@ const Index = () => {
       'quantum-ai',
       'ai-research-lab',
       'compliance-center',
-      'advanced-seo',
-      'algorithm-optimizer',
-      'customization-studio',
-      'advanced-media',
-      'multimodal-ai',
-      'predictive-intelligence',
-      'emotional-ai',
-      'agentic-ai'
+              'advanced-seo',
+              'algorithm-optimizer',
+              'customization-studio',
+              'advanced-media',
+              'multimodal-ai',
+              'predictive-intelligence',
+              'emotional-ai',
+              'agentic-ai',
+              'ai-research-lab',
+              'compliance-center'
     ];
     
     if (authRequiredViews.includes(view) && !isAuthenticated) {
@@ -476,10 +478,14 @@ const Index = () => {
                   <AdvancedMediaHub />
                 ) : currentView === 'video-learning' ? (
                   <VideoLearningHub />
-                ) : currentView === 'cultural-ai' ? (
-                  <CulturalAI />
-                ) : currentView === 'realtime-knowledge' ? (
-                  <RealtimeKnowledgeEngine />
+                ) : currentView === 'ai-research-lab' ? (
+                  <AIResearchLab />
+                ) : currentView === 'compliance-center' ? (
+                  <ComplianceCenter />
+                ) : currentView === 'advanced-seo' ? (
+                  <AdvancedSEOManager />
+                ) : currentView === 'algorithm-optimizer' ? (
+                  <AlgorithmOptimizer />
                 ) : selectedConversation && currentConversation ? (
                   <ChatInterface
                     conversation={currentConversation}
