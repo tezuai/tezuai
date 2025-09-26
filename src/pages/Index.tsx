@@ -478,14 +478,6 @@ const Index = () => {
                   <AdvancedMediaHub />
                 ) : currentView === 'video-learning' ? (
                   <VideoLearningHub />
-                ) : currentView === 'ai-research-lab' ? (
-                  <AIResearchLab />
-                ) : currentView === 'compliance-center' ? (
-                  <ComplianceCenter />
-                ) : currentView === 'advanced-seo' ? (
-                  <AdvancedSEOManager />
-                ) : currentView === 'algorithm-optimizer' ? (
-                  <AlgorithmOptimizer />
                 ) : selectedConversation && currentConversation ? (
                   <ChatInterface
                     conversation={currentConversation}
