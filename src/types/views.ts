@@ -37,4 +37,7 @@ export type ViewName =
   | 'algorithm-optimizer'
   | 'customization-studio'
   | 'advanced-media'
-  | 'video-learning';
+  | 'video-learning'
+  | 'advanced-search-rag'
+  | 'code-executor'
+  | 'team-management';

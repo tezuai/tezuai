@@ -57,6 +57,9 @@ import { AdvancedMediaHub } from "@/components/AdvancedMediaHub";
 import { VideoLearningHub } from "@/components/VideoLearningHub";
 import { CulturalAI } from "@/components/CulturalAI";
 import { RealtimeKnowledgeEngine } from "@/components/RealtimeKnowledgeEngine";
+import { AdvancedSearchRAG } from "@/components/AdvancedSearchRAG";
+import { CodeExecutor } from "@/components/CodeExecutor";
+import { TeamManagement } from "@/components/TeamManagement";
 import type { ViewName } from "@/types/views";
 
 const Index = () => {
@@ -254,16 +257,17 @@ const Index = () => {
       'quantum-ai',
       'ai-research-lab',
       'compliance-center',
-              'advanced-seo',
-              'algorithm-optimizer',
-              'customization-studio',
-              'advanced-media',
-              'multimodal-ai',
-              'predictive-intelligence',
-              'emotional-ai',
-              'agentic-ai',
-              'ai-research-lab',
-              'compliance-center'
+      'advanced-seo',
+      'algorithm-optimizer',
+      'customization-studio',
+      'advanced-media',
+      'multimodal-ai',
+      'predictive-intelligence',
+      'emotional-ai',
+      'agentic-ai',
+      'advanced-search-rag',
+      'code-executor',
+      'team-management'
     ];
     
     if (authRequiredViews.includes(view) && !isAuthenticated) {
@@ -341,7 +345,7 @@ const Index = () => {
             <OnboardingTips />
             <FunFacts />
             <div className="flex flex-1">
-              {(['chat', 'analytics', 'ai-model-switcher', 'collaboration', 'custom-training', 'templates', 'advanced-analytics', 'news-engine', 'productivity-suite', 'security-center', 'theme-gallery', 'ai-marketplace', 'workflow-automation', 'business-intelligence', 'smart-dashboard', 'quantum-ai', 'ai-research-lab', 'compliance-center', 'advanced-seo', 'algorithm-optimizer', 'customization-studio', 'advanced-media', 'multimodal-ai', 'predictive-intelligence', 'emotional-ai', 'agentic-ai'].includes(currentView)) && (
+              {(['chat', 'analytics', 'ai-model-switcher', 'collaboration', 'custom-training', 'templates', 'advanced-analytics', 'news-engine', 'productivity-suite', 'security-center', 'theme-gallery', 'ai-marketplace', 'workflow-automation', 'business-intelligence', 'smart-dashboard', 'quantum-ai', 'ai-research-lab', 'compliance-center', 'advanced-seo', 'algorithm-optimizer', 'customization-studio', 'advanced-media', 'multimodal-ai', 'predictive-intelligence', 'emotional-ai', 'agentic-ai', 'advanced-search-rag', 'code-executor', 'team-management'].includes(currentView)) && (
                 <Sidebar
                   conversations={conversations}
                   selectedConversation={selectedConversation}
@@ -478,6 +482,12 @@ const Index = () => {
                   <AdvancedMediaHub />
                 ) : currentView === 'video-learning' ? (
                   <VideoLearningHub />
+                ) : currentView === 'advanced-search-rag' ? (
+                  <AdvancedSearchRAG />
+                ) : currentView === 'code-executor' ? (
+                  <CodeExecutor />
+                ) : currentView === 'team-management' ? (
+                  <TeamManagement />
                 ) : selectedConversation && currentConversation ? (
                   <ChatInterface
                     conversation={currentConversation}

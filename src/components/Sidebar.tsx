@@ -28,7 +28,8 @@ import {
   TrendingUp,
   Heart,
   Globe,
-  Zap
+  Zap,
+  Terminal
 } from "lucide-react";
 import {
   DropdownMenu,
@@ -344,6 +345,36 @@ export function Sidebar({
       icon: Heart,
       view: "emotional-ai" as const,
       badge: "EQ"
+    },
+    {
+      title: "🔍 Advanced Search & RAG",
+      icon: Search,
+      view: "advanced-search-rag" as const,
+      badge: "Intelligence+"
+    },
+    {
+      title: "💻 Code Executor",
+      icon: Terminal,
+      view: "code-executor" as const,
+      badge: "Dev+"
+    },
+    {
+      title: "👥 Team Management",
+      icon: Users,
+      view: "team-management" as const,
+      badge: "Enterprise"
+    },
+    {
+      title: "🧪 AI Research Lab",
+      icon: Brain,
+      view: "ai-research-lab" as const,
+      badge: "Beta"
+    },
+    {
+      title: "🛡️ Legal Compliance",
+      icon: Shield,
+      view: "compliance-center" as const,
+      badge: "Enterprise"
     },
     {
       title: "🤖 Agentic AI",
