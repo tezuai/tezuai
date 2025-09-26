@@ -140,8 +140,6 @@ export default {
 				'slide-out-right': 'slide-out-right 0.3s ease-out',
 				'enter': 'fade-in 0.3s ease-out, scale-in 0.2s ease-out',
 				'exit': 'fade-out 0.3s ease-out, scale-out 0.2s ease-out',
-				'float': 'float 3s ease-in-out infinite',
-				'glow': 'glow 2s ease-in-out infinite alternate',
 				'gradient-x': 'gradient-x 8s ease infinite',
 				'pulse-slow': 'pulse 3s ease-in-out infinite',
 				'bounce-slow': 'bounce 2s infinite',
