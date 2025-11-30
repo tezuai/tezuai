@@ -18,9 +18,10 @@ import {
 
 interface SubscriptionPageProps {
   onBack: () => void;
+  onCheckout?: (planId: string, planName: string, amount: number, billingPeriod: "monthly" | "yearly") => void;
 }
 
-export function SubscriptionPage({ onBack }: SubscriptionPageProps) {
+export function SubscriptionPage({ onBack, onCheckout }: SubscriptionPageProps) {
   const { currentPlan, upgradeToPlan } = useSubscription();
   const [showSuccess, setShowSuccess] = useState(false);
 
@@ -83,6 +84,7 @@ export function SubscriptionPage({ onBack }: SubscriptionPageProps) {
             <SubscriptionPlans
               onSelectPlan={handlePlanSelect}
               currentPlan={currentPlan}
+              onCheckout={onCheckout}
             />
           </TabsContent>
 
