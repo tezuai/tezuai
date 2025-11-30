@@ -141,9 +141,10 @@ const plans: SubscriptionPlan[] = [
 interface SubscriptionPlansProps {
   onSelectPlan: (planId: string) => void;
   currentPlan?: string;
+  onCheckout?: (planId: string, planName: string, amount: number, billingPeriod: "monthly" | "yearly") => void;
 }
 
-export function SubscriptionPlans({ onSelectPlan, currentPlan = "free" }: SubscriptionPlansProps) {
+export function SubscriptionPlans({ onSelectPlan, currentPlan = "free", onCheckout }: SubscriptionPlansProps) {
   const [billingPeriod, setBillingPeriod] = useState<"monthly" | "yearly">("monthly");
 
   const formatPrice = (price: number) => {
@@ -279,7 +280,13 @@ export function SubscriptionPlans({ onSelectPlan, currentPlan = "free" }: Subscr
                 </div>
 
                 <Button
-                  onClick={() => onSelectPlan(plan.id)}
+                  onClick={() => {
+                    if (onCheckout && plan.price[billingPeriod] > 0 && plan.id !== 'enterprise' && !isCurrentPlan) {
+                      onCheckout(plan.id, plan.name, plan.price[billingPeriod], billingPeriod);
+                    } else {
+                      onSelectPlan(plan.id);
+                    }
+                  }}
                   disabled={isCurrentPlan}
                   className={`w-full mt-8 text-lg py-6 transition-all duration-300 ${
                     plan.id === 'starter' 

@@ -4,6 +4,7 @@ import { ChatInterface } from "@/components/ChatInterface";
 import { WelcomeScreen } from "@/components/WelcomeScreen";
 import { AnalyticsDashboard } from "@/components/AnalyticsDashboard";
 import { SubscriptionPage } from "@/pages/Subscription";
+import { CheckoutPage } from "@/pages/Checkout";
 import { LandingPage } from "@/components/LandingPage";
 import { OnboardingFlow } from "@/components/OnboardingFlow";
 import { PrivacySecurityHub } from "@/components/PrivacySecurityHub";
@@ -74,6 +75,12 @@ const Index = () => {
   const [showThemePicker, setShowThemePicker] = useState(false);
   const [appTheme, setAppTheme] = useState("from-blue-900 via-blue-800 to-purple-900");
   const [showHindiOnboarding, setShowHindiOnboarding] = useState(false);
+  const [checkoutData, setCheckoutData] = useState<{
+    planId: string;
+    planName: string;
+    amount: number;
+    billingPeriod: "monthly" | "yearly";
+  } | null>(null);
 
   // Move this useEffect block up here, before any conditional returns!
   useEffect(() => {
@@ -330,6 +337,28 @@ const Index = () => {
   // ThemePicker controls
   function handleThemeChange(cls: string) { setAppTheme(cls); }
 
+  const handleCheckout = (planId: string, planName: string, amount: number, billingPeriod: "monthly" | "yearly") => {
+    setCheckoutData({ planId, planName, amount, billingPeriod });
+  };
+
+  const handleCheckoutComplete = () => {
+    setCheckoutData(null);
+    setCurrentView('chat');
+  };
+
+  // Show checkout if checkout data exists
+  if (checkoutData) {
+    return (
+      <SubscriptionProvider>
+        <CheckoutPage
+          {...checkoutData}
+          onBack={() => setCheckoutData(null)}
+          onComplete={handleCheckoutComplete}
+        />
+      </SubscriptionProvider>
+    );
+  }
+
   return (
     <SubscriptionProvider>
       <SidebarProvider>
@@ -392,7 +421,10 @@ const Index = () => {
                   </>
                 )}
                 {currentView === 'subscription' ? (
-                  <SubscriptionPage onBack={() => setCurrentView('chat')} />
+                  <SubscriptionPage 
+                    onBack={() => setCurrentView('chat')}
+                    onCheckout={handleCheckout}
+                  />
                 ) : currentView === 'privacy' ? (
                   <PrivacySecurityHub />
                 ) : currentView === 'settings' ? (
