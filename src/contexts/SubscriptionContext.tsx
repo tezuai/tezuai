@@ -4,6 +4,7 @@ import { createContext, useContext, useState, useEffect, ReactNode } from 'react
 interface SubscriptionContextType {
   currentPlan: string;
   isSubscribed: boolean;
+  isDemoMode: boolean;
   features: {
     unlimitedChat: boolean;
     allAIModels: boolean;
@@ -34,13 +35,19 @@ interface SubscriptionContextType {
 
 const SubscriptionContext = createContext<SubscriptionContextType | undefined>(undefined);
 
+// Demo Mode - All features unlocked for free launch
+const DEMO_MODE = true;
+
 export function SubscriptionProvider({ children }: { children: ReactNode }) {
   const [currentPlan, setCurrentPlan] = useState<string>(() => {
-    // Check if user is authenticated and auto-set to enterprise
+    // Demo Mode: Auto-set to enterprise for all users
+    if (DEMO_MODE) return 'enterprise';
     const savedPlan = localStorage.getItem('tezu-ai-plan');
     const isAuth = localStorage.getItem('tezu-ai-authenticated');
     return isAuth === 'true' ? (savedPlan || 'enterprise') : 'free';
   });
+  
+  const [isDemoMode] = useState(DEMO_MODE);
   const [usage, setUsage] = useState({
     messagesUsed: 0,
     messagesLimit: 10,
@@ -145,6 +152,7 @@ export function SubscriptionProvider({ children }: { children: ReactNode }) {
     <SubscriptionContext.Provider value={{
       currentPlan,
       isSubscribed,
+      isDemoMode,
       features,
       usage,
       upgradeToPlan,

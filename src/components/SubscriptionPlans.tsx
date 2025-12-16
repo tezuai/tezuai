@@ -160,6 +160,18 @@ export function SubscriptionPlans({ onSelectPlan, currentPlan = "free", onChecko
 
   return (
     <div className="max-w-7xl mx-auto p-6 space-y-8">
+      {/* Demo Mode Banner */}
+      <div className="bg-gradient-to-r from-green-600/20 via-emerald-600/30 to-green-600/20 border border-green-500/50 rounded-2xl p-6 text-center">
+        <div className="flex items-center justify-center gap-3 mb-2">
+          <Zap className="w-8 h-8 text-green-400 animate-pulse" />
+          <span className="text-2xl font-bold text-green-400">🎉 DEMO MODE ACTIVE</span>
+          <Zap className="w-8 h-8 text-green-400 animate-pulse" />
+        </div>
+        <p className="text-lg text-gray-300">
+          सभी Premium Features <span className="text-green-400 font-semibold">FREE</span> में उपलब्ध हैं! | All Premium Features Available for <span className="text-green-400 font-semibold">FREE</span>!
+        </p>
+      </div>
+
       <div className="text-center space-y-6">
         <h1 className="text-5xl font-bold text-white">
           <span className="bg-gradient-to-r from-blue-400 via-purple-400 to-pink-400 bg-clip-text text-transparent">
