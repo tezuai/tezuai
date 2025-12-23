@@ -128,259 +128,31 @@ export function Sidebar({
     conversation.title.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
-  // Add new professional features to the navigation items
+  // Essential navigation items only - removed broken/non-working features
   const navigationItems = [
     {
-      title: "Smart Dashboard",
-      icon: BarChart3,
-      view: "smart-dashboard" as const,
-      badge: "New"
-    },
-    {
-      title: "Chat",
+      title: "💬 Chat",
       icon: MessageSquare,
       view: "chat" as const,
       badge: null
     },
     {
-      title: "Quantum AI",
-      icon: Zap,
-      view: "quantum-ai" as const,
-      badge: "Pro"
-    },
-    {
-      title: "AI Research Lab",
-      icon: Brain,
-      view: "ai-research-lab" as const,
-      badge: "Beta"
-    },
-    {
-      title: "Legal Compliance",
-      icon: Shield,
-      view: "compliance-center" as const,
-      badge: "Enterprise"
-    },
-    {
-      title: "Analytics",
+      title: "📊 Analytics",
       icon: TrendingUp,
       view: "analytics" as const,
       badge: null
     },
     {
-      title: "Templates",
-      icon: FileText,
-      view: "templates" as const,
-      badge: "Pro"
-    },
-    {
-      title: "Advanced Analytics",
-      icon: Layers,
-      view: "advanced-analytics" as const,
-      badge: "Pro"
-    },
-    {
-      title: "News Engine",
-      icon: FileText,
-      view: "news-engine" as const,
-      badge: "New"
-    },
-    {
-      title: "Productivity Suite",
-      icon: BarChart3,
-      view: "productivity-suite" as const,
-      badge: "Pro"
-    },
-    {
-      title: "Security Center",
-      icon: Lock,
-      view: "security-center" as const,
-      badge: "Pro"
-    },
-    {
-      title: "Theme Gallery",
-      icon: Layers,
-      view: "theme-gallery" as const,
-      badge: "New"
-    },
-    {
-      title: "AI Marketplace",
-      icon: Brain,
-      view: "ai-marketplace" as const,
-      badge: "Pro"
-    },
-    {
-      title: "Workflow Automation",
-      icon: Bot,
-      view: "workflow-automation" as const,
-      badge: "Pro"
-    },
-    {
-      title: "Business Intelligence",
-      icon: BarChart3,
-      view: "business-intelligence" as const,
-      badge: "Enterprise"
-    },
-    {
-      title: "Multimodal AI",
-      icon: Brain,
-      view: "multimodal-ai" as const,
-      badge: "Ultra Pro"
-    },
-    {
-      title: "Realtime Knowledge",
-      icon: FileText,
-      view: "realtime-knowledge" as const,
-      badge: "Live"
-    },
-    {
-      title: "Agentic AI",
-      icon: Cpu,
-      view: "agentic-ai" as const,
-      badge: "Auto"
-    },
-    {
-      title: "Creative Studio",
-      icon: Layers,
-      view: "creative-studio" as const,
-      badge: "Pro"
-    },
-    {
-      title: "Smart Learning",
-      icon: Brain,
-      view: "smart-learning" as const,
-      badge: "AI+"
-    },
-    {
-      title: "Advanced Security",
-      icon: Shield,
-      view: "advanced-security" as const,
-      badge: "Ultra Safe"
-    },
-    {
-      title: "Predictive Intelligence",
-      icon: TrendingUp,
-      view: "predictive-intelligence" as const,
-      badge: "Future AI"
-    },
-    {
-      title: "Emotional AI",
-      icon: Heart,
-      view: "emotional-ai" as const,
-      badge: "Empathy+"
-    },
-    {
-      title: "Polyglot AI",
-      icon: Globe,
-      view: "polyglot-ai" as const,
-      badge: "12+ Languages"
-    },
-    {
-      title: "Cultural AI",
-      icon: Users,
-      view: "cultural-ai" as const,
-      badge: "Global Aware"
-    },
-    {
-      title: "AI Assistant",
-      icon: Bot,
-      view: "ai-assistant" as const,
-      badge: null
-    },
-    {
-      title: "Settings",
+      title: "⚙️ Settings",
       icon: Settings,
       view: "settings" as const,
       badge: null
     },
     {
-      title: "Privacy & Security",
+      title: "🔒 Privacy",
       icon: Lock,
       view: "privacy" as const,
       badge: null
-    },
-    {
-      title: "Subscription",
-      icon: CreditCard,
-      view: "subscription" as const,
-      badge: null
-    },
-    {
-      title: "🔍 Advanced SEO",
-      icon: TrendingUp,
-      view: "advanced-seo" as const,
-      badge: "Power+"
-    },
-    {
-      title: "⚡ Algorithm Optimizer",
-      icon: Cpu,
-      view: "algorithm-optimizer" as const,
-      badge: "Quantum"
-    },
-    {
-      title: "🎨 Customization Studio",
-      icon: Layers,
-      view: "customization-studio" as const,
-      badge: "Pro+"
-    },
-    {
-      title: "🎬 Advanced Media Hub",
-      icon: FileText,
-      view: "advanced-media" as const,
-      badge: "Creative+"
-    },
-    {
-      title: "🧠 Multimodal AI",
-      icon: Brain,
-      view: "multimodal-ai" as const,
-      badge: "GPT-5+"
-    },
-    {
-      title: "🔮 Predictive AI",
-      icon: TrendingUp,
-      view: "predictive-intelligence" as const,
-      badge: "Future"
-    },
-    {
-      title: "💖 Emotional AI",
-      icon: Heart,
-      view: "emotional-ai" as const,
-      badge: "EQ"
-    },
-    {
-      title: "🔍 Advanced Search & RAG",
-      icon: Search,
-      view: "advanced-search-rag" as const,
-      badge: "Intelligence+"
-    },
-    {
-      title: "💻 Code Executor",
-      icon: Terminal,
-      view: "code-executor" as const,
-      badge: "Dev+"
-    },
-    {
-      title: "👥 Team Management",
-      icon: Users,
-      view: "team-management" as const,
-      badge: "Enterprise"
-    },
-    {
-      title: "🧪 AI Research Lab",
-      icon: Brain,
-      view: "ai-research-lab" as const,
-      badge: "Beta"
-    },
-    {
-      title: "🛡️ Legal Compliance",
-      icon: Shield,
-      view: "compliance-center" as const,
-      badge: "Enterprise"
-    },
-    {
-      title: "🤖 Agentic AI",
-      icon: Bot,
-      view: "agentic-ai" as const,
-      badge: "Auto"
     }
   ];
 

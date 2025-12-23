@@ -4,36 +4,24 @@ import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   Send,
   Paperclip,
   Mic,
   Square,
-  Settings,
   Bot,
-  Search,
-  Download,
-  Zap,
-  Users,
-  Video,
   Brain,
-  Palette,
-  Languages,
-  BarChart3,
-  Sparkles,
-  User,
   FileText,
-  Shield,
-  Store,
   Code,
   Image as ImageIcon,
   Calendar,
-  MessageSquare
+  MessageSquare,
+  Sparkles
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { MessageBubble } from "@/components/MessageBubble";
 import { TypingIndicator } from "@/components/TypingIndicator";
+import { streamZentaraChat, type ChatMessage } from "@/lib/zentara-ai";
 
 interface Message {
   id: string;
@@ -64,125 +52,95 @@ export function ChatInterface({ conversation, onUpdateConversation, allConversat
     }
   }, [conversation.messages]);
 
-  // Enhanced AI response system with proper Hindi/English support
-  const generateTezuResponse = (userMessage: string): string => {
-    if (!userMessage) {
-      return "😓 अभी जवाब नहीं आया, कृपया फिर से कोशिश करें। (No input sent to AI)";
-    }
-    const responses = [
-      `🙏 Namaste! Main Tezu AI hun...`,
-      `हैलो जी! 🌟 Tezu AI यहाँ present! "${userMessage}" - बहुत बढ़िया सवाल है!
-
-🔍 **Detailed Response**:
-• Main advanced AI capabilities use karta hun
-• Multiple languages support karta hun
-• Complex problems solve kar sakta hun
-
-📊 **Professional Analysis**:
-- Technical questions: ✅ Handled
-- Creative tasks: ✅ Expert level  
-- Business solutions: ✅ Available
-- Educational content: ✅ Detailed explanations
-
-🎯 **Next Steps**: Batayiye aur kya specific help chahiye? Main comprehensive solutions provide kar sakta hun!`,
-
-      `Excellent question! 💼 Main Tezu AI, aapka professional assistant hun.
-🧠 **Intelligent Response to "${userMessage}"**:
-**Technical Capabilities:**
-- Advanced AI models integration
-- Multi-language processing
-- Document analysis & creation
-- Code generation & debugging
-- Image processing & generation
-
-**Professional Features:**
-- Business intelligence
-- Data analytics
-- Workflow automation
-- Real-time collaboration
-- Enterprise security
-
-**Creative Solutions:**
-- Content creation
-- Design assistance  
-- Story writing
-- Educational content
-- Entertainment options
-
-Kya specific area mein help chahiye? Main detailed guidance de sakta hun! 🚀✨`
-    ];
-    const resp = responses[Math.floor(Math.random() * responses.length)];
-    if (!resp) {
-      // fallback if for any weird reason, no response
-      return "😓 Tezu AI abhi busy है, कृपया दोबारा पूछें!";
-    }
-    return resp;
-  };
-
   const handleSendMessage = async () => {
     if ((!input.trim() && attachedFiles.length === 0) || isLoading) {
       return;
     }
 
+    const userContent = input.trim() || "📎 File attachment";
+    
+    const userMessage: Message = {
+      id: Date.now().toString(),
+      role: "user",
+      content: userContent,
+      timestamp: new Date(),
+      attachments: attachedFiles.length > 0 ? [...attachedFiles] : undefined,
+    };
+
+    const updatedConversation = {
+      ...conversation,
+      messages: [...conversation.messages, userMessage],
+      title: conversation.messages.length === 0 ? input.slice(0, 50) + "..." : conversation.title,
+    };
+
+    onUpdateConversation(updatedConversation);
+    setInput("");
+    setAttachedFiles([]);
+    setIsLoading(true);
+
+    // Build message history for AI
+    const chatHistory: ChatMessage[] = updatedConversation.messages.map((msg: Message) => ({
+      role: msg.role,
+      content: msg.content,
+    }));
+
+    let assistantContent = "";
+
+    // Create placeholder assistant message
+    const assistantMessage: Message = {
+      id: (Date.now() + 1).toString(),
+      role: "assistant",
+      content: "",
+      timestamp: new Date(),
+      model: "Zentara AI",
+    };
+
+    const conversationWithAssistant = {
+      ...updatedConversation,
+      messages: [...updatedConversation.messages, assistantMessage],
+    };
+    onUpdateConversation(conversationWithAssistant);
+
     try {
-      const userMessage: Message = {
-        id: Date.now().toString(),
-        role: "user",
-        content: input.trim() || "📎 File attachment",
-        timestamp: new Date(),
-        attachments: attachedFiles.length > 0 ? [...attachedFiles] : undefined,
-      };
-
-      const updatedConversation = {
-        ...conversation,
-        messages: [...conversation.messages, userMessage],
-        title: conversation.messages.length === 0 ? input.slice(0, 50) + "..." : conversation.title,
-      };
-
-      onUpdateConversation(updatedConversation);
-      setInput("");
-      setAttachedFiles([]);
-      setIsLoading(true);
-
-      // Simulate AI response with proper delay
-      setTimeout(() => {
-        let tezuResponse;
-        try {
-          tezuResponse = generateTezuResponse(userMessage.content);
-        } catch (e) {
-          console.error("Tezu AI error:", e);
-          tezuResponse = "😓 Tezu AI में कोई दिक्कत आ गई (AI Error). कृपया फिर से कोशिश करें!";
-        }
-
-        const aiMessage: Message = {
-          id: (Date.now() + 1).toString(),
-          role: "assistant",
-          content: tezuResponse,
-          timestamp: new Date(),
-          model: "Tezu AI Pro",
-        };
-
-        const finalConversation = {
-          ...updatedConversation,
-          messages: [...updatedConversation.messages, aiMessage],
-        };
-
-        onUpdateConversation(finalConversation);
-        setIsLoading(false);
-
-        toast({
-          title: "✅ Tezu AI Response Ready!",
-          description: "Professional answer generated successfully",
-        });
-      }, 2000);
+      await streamZentaraChat({
+        messages: chatHistory,
+        onDelta: (delta) => {
+          assistantContent += delta;
+          const updatedMessages = conversationWithAssistant.messages.map((msg: Message) =>
+            msg.id === assistantMessage.id
+              ? { ...msg, content: assistantContent }
+              : msg
+          );
+          onUpdateConversation({ ...conversationWithAssistant, messages: updatedMessages });
+        },
+        onDone: () => {
+          setIsLoading(false);
+        },
+        onError: (error) => {
+          console.error("Zentara AI error:", error);
+          const errorContent = `😓 कुछ गड़बड़ हो गई: ${error.message}. कृपया फिर से कोशिश करें!`;
+          const updatedMessages = conversationWithAssistant.messages.map((msg: Message) =>
+            msg.id === assistantMessage.id
+              ? { ...msg, content: errorContent }
+              : msg
+          );
+          onUpdateConversation({ ...conversationWithAssistant, messages: updatedMessages });
+          setIsLoading(false);
+          toast({
+            title: "Error",
+            description: error.message,
+            variant: "destructive",
+          });
+        },
+      });
     } catch (err) {
-      console.error("Error occurred while sending or receiving message:", err);
+      console.error("Chat error:", err);
+      setIsLoading(false);
       toast({
         title: "❌ Error",
-        description: "Kuch galat ho gaya! कृपया फिर से कोशिश करें।",
-        variant: "destructive"
+        description: "कुछ गलत हो गया! कृपया फिर से कोशिश करें।",
+        variant: "destructive",
       });
-      setIsLoading(false);
     }
   };
 
@@ -195,45 +153,45 @@ Kya specific area mein help chahiye? Main detailed guidance de sakta hun! 🚀�
 
   const handleQuickAction = (prompt: string) => {
     setInput(prompt);
-    handleSendMessage();
+    setTimeout(() => handleSendMessage(), 100);
   };
 
   const quickActions = [
-    { icon: FileText, label: "Write a creative story", prompt: "मुझे एक creative story लिखकर दो" },
-    { icon: BarChart3, label: "Analyze this document", prompt: "इस document का analysis करो" },
-    { icon: Code, label: "Help me code a function", prompt: "एक function code करने में help करो" },
-    { icon: Brain, label: "Explain a complex topic", prompt: "कोई complex topic explain करो" },
-    { icon: ImageIcon, label: "Generate an image", prompt: "एक image generate करो" },
-    { icon: Calendar, label: "Plan my schedule", prompt: "मेरे schedule की planning करो" },
+    { icon: FileText, label: "Creative Story", prompt: "मुझे एक creative story लिखकर दो" },
+    { icon: Brain, label: "Explain Topic", prompt: "कोई complex topic explain करो" },
+    { icon: Code, label: "Help Code", prompt: "एक function code करने में help करो" },
+    { icon: ImageIcon, label: "Describe Image", prompt: "एक beautiful scene describe करो" },
+    { icon: Calendar, label: "Plan Schedule", prompt: "मेरे schedule की planning करो" },
+    { icon: Sparkles, label: "Creative Ideas", prompt: "कुछ creative ideas दो" },
   ];
 
   return (
     <div className="flex-1 flex flex-col h-screen">
       {/* Header */}
-      <div className="flex items-center justify-between p-4 border-b border-gray-700/50 bg-gradient-to-r from-gray-900/95 to-blue-900/50 backdrop-blur-xl">
+      <div className="flex items-center justify-between p-4 border-b border-gray-700/50 bg-gradient-to-r from-gray-900/95 via-emerald-900/30 to-gray-900/95 backdrop-blur-xl">
         <div className="flex items-center gap-3">
-          <Avatar className="w-10 h-10 ring-2 ring-blue-500/50">
+          <Avatar className="w-10 h-10 ring-2 ring-emerald-500/50">
             <AvatarImage src="/lovable-uploads/95fdd9ab-8aef-49dd-b3c6-d153ec4336ca.png" />
-            <AvatarFallback className="bg-gradient-to-br from-blue-500 to-purple-600 text-white">
+            <AvatarFallback className="bg-gradient-to-br from-emerald-500 to-teal-600 text-white">
               <Bot className="w-5 h-5" />
             </AvatarFallback>
           </Avatar>
           <div>
             <h2 className="text-xl font-bold text-white flex items-center gap-2">
-              🤖 Tezu AI Pro
-              <Badge className="bg-yellow-500/20 text-yellow-400 text-xs">
-                🏆 World's #1 Secure AI
+              ✨ Zentara AI
+              <Badge className="bg-emerald-500/20 text-emerald-400 text-xs">
+                ज़ेंतारा
               </Badge>
             </h2>
             <div className="flex items-center gap-2 mt-1">
               <Badge variant="secondary" className="text-xs bg-green-500/20 text-green-400">
-                🔒 100% Private & Secure
+                🔒 Secure & Private
               </Badge>
               <Badge variant="secondary" className="text-xs bg-purple-500/20 text-purple-400">
-                ⚡ Real-time Responses
+                ⚡ Real AI Powered
               </Badge>
               <Badge variant="secondary" className="text-xs bg-blue-500/20 text-blue-400">
-                🧠 Advanced AI Models
+                🧠 Gemini 2.5
               </Badge>
             </div>
           </div>
@@ -250,7 +208,7 @@ Kya specific area mein help chahiye? Main detailed guidance de sakta hun! 🚀�
                 variant="outline"
                 size="sm"
                 onClick={() => handleQuickAction(action.prompt)}
-                className="flex items-center gap-2 bg-gray-800/50 border-gray-600 text-gray-300 hover:bg-gray-700/50 hover:text-white transition-all"
+                className="flex items-center gap-2 bg-gray-800/50 border-gray-600 text-gray-300 hover:bg-emerald-900/30 hover:text-white hover:border-emerald-500/50 transition-all"
               >
                 <action.icon className="w-4 h-4" />
                 <span className="text-xs hidden sm:inline">{action.label}</span>
@@ -262,61 +220,53 @@ Kya specific area mein help chahiye? Main detailed guidance de sakta hun! 🚀�
 
       {/* Main Chat Area */}
       <div className="flex-1 flex flex-col">
-        {/* Messages */}
         <ScrollArea className="flex-1 p-4 bg-gradient-to-b from-gray-900/50 to-gray-800/50">
           <div className="space-y-4 max-w-4xl mx-auto">
             {conversation.messages.length === 0 && (
               <div className="text-center py-8">
-                <div className="w-24 h-24 mx-auto mb-6 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center">
+                <div className="w-24 h-24 mx-auto mb-6 bg-gradient-to-br from-emerald-500 to-teal-600 rounded-full flex items-center justify-center shadow-lg shadow-emerald-500/30">
                   <Bot className="w-12 h-12 text-white" />
                 </div>
-                <h3 className="text-2xl font-bold text-white mb-2">Welcome to AI Agent Pro</h3>
-                <p className="text-gray-400 mb-6">Your advanced AI assistant with cutting-edge capabilities for all your creative and analytical needs</p>
+                <h3 className="text-2xl font-bold text-white mb-2">
+                  Welcome to Zentara AI ✨
+                </h3>
+                <p className="text-lg text-emerald-400 mb-2">ज़ेंतारा AI में आपका स्वागत है!</p>
+                <p className="text-gray-400 mb-6">
+                  India's most intelligent AI assistant - Hindi & English में बात करें
+                </p>
                 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 max-w-2xl mx-auto">
-                  <div className="p-4 bg-gray-800/50 rounded-lg border border-gray-700/50">
-                    <Brain className="w-8 h-8 text-blue-400 mx-auto mb-2" />
-                    <h4 className="text-white font-medium mb-1">Advanced AI Models</h4>
-                    <p className="text-xs text-gray-400">Access to multiple AI models including GPT-4, Claude, and custom models</p>
+                  <div className="p-4 bg-gray-800/50 rounded-lg border border-emerald-700/50">
+                    <Brain className="w-8 h-8 text-emerald-400 mx-auto mb-2" />
+                    <h4 className="text-white font-medium mb-1">Advanced Intelligence</h4>
+                    <p className="text-xs text-gray-400">Powered by latest Gemini AI for accurate responses</p>
                   </div>
                   
-                  <div className="p-4 bg-gray-800/50 rounded-lg border border-gray-700/50">
+                  <div className="p-4 bg-gray-800/50 rounded-lg border border-emerald-700/50">
                     <FileText className="w-8 h-8 text-green-400 mx-auto mb-2" />
-                    <h4 className="text-white font-medium mb-1">Document Analysis</h4>
-                    <p className="text-xs text-gray-400">Upload and analyze documents, PDFs, and text files</p>
+                    <h4 className="text-white font-medium mb-1">Multilingual Support</h4>
+                    <p className="text-xs text-gray-400">Hindi, English, Hinglish - जैसे चाहो बोलो!</p>
                   </div>
                   
-                  <div className="p-4 bg-gray-800/50 rounded-lg border border-gray-700/50">
+                  <div className="p-4 bg-gray-800/50 rounded-lg border border-emerald-700/50">
                     <Mic className="w-8 h-8 text-purple-400 mx-auto mb-2" />
-                    <h4 className="text-white font-medium mb-1">Voice Interface</h4>
-                    <p className="text-xs text-gray-400">Natural voice conversations with speech-to-text and text-to-speech</p>
+                    <h4 className="text-white font-medium mb-1">Smart Conversations</h4>
+                    <p className="text-xs text-gray-400">Natural, friendly chat experience</p>
                   </div>
                   
-                  <div className="p-4 bg-gray-800/50 rounded-lg border border-gray-700/50">
-                    <ImageIcon className="w-8 h-8 text-yellow-400 mx-auto mb-2" />
-                    <h4 className="text-white font-medium mb-1">Image Processing</h4>
-                    <p className="text-xs text-gray-400">Generate, analyze, and edit images with AI assistance</p>
-                  </div>
-                  
-                  <div className="p-4 bg-gray-800/50 rounded-lg border border-gray-700/50">
-                    <Code className="w-8 h-8 text-red-400 mx-auto mb-2" />
-                    <h4 className="text-white font-medium mb-1">Code Assistant</h4>
-                    <p className="text-xs text-gray-400">Advanced coding help with multiple programming languages</p>
-                  </div>
-                  
-                  <div className="p-4 bg-gray-800/50 rounded-lg border border-gray-700/50">
-                    <Zap className="w-8 h-8 text-orange-400 mx-auto mb-2" />
-                    <h4 className="text-white font-medium mb-1">Real-time Responses</h4>
-                    <p className="text-xs text-gray-400">Lightning-fast responses with streaming capabilities</p>
+                  <div className="p-4 bg-gray-800/50 rounded-lg border border-emerald-700/50">
+                    <Code className="w-8 h-8 text-yellow-400 mx-auto mb-2" />
+                    <h4 className="text-white font-medium mb-1">Expert Help</h4>
+                    <p className="text-xs text-gray-400">Coding, writing, analysis & more</p>
                   </div>
                 </div>
 
                 <Button 
-                  onClick={() => handleQuickAction("Hello Tezu AI! मुझे आपके features के बारे में बताइए")}
-                  className="mt-6 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700"
+                  onClick={() => handleQuickAction("Namaste Zentara AI! मुझे आपके बारे में बताइए")}
+                  className="mt-6 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700"
                 >
                   <MessageSquare className="w-4 h-4 mr-2" />
-                  Start New Conversation
+                  Start Conversation
                 </Button>
               </div>
             )}
@@ -328,8 +278,8 @@ Kya specific area mein help chahiye? Main detailed guidance de sakta hun! 🚀�
                 onCopy={(content) => {
                   navigator.clipboard.writeText(content);
                   toast({
-                    title: "Copied to clipboard",
-                    description: "Message content has been copied.",
+                    title: "Copied!",
+                    description: "Message copied to clipboard.",
                   });
                 }}
               />
@@ -339,8 +289,8 @@ Kya specific area mein help chahiye? Main detailed guidance de sakta hun! 🚀�
           </div>
         </ScrollArea>
 
-        {/* Enhanced Professional Input Section */}
-        <div className="p-6 border-t border-gray-700/50 bg-gradient-to-r from-gray-900/98 via-purple-900/10 to-gray-900/98 backdrop-blur-xl">
+        {/* Input Section */}
+        <div className="p-6 border-t border-gray-700/50 bg-gradient-to-r from-gray-900/98 via-emerald-900/10 to-gray-900/98 backdrop-blur-xl">
           <div className="max-w-4xl mx-auto">
             {/* Attachment Preview */}
             {attachedFiles.length > 0 && (
@@ -364,30 +314,18 @@ Kya specific area mein help chahiye? Main detailed guidance de sakta hun! 🚀�
             )}
 
             {/* Main Input Container */}
-            <div className="relative bg-gradient-to-r from-gray-800/50 via-gray-800/60 to-gray-800/50 rounded-2xl border border-gray-600/50 shadow-2xl hover:border-purple-500/50 transition-all duration-300">
+            <div className="relative bg-gradient-to-r from-gray-800/50 via-gray-800/60 to-gray-800/50 rounded-2xl border border-gray-600/50 shadow-2xl hover:border-emerald-500/50 transition-all duration-300">
               <div className="flex items-end gap-3 p-4">
-                {/* Text Input Area */}
                 <div className="flex-1 relative">
                   <Input
                     value={input}
                     onChange={(e) => setInput(e.target.value)}
                     onKeyPress={handleKeyPress}
-                    placeholder="Ask Tezu AI anything... Hindi/English में कुछ भी पूछें 💬✨"
+                    placeholder="Zentara AI से कुछ भी पूछें... Hindi/English 💬✨"
                     className="input-premium text-lg py-4 pr-16 min-h-[56px] border-0 bg-transparent placeholder:text-gray-400 focus:ring-0 focus:outline-none text-white"
                     disabled={isLoading}
                   />
                   
-                  {/* Attachment Button */}
-                  <Button
-                    size="sm"
-                    variant="ghost"
-                    onClick={() => {}}
-                    className="absolute right-12 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-purple-400 hover:bg-purple-500/10 rounded-xl transition-all"
-                  >
-                    <Paperclip className="w-5 h-5" />
-                  </Button>
-
-                  {/* Character Count Indicator */}
                   <div className="absolute right-2 top-1/2 transform -translate-y-1/2">
                     <div className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-medium ${
                       input.length > 3500 ? 'bg-red-500/20 text-red-400' : 
@@ -401,16 +339,15 @@ Kya specific area mein help chahiye? Main detailed guidance de sakta hun! 🚀�
 
                 {/* Action Buttons */}
                 <div className="flex gap-2">
-                  {/* Voice Recording Button */}
                   <Button
                     onClick={() => setIsRecording(!isRecording)}
                     variant={isRecording ? "destructive" : "outline"}
                     size="lg"
                     className={`${
                       isRecording
-                        ? "bg-red-600 hover:bg-red-700 border-red-500 shadow-red-500/50"
-                        : "border-gray-600 text-gray-400 hover:text-white hover:bg-purple-500/20 hover:border-purple-500"
-                    } rounded-xl transition-all duration-300 shadow-lg h-14 w-14 p-0`}
+                        ? "bg-red-600 hover:bg-red-700 border-red-500"
+                        : "border-gray-600 text-gray-400 hover:text-white hover:bg-emerald-500/20 hover:border-emerald-500"
+                    } rounded-xl transition-all duration-300 h-14 w-14 p-0`}
                   >
                     {isRecording ? (
                       <Square className="w-6 h-6 animate-pulse" />
@@ -419,66 +356,29 @@ Kya specific area mein help chahiye? Main detailed guidance de sakta hun! 🚀�
                     )}
                   </Button>
 
-                  {/* Send Button */}
                   <Button
                     onClick={handleSendMessage}
                     disabled={(!input.trim() && attachedFiles.length === 0) || isLoading}
                     size="lg"
-                    className={`
-                      btn-royal h-14 px-8 shadow-2xl transition-all duration-300 
-                      ${(!input.trim() && attachedFiles.length === 0) || isLoading 
-                        ? 'opacity-50 cursor-not-allowed' 
-                        : 'hover:scale-105 hover:shadow-purple-500/50'
-                      }
-                    `}
+                    className="bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white font-semibold rounded-xl shadow-lg shadow-emerald-500/30 hover:shadow-emerald-500/50 transition-all duration-300 h-14 w-14 p-0 disabled:opacity-50"
                   >
-                    {isLoading ? (
-                      <div className="w-6 h-6 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                    ) : (
-                      <Send className="w-6 h-6" />
-                    )}
+                    <Send className="w-6 h-6" />
                   </Button>
                 </div>
               </div>
             </div>
 
             {/* Status Bar */}
-            <div className="flex items-center justify-between mt-4 text-sm text-gray-400">
+            <div className="flex items-center justify-between mt-3 px-2 text-xs text-gray-500">
               <div className="flex items-center gap-4">
-                <span className="text-gray-500">Press Enter to send, Shift+Enter for new line</span>
-                <div className="flex items-center gap-6">
-                  <div className="flex items-center gap-2">
-                    <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
-                    <span className="text-green-400 font-medium">AI Ready & Online</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <Shield className="w-4 h-4 text-blue-400" />
-                    <span className="text-blue-400">Secure & Encrypted</span>
-                  </div>
-                </div>
-              </div>
-              
-              <div className="flex items-center gap-4">
-                <span className={`${
-                  input.length > 3500 ? 'text-red-400' : 
-                  input.length > 3000 ? 'text-yellow-400' : 
-                  'text-gray-400'
-                }`}>
-                  {input.length}/4000
+                <span className="flex items-center gap-1">
+                  <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse"></div>
+                  Zentara AI Ready
                 </span>
-                <div className="text-purple-400 font-medium">⚡ Ultra Fast</div>
+                <span>🔒 End-to-end Secure</span>
               </div>
+              <span>{input.length}/4000 characters</span>
             </div>
-
-            {/* Advanced Features Hint */}
-            {input.length === 0 && (
-              <div className="mt-3 text-center">
-                <div className="inline-flex items-center gap-2 px-4 py-2 bg-purple-500/10 border border-purple-500/20 rounded-full text-purple-300 text-sm">
-                  <Sparkles className="w-4 h-4" />
-                  <span>Try voice input, file uploads, or advanced AI commands</span>
-                </div>
-              </div>
-            )}
           </div>
         </div>
       </div>
