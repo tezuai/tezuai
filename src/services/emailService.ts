@@ -12,14 +12,11 @@ export class SecureNotificationService {
     return SecureNotificationService.instance;
   }
 
-  // Generate secure OTP
+  // Generate cryptographically secure OTP using Web Crypto API
   generateOTP(length: number = 6): string {
-    const digits = '0123456789';
-    let otp = '';
-    for (let i = 0; i < length; i++) {
-      otp += digits[Math.floor(Math.random() * digits.length)];
-    }
-    return otp;
+    const array = new Uint32Array(length);
+    crypto.getRandomValues(array);
+    return Array.from(array, (num) => (num % 10).toString()).join('');
   }
 
   // Send Email OTP
@@ -46,11 +43,12 @@ export class SecureNotificationService {
       if (response.ok) {
         return { success: true, otp };
       } else {
-        throw new Error('Email service failed');
+        console.error('Email service returned non-OK status');
+        return { success: false, error: 'Failed to send verification code. Please try again.' };
       }
     } catch (error) {
-      // Fallback for development
-      return { success: true, otp: '123456' };
+      console.error('Email service error:', error instanceof Error ? error.message : 'Unknown error');
+      return { success: false, error: 'Failed to send verification code. Please try again.' };
     }
   }
 
@@ -77,11 +75,12 @@ export class SecureNotificationService {
       if (response.ok) {
         return { success: true, otp };
       } else {
-        throw new Error('SMS service failed');
+        console.error('SMS service returned non-OK status');
+        return { success: false, error: 'Failed to send verification code. Please try again.' };
       }
     } catch (error) {
-      // Fallback for development
-      return { success: true, otp: '654321' };
+      console.error('SMS service error:', error instanceof Error ? error.message : 'Unknown error');
+      return { success: false, error: 'Failed to send verification code. Please try again.' };
     }
   }
 

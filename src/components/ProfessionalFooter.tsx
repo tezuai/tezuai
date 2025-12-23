@@ -5,11 +5,12 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 
 interface LegalDialogProps {
   title: string;
-  content: string;
+  children: React.ReactNode;
   trigger: React.ReactNode;
 }
 
-function LegalDialog({ title, content, trigger }: LegalDialogProps) {
+// Safe JSX-based LegalDialog component - no dangerouslySetInnerHTML
+function LegalDialog({ title, children, trigger }: LegalDialogProps) {
   return (
     <Dialog>
       <DialogTrigger asChild>
@@ -19,21 +20,22 @@ function LegalDialog({ title, content, trigger }: LegalDialogProps) {
         <DialogHeader>
           <DialogTitle className="text-2xl font-bold text-white">{title}</DialogTitle>
         </DialogHeader>
-        <div className="mt-4 text-gray-300 leading-relaxed" dangerouslySetInnerHTML={{ __html: content }} />
+        <div className="mt-4 text-gray-300 leading-relaxed">
+          {children}
+        </div>
       </DialogContent>
     </Dialog>
   );
 }
 
-export function ProfessionalFooter() {
-  const [email, setEmail] = useState("");
-
-  const privacyPolicy = `
-    <div class="space-y-6">
+// Privacy Policy Component - Safe JSX instead of HTML string
+function PrivacyPolicyContent() {
+  return (
+    <div className="space-y-6">
       <section>
-        <h3 class="text-xl font-semibold text-white mb-3">1. Information Collection</h3>
+        <h3 className="text-xl font-semibold text-white mb-3">1. Information Collection</h3>
         <p>At Tezu AI, we collect information to provide better services to our users. This includes:</p>
-        <ul class="list-disc list-inside mt-2 space-y-1">
+        <ul className="list-disc list-inside mt-2 space-y-1">
           <li>Information you provide when creating an account</li>
           <li>Chat conversations and AI interactions</li>
           <li>Usage analytics and performance data</li>
@@ -42,9 +44,9 @@ export function ProfessionalFooter() {
       </section>
 
       <section>
-        <h3 class="text-xl font-semibold text-white mb-3">2. Data Security</h3>
+        <h3 className="text-xl font-semibold text-white mb-3">2. Data Security</h3>
         <p>We implement industry-leading security measures including:</p>
-        <ul class="list-disc list-inside mt-2 space-y-1">
+        <ul className="list-disc list-inside mt-2 space-y-1">
           <li>End-to-end encryption for all conversations</li>
           <li>Advanced AI ethics monitoring</li>
           <li>GDPR and CCPA compliant data handling</li>
@@ -53,9 +55,9 @@ export function ProfessionalFooter() {
       </section>
 
       <section>
-        <h3 class="text-xl font-semibold text-white mb-3">3. AI Data Processing</h3>
+        <h3 className="text-xl font-semibold text-white mb-3">3. AI Data Processing</h3>
         <p>Our advanced AI systems process your data with the highest privacy standards:</p>
-        <ul class="list-disc list-inside mt-2 space-y-1">
+        <ul className="list-disc list-inside mt-2 space-y-1">
           <li>No human review of private conversations</li>
           <li>Automated content moderation with privacy protection</li>
           <li>Data minimization principles applied</li>
@@ -64,19 +66,22 @@ export function ProfessionalFooter() {
       </section>
 
       <section>
-        <h3 class="text-xl font-semibold text-white mb-3">4. Contact Information</h3>
+        <h3 className="text-xl font-semibold text-white mb-3">4. Contact Information</h3>
         <p>For privacy-related inquiries: <strong>privacy@tezuai.com</strong></p>
         <p>Data Protection Officer: <strong>dpo@tezuai.com</strong></p>
       </section>
     </div>
-  `;
+  );
+}
 
-  const termsOfService = `
-    <div class="space-y-6">
+// Terms of Service Component - Safe JSX instead of HTML string
+function TermsOfServiceContent() {
+  return (
+    <div className="space-y-6">
       <section>
-        <h3 class="text-xl font-semibold text-white mb-3">1. Service Description</h3>
+        <h3 className="text-xl font-semibold text-white mb-3">1. Service Description</h3>
         <p>Tezu AI Pro provides advanced artificial intelligence services including:</p>
-        <ul class="list-disc list-inside mt-2 space-y-1">
+        <ul className="list-disc list-inside mt-2 space-y-1">
           <li>Multi-modal AI conversations (text, voice, image, video)</li>
           <li>Real-time knowledge and information retrieval</li>
           <li>Creative content generation and analysis</li>
@@ -85,9 +90,9 @@ export function ProfessionalFooter() {
       </section>
 
       <section>
-        <h3 class="text-xl font-semibold text-white mb-3">2. User Responsibilities</h3>
+        <h3 className="text-xl font-semibold text-white mb-3">2. User Responsibilities</h3>
         <p>Users agree to:</p>
-        <ul class="list-disc list-inside mt-2 space-y-1">
+        <ul className="list-disc list-inside mt-2 space-y-1">
           <li>Use the service in compliance with applicable laws</li>
           <li>Not attempt to reverse engineer or exploit the AI systems</li>
           <li>Respect intellectual property rights</li>
@@ -96,9 +101,9 @@ export function ProfessionalFooter() {
       </section>
 
       <section>
-        <h3 class="text-xl font-semibold text-white mb-3">3. AI Ethics and Limitations</h3>
+        <h3 className="text-xl font-semibold text-white mb-3">3. AI Ethics and Limitations</h3>
         <p>Our AI systems are designed with ethical guidelines:</p>
-        <ul class="list-disc list-inside mt-2 space-y-1">
+        <ul className="list-disc list-inside mt-2 space-y-1">
           <li>Continuous bias monitoring and correction</li>
           <li>Transparent decision-making processes</li>
           <li>Human oversight for critical applications</li>
@@ -107,18 +112,21 @@ export function ProfessionalFooter() {
       </section>
 
       <section>
-        <h3 class="text-xl font-semibold text-white mb-3">4. Service Availability</h3>
+        <h3 className="text-xl font-semibold text-white mb-3">4. Service Availability</h3>
         <p>We strive for 99.9% uptime with enterprise-grade infrastructure and global CDN distribution.</p>
       </section>
     </div>
-  `;
+  );
+}
 
-  const cookiePolicy = `
-    <div class="space-y-6">
+// Cookie Policy Component - Safe JSX instead of HTML string
+function CookiePolicyContent() {
+  return (
+    <div className="space-y-6">
       <section>
-        <h3 class="text-xl font-semibold text-white mb-3">1. Essential Cookies</h3>
+        <h3 className="text-xl font-semibold text-white mb-3">1. Essential Cookies</h3>
         <p>These cookies are necessary for the website to function:</p>
-        <ul class="list-disc list-inside mt-2 space-y-1">
+        <ul className="list-disc list-inside mt-2 space-y-1">
           <li>Authentication and session management</li>
           <li>Security and fraud prevention</li>
           <li>Load balancing and performance optimization</li>
@@ -126,9 +134,9 @@ export function ProfessionalFooter() {
       </section>
 
       <section>
-        <h3 class="text-xl font-semibold text-white mb-3">2. Analytics Cookies</h3>
+        <h3 className="text-xl font-semibold text-white mb-3">2. Analytics Cookies</h3>
         <p>We use analytics to improve our services:</p>
-        <ul class="list-disc list-inside mt-2 space-y-1">
+        <ul className="list-disc list-inside mt-2 space-y-1">
           <li>Usage statistics and feature adoption</li>
           <li>Performance monitoring and error tracking</li>
           <li>A/B testing for user experience improvements</li>
@@ -136,39 +144,46 @@ export function ProfessionalFooter() {
       </section>
 
       <section>
-        <h3 class="text-xl font-semibold text-white mb-3">3. Preference Management</h3>
+        <h3 className="text-xl font-semibold text-white mb-3">3. Preference Management</h3>
         <p>You can control cookies through your browser settings or our preference center.</p>
       </section>
     </div>
-  `;
+  );
+}
 
-  const aboutCompany = `
-    <div class="space-y-6">
+// About Company Component - Safe JSX instead of HTML string
+function AboutCompanyContent() {
+  return (
+    <div className="space-y-6">
       <section>
-        <h3 class="text-xl font-semibold text-white mb-3">Our Mission</h3>
+        <h3 className="text-xl font-semibold text-white mb-3">Our Mission</h3>
         <p>To democratize access to advanced AI technology while maintaining the highest standards of ethics, privacy, and security.</p>
       </section>
 
       <section>
-        <h3 class="text-xl font-semibold text-white mb-3">Founded in India</h3>
+        <h3 className="text-xl font-semibold text-white mb-3">Founded in India</h3>
         <p>Tezu AI was founded in 2024 in Bangalore, India, with a vision to create AI that understands and respects cultural diversity while providing world-class capabilities.</p>
       </section>
 
       <section>
-        <h3 class="text-xl font-semibold text-white mb-3">Our Team</h3>
+        <h3 className="text-xl font-semibold text-white mb-3">Our Team</h3>
         <p>Led by experts from IIT, IIM, and global tech companies, our team combines deep technical expertise with a commitment to responsible AI development.</p>
       </section>
 
       <section>
-        <h3 class="text-xl font-semibold text-white mb-3">Awards & Recognition</h3>
-        <ul class="list-disc list-inside mt-2 space-y-1">
+        <h3 className="text-xl font-semibold text-white mb-3">Awards & Recognition</h3>
+        <ul className="list-disc list-inside mt-2 space-y-1">
           <li>Best AI Innovation Award 2024 - Tech India Summit</li>
           <li>Excellence in AI Ethics - Global AI Conference</li>
           <li>Startup of the Year - Bangalore Tech Awards</li>
         </ul>
       </section>
     </div>
-  `;
+  );
+}
+
+export function ProfessionalFooter() {
+  const [email, setEmail] = useState("");
 
   return (
     <footer className="bg-gradient-to-b from-gray-900 via-gray-900 to-black border-t border-gray-700/50">
@@ -266,8 +281,15 @@ export function ProfessionalFooter() {
           <div>
             <h4 className="text-white font-bold mb-4 text-lg">Company</h4>
             <div className="space-y-3 text-sm">
+              <div className="text-gray-400 hover:text-white transition-colors cursor-pointer">
+                <LegalDialog
+                  title="About Tezu AI"
+                  trigger={<span className="hover:text-white transition-colors">About Us</span>}
+                >
+                  <AboutCompanyContent />
+                </LegalDialog>
+              </div>
               {[
-                { label: "About Us", dialog: aboutCompany },
                 "Our Story",
                 "Careers",
                 "Press Kit",
@@ -277,15 +299,7 @@ export function ProfessionalFooter() {
                 "Investors"
               ].map((item, index) => (
                 <div key={index} className="text-gray-400 hover:text-white transition-colors cursor-pointer">
-                  {typeof item === 'object' ? (
-                    <LegalDialog
-                      title="About Tezu AI"
-                      content={item.dialog}
-                      trigger={<span className="hover:text-white transition-colors">{item.label}</span>}
-                    />
-                  ) : (
-                    item
-                  )}
+                  {item}
                 </div>
               ))}
             </div>
@@ -378,19 +392,22 @@ export function ProfessionalFooter() {
             <div className="flex flex-wrap items-center gap-6 text-sm">
               <LegalDialog
                 title="Privacy Policy"
-                content={privacyPolicy}
                 trigger={<span className="text-gray-400 hover:text-white transition-colors cursor-pointer">Privacy Policy</span>}
-              />
+              >
+                <PrivacyPolicyContent />
+              </LegalDialog>
               <LegalDialog
                 title="Terms of Service"
-                content={termsOfService}
                 trigger={<span className="text-gray-400 hover:text-white transition-colors cursor-pointer">Terms of Service</span>}
-              />
+              >
+                <TermsOfServiceContent />
+              </LegalDialog>
               <LegalDialog
                 title="Cookie Policy"
-                content={cookiePolicy}
                 trigger={<span className="text-gray-400 hover:text-white transition-colors cursor-pointer">Cookie Policy</span>}
-              />
+              >
+                <CookiePolicyContent />
+              </LegalDialog>
               <span className="text-gray-400 hover:text-white transition-colors cursor-pointer">GDPR Compliance</span>
             </div>
           </div>
