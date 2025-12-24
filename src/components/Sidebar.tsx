@@ -128,12 +128,30 @@ export function Sidebar({
     conversation.title.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
-  // Essential navigation items only - removed broken/non-working features
+  // Zentara AI Features
   const navigationItems = [
     {
       title: "💬 Chat",
       icon: MessageSquare,
       view: "chat" as const,
+      badge: null
+    },
+    {
+      title: "🎨 Image Generator",
+      icon: Brain,
+      view: "image-generator" as const,
+      badge: "NEW"
+    },
+    {
+      title: "📝 Templates",
+      icon: FileText,
+      view: "templates" as const,
+      badge: null
+    },
+    {
+      title: "✨ Creative Studio",
+      icon: Layers,
+      view: "creative-studio" as const,
       badge: null
     },
     {
@@ -147,19 +165,13 @@ export function Sidebar({
       icon: Settings,
       view: "settings" as const,
       badge: null
-    },
-    {
-      title: "🔒 Privacy",
-      icon: Lock,
-      view: "privacy" as const,
-      badge: null
     }
   ];
 
   return (
-    <div className="flex flex-col h-full bg-gradient-to-b from-gray-900 via-gray-800/95 to-gray-900/95 border-r border-gray-700/50 w-72">
+    <div className="flex flex-col h-full bg-gradient-to-b from-sidebar via-sidebar/95 to-sidebar border-r border-sidebar-border w-72">
       {/* Top Section: User Info, New Chat Button, Search */}
-      <div className="px-4 py-3 border-b border-gray-700/50">
+      <div className="px-4 py-3 border-b border-sidebar-border">
         {/* User Info */}
         {isAuthenticated && currentUser ? (
           <div className="flex items-center space-x-3 mb-3">
