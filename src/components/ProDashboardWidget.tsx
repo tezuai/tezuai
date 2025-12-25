@@ -1,24 +1,20 @@
-
 import { useState, useEffect } from "react";
-import { Users, Award, RefreshCw, Sparkles, Target, Star, Gift, Smile, Timer, UserPlus, CheckCircle } from "lucide-react";
+import { Users, Award, Sparkles, Target, Star, Gift, Smile, Timer, UserPlus, CheckCircle, Bot, Zap } from "lucide-react";
 
-// Dummy leaderboard data
 const leaderboard = [
-  { name: "Rohit Pro", xp: 198, streak: 9, avatar: "🦸‍♂️" },
-  { name: "Meena Maker", xp: 186, streak: 7, avatar: "🦸‍♀️" },
-  { name: "Krishna Dev", xp: 170, streak: 11, avatar: "🦸" }
+  { name: "Rohit", xp: 198, streak: 9, avatar: "🦸‍♂️" },
+  { name: "Meena", xp: 186, streak: 7, avatar: "🦸‍♀️" },
+  { name: "Krishna", xp: 170, streak: 11, avatar: "🦸" }
 ];
 
-// Dummy recent achievements
 const achievements = [
-  { label: "Pro Streak 5 🔥", when: "Today" },
-  { label: "100 XP Earned 💯", when: "Yesterday" },
-  { label: "Quiz King 🧠", when: "2d ago" },
+  { label: "Active Streak 🔥", when: "Today" },
+  { label: "100 XP 💯", when: "Yesterday" },
+  { label: "Quiz Master 🧠", when: "2d ago" },
 ];
 
-// Pomodoro-style Timer
 function usePomodoroTimer() {
-  const [time, setTime] = useState(25*60);
+  const [time, setTime] = useState(25 * 60);
   const [active, setActive] = useState(false);
 
   useEffect(() => {
@@ -29,9 +25,9 @@ function usePomodoroTimer() {
     return () => clearInterval(interval);
   }, [active]);
 
-  function start() { setActive(true);}
-  function pause() { setActive(false);}
-  function reset() { setTime(25*60); setActive(false);}
+  function start() { setActive(true); }
+  function pause() { setActive(false); }
+  function reset() { setTime(25 * 60); setActive(false); }
 
   return {
     time,
@@ -45,16 +41,15 @@ function usePomodoroTimer() {
 }
 
 export function ProDashboardWidget() {
-  // Lucky Draw Spinner - daily reward
   const [spinResult, setSpinResult] = useState<string | null>(null);
 
   const rewardItems = [
-    "🎁 Extra 10 XP!", 
-    "⭐ New 'Motivator' Badge!", 
-    "🔥 Double streak today!", 
-    "📝 Special prompt unlocked!", 
-    "💡 Productivity Tip Boost",
-    "🔓 Beta feature access!"
+    "🎁 Extra 10 XP!",
+    "⭐ New Badge!",
+    "🔥 Double streak!",
+    "📝 Special prompt!",
+    "💡 Productivity Boost",
+    "🔓 Beta feature!"
   ];
 
   function spin() {
@@ -66,157 +61,166 @@ export function ProDashboardWidget() {
     }, 800);
   }
 
-  // Goal Tracker Demo
   const [goal, setGoal] = useState("");
   const [goalMsg, setGoalMsg] = useState<string | null>(null);
 
   function handleGoalSet(e: React.FormEvent) {
     e.preventDefault();
     if (goal.trim().length === 0) return;
-    setGoalMsg(`🎯 Goal set: "${goal}" - AI will cheer you on!`);
+    setGoalMsg(`🎯 Goal set: "${goal}"`);
     setGoal("");
     setTimeout(() => setGoalMsg(null), 2000);
   }
 
-  // Pomodoro
   const pomodoro = usePomodoroTimer();
 
-  // Theme Customizer (just show avatars for now)
   const avatars = ["🦸‍♀️", "🦸‍♂️", "🧙‍♂️", "👩‍🎨", "🤴", "👩‍🔬"];
   const [selectedAvatar, setSelectedAvatar] = useState(avatars[0]);
 
-  // Notice board dummy data
   const communityNotices = [
-    { name: "Deepak", msg: "AI ne mere resume ko 2x improve kiya!", time: "1 min ago" },
-    { name: "Aarti", msg: "Photo edit shortcut discovered, try it out!", time: "3 min ago" },
-    { name: "Vikas", msg: "Got 200+ XP in 1 week using workflow automation!", time: "5 min ago" }
+    { name: "Deepak", msg: "Zentara AI ने मेरी productivity 2x की!", time: "1 min ago" },
+    { name: "Aarti", msg: "Image generator amazing है!", time: "3 min ago" },
+    { name: "Vikas", msg: "200+ XP in 1 week!", time: "5 min ago" }
   ];
 
-  // Referral demo
   const [inviteStatus, setInviteStatus] = useState<string | null>(null);
   const handleInvite = () => {
-    setInviteStatus("Link Copied! Friends joining will earn you XP!");
+    setInviteStatus("Link Copied! Share with friends!");
     setTimeout(() => setInviteStatus(null), 2000);
   }
 
-  // Animations on achievement (simply pulse for now)
   return (
-    <div className="mb-4 max-w-2xl w-full mx-auto rounded-xl shadow-2xl bg-gradient-to-br from-fuchsia-950/65 via-blue-900/80 to-yellow-400/10 py-6 px-6 border-2 border-blue-300/10 animate-fade-in">
-      {/* Pro Leaderboard */}
-      <div className="mb-4">
-        <div className="flex items-center gap-2 mb-1">
-          <Award className="w-5 h-5 text-yellow-300 animate-pulse" />
-          <span className="text-lg font-bold text-yellow-200">Pro Leaderboard</span>
+    <div className="mb-4 max-w-2xl w-full mx-auto rounded-2xl shadow-2xl bg-gradient-to-br from-gray-900/90 via-emerald-950/40 to-gray-900/90 py-6 px-6 border border-emerald-800/30 animate-fade-in">
+      
+      {/* Leaderboard */}
+      <div className="mb-5">
+        <div className="flex items-center gap-2 mb-3">
+          <Award className="w-5 h-5 text-emerald-400" />
+          <span className="text-lg font-bold text-emerald-400">Leaderboard</span>
         </div>
-        <div className="flex flex-wrap items-center gap-3 bg-gradient-to-r from-fuchsia-800/30 to-blue-800/20 px-2 py-2 rounded-xl">
-          {leaderboard.map((u,i) => (
-            <div key={i} className="flex flex-col items-center w-28 rounded-xl px-2 py-1 text-center border border-fuchsia-400/30 bg-fuchsia-900/10">
+        <div className="flex flex-wrap items-center gap-3">
+          {leaderboard.map((u, i) => (
+            <div key={i} className="flex flex-col items-center w-24 rounded-xl px-2 py-2 text-center border border-emerald-800/30 bg-gray-800/30">
               <span className="text-3xl">{u.avatar}</span>
-              <span className="font-bold text-yellow-100">{u.name}</span>
-              <span className="text-xs text-fuchsia-200">XP {u.xp}</span>
-              <span className="text-xs text-yellow-300">🔥 Streak {u.streak}</span>
+              <span className="font-bold text-gray-200 text-sm">{u.name}</span>
+              <span className="text-xs text-emerald-400">XP {u.xp}</span>
+              <span className="text-xs text-yellow-400">🔥 {u.streak}</span>
             </div>
           ))}
         </div>
       </div>
-      {/* Spinner - Daily Reward */}
-      <div className="mb-4">
-        <div className="flex items-center gap-2 mb-1">
-          <Gift className="w-5 h-5 text-pink-400 animate-bounce" />
-          <span className="text-sm font-bold text-pink-200">Spin for Daily Reward</span>
+
+      {/* Daily Reward Spinner */}
+      <div className="mb-5">
+        <div className="flex items-center gap-2 mb-2">
+          <Gift className="w-5 h-5 text-teal-400" />
+          <span className="text-sm font-bold text-teal-400">Daily Reward</span>
         </div>
         <button
-          className="bg-yellow-400/20 hover:bg-pink-300/30 transition px-6 py-2 rounded-xl text-lg font-semibold text-yellow-100 shadow-lg mb-1"
+          className="bg-emerald-900/40 hover:bg-emerald-800/50 transition px-6 py-2 rounded-xl text-base font-semibold text-emerald-300 shadow-lg border border-emerald-700/30"
           onClick={spin}
           disabled={!!spinResult}
-        >{spinResult ?? "🎡 Spin Now"}</button>
-        {spinResult && <div className="text-sm text-pink-300 animate-pulse mt-1">{spinResult}</div>}
+        >
+          {spinResult ?? "🎡 Spin Now"}
+        </button>
+        {spinResult && <div className="text-sm text-emerald-400 animate-pulse mt-1">{spinResult}</div>}
       </div>
-      {/* Avatar Customization */}
-      <div className="mb-4">
-        <div className="flex items-center gap-2 mb-1">
-          <Smile className="w-5 h-5 text-green-300" />
-          <span className="font-bold text-green-100 text-sm">Choose Your AI Avatar</span>
+
+      {/* Avatar Selection */}
+      <div className="mb-5">
+        <div className="flex items-center gap-2 mb-2">
+          <Smile className="w-5 h-5 text-cyan-400" />
+          <span className="font-bold text-cyan-400 text-sm">Choose Avatar</span>
         </div>
         <div className="flex gap-2">
           {avatars.map(av => (
             <button
               key={av}
               onClick={() => setSelectedAvatar(av)}
-              className={`text-2xl ${selectedAvatar === av ? "ring-4 ring-yellow-300 scale-125" : ""} bg-fuchsia-950/50 px-3 py-1 rounded-full`}
-            >{av}</button>
+              className={`text-2xl ${selectedAvatar === av ? "ring-2 ring-emerald-400 scale-110" : ""} bg-gray-800/50 px-3 py-1 rounded-full transition`}
+            >
+              {av}
+            </button>
           ))}
         </div>
-        <div className="mt-2 text-xs text-fuchsia-100">Selected: <span className="font-bold">{selectedAvatar}</span></div>
+        <div className="mt-2 text-xs text-gray-400">Selected: <span className="font-bold text-emerald-400">{selectedAvatar}</span></div>
       </div>
+
       {/* Achievements */}
-      <div className="mb-4">
-        <div className="flex items-center gap-2 mb-1">
-          <CheckCircle className="w-5 h-5 text-fuchsia-300 animate-pulse" />
-          <span className="font-bold text-fuchsia-100 text-sm">Recent Achievements</span>
+      <div className="mb-5">
+        <div className="flex items-center gap-2 mb-2">
+          <CheckCircle className="w-5 h-5 text-emerald-400" />
+          <span className="font-bold text-emerald-400 text-sm">Achievements</span>
         </div>
         <div className="flex gap-2 flex-wrap">
-          {achievements.map((a,i) => (
-            <span key={i} className="bg-fuchsia-900/30 rounded-full px-3 py-1 text-xs font-semibold text-yellow-100 animate-pulse">{a.label} <span className="text-[10px] text-fuchsia-200">({a.when})</span></span>
+          {achievements.map((a, i) => (
+            <span key={i} className="bg-emerald-900/30 rounded-full px-3 py-1 text-xs font-semibold text-emerald-300 border border-emerald-700/30">
+              {a.label} <span className="text-[10px] text-gray-400">({a.when})</span>
+            </span>
           ))}
         </div>
       </div>
+
       {/* Productivity Timer */}
-      <div className="mb-4">
-        <div className="flex items-center gap-2 mb-1">
-          <Timer className="w-5 h-5 text-blue-400 animate-pulse" />
-          <span className="font-bold text-blue-100 text-sm">Productivity Timer</span>
+      <div className="mb-5">
+        <div className="flex items-center gap-2 mb-2">
+          <Timer className="w-5 h-5 text-teal-400" />
+          <span className="font-bold text-teal-400 text-sm">Focus Timer</span>
         </div>
         <div className="flex items-center gap-4">
-          <span className="text-2xl font-mono text-yellow-200">{pomodoro.minutes.toString().padStart(2,'0')}:{pomodoro.seconds.toString().padStart(2,'0')}</span>
-          <button onClick={pomodoro.start} className="bg-green-400/30 px-3 py-1 rounded font-bold text-green-100 mr-1">Start</button>
-          <button onClick={pomodoro.pause} className="bg-yellow-400/20 px-3 py-1 rounded font-bold text-yellow-100">Pause</button>
-          <button onClick={pomodoro.reset} className="bg-red-400/20 px-3 py-1 rounded font-bold text-pink-200">Reset</button>
+          <span className="text-2xl font-mono text-emerald-300">{pomodoro.minutes.toString().padStart(2, '0')}:{pomodoro.seconds.toString().padStart(2, '0')}</span>
+          <button onClick={pomodoro.start} className="bg-emerald-600/30 px-3 py-1 rounded font-bold text-emerald-300 text-sm border border-emerald-600/30">Start</button>
+          <button onClick={pomodoro.pause} className="bg-yellow-600/20 px-3 py-1 rounded font-bold text-yellow-300 text-sm border border-yellow-600/30">Pause</button>
+          <button onClick={pomodoro.reset} className="bg-red-600/20 px-3 py-1 rounded font-bold text-red-300 text-sm border border-red-600/30">Reset</button>
         </div>
-        <div className="text-xs text-fuchsia-200 mt-1">Pro Tip: Kaam 25 min, phir 5 min break!</div>
       </div>
+
       {/* Goal Tracker */}
-      <div className="mb-4">
-        <div className="flex items-center gap-2 mb-1">
-          <Target className="w-5 h-5 text-yellow-300" />
-          <span className="font-bold text-yellow-100 text-sm">Set Your Daily Goal</span>
+      <div className="mb-5">
+        <div className="flex items-center gap-2 mb-2">
+          <Target className="w-5 h-5 text-cyan-400" />
+          <span className="font-bold text-cyan-400 text-sm">Set Daily Goal</span>
         </div>
         <form className="flex gap-2" onSubmit={handleGoalSet}>
           <input
             value={goal}
             onChange={e => setGoal(e.target.value)}
-            className="px-3 py-1 rounded bg-fuchsia-950/40 border border-fuchsia-700/40 text-fuchsia-100 text-xs w-40"
+            className="px-3 py-1.5 rounded-lg bg-gray-800/50 border border-emerald-700/30 text-gray-200 text-sm w-40 focus:border-emerald-500 focus:outline-none"
             placeholder="Aaj ka goal..."
             maxLength={40}
           />
-          <button className="bg-blue-400/20 px-3 py-1 rounded text-blue-100 font-bold" type="submit">Set</button>
+          <button className="bg-emerald-600/30 px-4 py-1.5 rounded-lg text-emerald-300 font-bold text-sm border border-emerald-600/30" type="submit">Set</button>
         </form>
-        {goalMsg && <div className="text-xs mt-1 text-green-200 animate-pulse">{goalMsg}</div>}
+        {goalMsg && <div className="text-xs mt-1 text-emerald-400 animate-pulse">{goalMsg}</div>}
       </div>
+
       {/* Invite Friends */}
-      <div className="mb-4">
-        <div className="flex items-center gap-2 mb-1">
-          <UserPlus className="w-5 h-5 text-fuchsia-300" />
-          <span className="font-bold text-fuchsia-100 text-sm">Invite Friends (Referral Bonus)</span>
+      <div className="mb-5">
+        <div className="flex items-center gap-2 mb-2">
+          <UserPlus className="w-5 h-5 text-teal-400" />
+          <span className="font-bold text-teal-400 text-sm">Invite Friends</span>
         </div>
         <button
-          className="bg-gradient-to-r from-blue-400 to-fuchsia-400 px-3 py-1 rounded text-white font-bold hover:scale-105"
+          className="bg-gradient-to-r from-emerald-600 to-teal-600 px-4 py-2 rounded-lg text-white font-bold hover:scale-105 transition text-sm"
           onClick={handleInvite}
-        >Copy Invite Link</button>
-        {inviteStatus && <div className="text-xs mt-1 text-green-200 animate-pulse">{inviteStatus}</div>}
+        >
+          Copy Invite Link
+        </button>
+        {inviteStatus && <div className="text-xs mt-1 text-emerald-400 animate-pulse">{inviteStatus}</div>}
       </div>
-      {/* Pro Notice Board (read-only demo) */}
+
+      {/* Community Notice Board */}
       <div>
-        <div className="flex items-center gap-2 mb-1">
-          <Users className="w-5 h-5 text-fuchsia-400" />
-          <span className="font-bold text-fuchsia-100 text-sm">Pro Community Notice Board</span>
+        <div className="flex items-center gap-2 mb-2">
+          <Users className="w-5 h-5 text-emerald-400" />
+          <span className="font-bold text-emerald-400 text-sm">Community</span>
         </div>
-        <div className="flex flex-col gap-1">
-          {communityNotices.map((n,i) => (
-            <div key={i} className="bg-blue-900/20 rounded px-3 py-1 flex items-center gap-2">
-              <span className="font-bold text-yellow-100">{n.name}:</span>
-              <span className="text-fuchsia-100">{n.msg}</span>
-              <span className="ml-auto text-xs text-fuchsia-200">{n.time}</span>
+        <div className="flex flex-col gap-2">
+          {communityNotices.map((n, i) => (
+            <div key={i} className="bg-gray-800/30 rounded-lg px-3 py-2 flex items-center gap-2 border border-emerald-800/20">
+              <span className="font-bold text-emerald-300 text-sm">{n.name}:</span>
+              <span className="text-gray-300 text-sm">{n.msg}</span>
+              <span className="ml-auto text-xs text-gray-500">{n.time}</span>
             </div>
           ))}
         </div>
