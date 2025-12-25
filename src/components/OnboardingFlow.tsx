@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -14,6 +13,9 @@ import {
   CheckCircle,
   Zap,
   Shield,
+  Brain,
+  ImageIcon,
+  Code
 } from "lucide-react";
 
 interface OnboardingFlowProps {
@@ -26,16 +28,16 @@ export function OnboardingFlow({ onComplete, onSkip }: OnboardingFlowProps) {
 
   const steps = [
     {
-      title: "Welcome to AI Assistant! 🎉",
-      description: "India ka sabse advanced AI assistant mein aapka swagat hai!",
+      title: "Welcome to Zentara AI! 🎉",
+      description: "ज़ेंतारा AI में आपका स्वागत है!",
       content: (
         <div className="space-y-6">
           <div className="text-center">
-            <div className="w-20 h-20 bg-blue-600/20 rounded-full flex items-center justify-center mx-auto mb-4">
-              <Bot className="w-10 h-10 text-blue-400" />
+            <div className="w-20 h-20 bg-gradient-to-br from-emerald-500 to-teal-500 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg shadow-emerald-500/30">
+              <Bot className="w-10 h-10 text-white" />
             </div>
             <h3 className="text-xl font-semibold text-white mb-2">
-              Namaste! Main aapka AI Assistant hun
+              Namaste! Main Zentara AI hun
             </h3>
             <p className="text-gray-400">
               Main aapki har sawal ka jawab de sakta hun - coding se lekar creative writing tak!
@@ -43,16 +45,16 @@ export function OnboardingFlow({ onComplete, onSkip }: OnboardingFlowProps) {
           </div>
           
           <div className="grid grid-cols-3 gap-4">
-            <div className="text-center p-4 bg-gray-800/50 rounded-lg">
-              <MessageSquare className="w-6 h-6 text-blue-400 mx-auto mb-2" />
+            <div className="text-center p-4 bg-emerald-900/20 rounded-xl border border-emerald-700/30">
+              <MessageSquare className="w-6 h-6 text-emerald-400 mx-auto mb-2" />
               <div className="text-sm text-gray-300">Natural Chat</div>
             </div>
-            <div className="text-center p-4 bg-gray-800/50 rounded-lg">
-              <Sparkles className="w-6 h-6 text-purple-400 mx-auto mb-2" />
-              <div className="text-sm text-gray-300">Creative Writing</div>
+            <div className="text-center p-4 bg-teal-900/20 rounded-xl border border-teal-700/30">
+              <Sparkles className="w-6 h-6 text-teal-400 mx-auto mb-2" />
+              <div className="text-sm text-gray-300">Creative Studio</div>
             </div>
-            <div className="text-center p-4 bg-gray-800/50 rounded-lg">
-              <Zap className="w-6 h-6 text-yellow-400 mx-auto mb-2" />
+            <div className="text-center p-4 bg-cyan-900/20 rounded-xl border border-cyan-700/30">
+              <Zap className="w-6 h-6 text-cyan-400 mx-auto mb-2" />
               <div className="text-sm text-gray-300">Instant Results</div>
             </div>
           </div>
@@ -60,39 +62,39 @@ export function OnboardingFlow({ onComplete, onSkip }: OnboardingFlowProps) {
       )
     },
     {
-      title: "Free Features 🆓",
-      description: "Dekho aapko kya-kya free mein milta hai!",
+      title: "Zentara AI Features 🆓",
+      description: "Dekho aapko kya-kya milta hai!",
       content: (
         <div className="space-y-4">
           <div className="grid grid-cols-1 gap-4">
-            <div className="flex items-center gap-3 p-4 bg-green-900/20 border border-green-500/30 rounded-lg">
-              <CheckCircle className="w-5 h-5 text-green-400" />
+            <div className="flex items-center gap-3 p-4 bg-emerald-900/20 border border-emerald-500/30 rounded-xl">
+              <Brain className="w-5 h-5 text-emerald-400" />
               <div>
-                <div className="text-white font-medium">10 Free Messages Daily</div>
-                <div className="text-sm text-gray-400">Har din reset ho jata hai</div>
+                <div className="text-white font-medium">Advanced AI Chat</div>
+                <div className="text-sm text-gray-400">Gemini 2.5 Flash powered intelligence</div>
               </div>
             </div>
             
-            <div className="flex items-center gap-3 p-4 bg-blue-900/20 border border-blue-500/30 rounded-lg">
-              <CheckCircle className="w-5 h-5 text-blue-400" />
+            <div className="flex items-center gap-3 p-4 bg-teal-900/20 border border-teal-500/30 rounded-xl">
+              <ImageIcon className="w-5 h-5 text-teal-400" />
               <div>
-                <div className="text-white font-medium">Basic AI Model Access</div>
-                <div className="text-sm text-gray-400">Powerful GPT-3.5 model</div>
+                <div className="text-white font-medium">AI Image Generator</div>
+                <div className="text-sm text-gray-400">किसी भी prompt से images बनाएं</div>
               </div>
             </div>
             
-            <div className="flex items-center gap-3 p-4 bg-purple-900/20 border border-purple-500/30 rounded-lg">
-              <CheckCircle className="w-5 h-5 text-purple-400" />
+            <div className="flex items-center gap-3 p-4 bg-cyan-900/20 border border-cyan-500/30 rounded-xl">
+              <Code className="w-5 h-5 text-cyan-400" />
               <div>
-                <div className="text-white font-medium">Chat History (7 days)</div>
-                <div className="text-sm text-gray-400">Purane conversations save</div>
+                <div className="text-white font-medium">Code Assistant</div>
+                <div className="text-sm text-gray-400">Coding help in multiple languages</div>
               </div>
             </div>
           </div>
           
-          <div className="bg-gradient-to-r from-blue-900/20 to-purple-900/20 p-4 rounded-lg border border-blue-500/20">
+          <div className="bg-emerald-900/20 p-4 rounded-xl border border-emerald-500/20">
             <div className="text-center">
-              <Badge className="bg-blue-600 text-white mb-2">Pro Tips</Badge>
+              <Badge className="bg-emerald-600 text-white mb-2">Pro Tips</Badge>
               <p className="text-sm text-gray-300">
                 Detailed questions pucho better answers ke liye!
               </p>
@@ -103,12 +105,12 @@ export function OnboardingFlow({ onComplete, onSkip }: OnboardingFlowProps) {
     },
     {
       title: "How to Get Started 🚀",
-      description: "Simple steps mein master ban jao!",
+      description: "Simple steps mein shuru karo!",
       content: (
         <div className="space-y-4">
           <div className="space-y-3">
             <div className="flex items-start gap-3">
-              <div className="w-8 h-8 bg-blue-600 text-white rounded-full flex items-center justify-center text-sm font-bold">
+              <div className="w-8 h-8 bg-emerald-600 text-white rounded-full flex items-center justify-center text-sm font-bold">
                 1
               </div>
               <div>
@@ -120,19 +122,19 @@ export function OnboardingFlow({ onComplete, onSkip }: OnboardingFlowProps) {
             </div>
             
             <div className="flex items-start gap-3">
-              <div className="w-8 h-8 bg-blue-600 text-white rounded-full flex items-center justify-center text-sm font-bold">
+              <div className="w-8 h-8 bg-teal-600 text-white rounded-full flex items-center justify-center text-sm font-bold">
                 2
               </div>
               <div>
                 <div className="text-white font-medium">Get Instant Response</div>
                 <div className="text-sm text-gray-400">
-                  AI turant detailed answer dega with examples
+                  Zentara AI turant detailed answer dega
                 </div>
               </div>
             </div>
             
             <div className="flex items-start gap-3">
-              <div className="w-8 h-8 bg-blue-600 text-white rounded-full flex items-center justify-center text-sm font-bold">
+              <div className="w-8 h-8 bg-cyan-600 text-white rounded-full flex items-center justify-center text-sm font-bold">
                 3
               </div>
               <div>
@@ -144,15 +146,15 @@ export function OnboardingFlow({ onComplete, onSkip }: OnboardingFlowProps) {
             </div>
           </div>
           
-          <div className="bg-yellow-900/20 border border-yellow-500/30 p-4 rounded-lg">
+          <div className="bg-emerald-900/20 border border-emerald-500/30 p-4 rounded-xl">
             <div className="flex items-start gap-2">
-              <Sparkles className="w-5 h-5 text-yellow-400 mt-0.5" />
+              <Sparkles className="w-5 h-5 text-emerald-400 mt-0.5" />
               <div>
-                <div className="text-yellow-400 font-medium text-sm">Example Questions:</div>
+                <div className="text-emerald-400 font-medium text-sm">Example Questions:</div>
                 <div className="text-sm text-gray-300 space-y-1 mt-1">
                   <div>• "Python mein loop kaise likhte hain?"</div>
-                  <div>• "Business plan banane mein help karo"</div>
-                  <div>• "Creative story likhna hai love ke baare mein"</div>
+                  <div>• "Creative story likhna hai"</div>
+                  <div>• "एक beautiful image generate करो"</div>
                 </div>
               </div>
             </div>
@@ -162,39 +164,39 @@ export function OnboardingFlow({ onComplete, onSkip }: OnboardingFlowProps) {
     },
     {
       title: "Privacy & Security 🔒",
-      description: "Aapka data bilkul safe hai hamare saath!",
+      description: "Aapka data bilkul safe hai!",
       content: (
         <div className="space-y-4">
           <div className="grid grid-cols-1 gap-4">
-            <div className="flex items-center gap-3 p-4 bg-green-900/20 border border-green-500/30 rounded-lg">
-              <Shield className="w-5 h-5 text-green-400" />
+            <div className="flex items-center gap-3 p-4 bg-emerald-900/20 border border-emerald-500/30 rounded-xl">
+              <Shield className="w-5 h-5 text-emerald-400" />
               <div>
                 <div className="text-white font-medium">End-to-End Encryption</div>
                 <div className="text-sm text-gray-400">Saare messages encrypted rehte hain</div>
               </div>
             </div>
             
-            <div className="flex items-center gap-3 p-4 bg-blue-900/20 border border-blue-500/30 rounded-lg">
-              <CheckCircle className="w-5 h-5 text-blue-400" />
+            <div className="flex items-center gap-3 p-4 bg-teal-900/20 border border-teal-500/30 rounded-xl">
+              <CheckCircle className="w-5 h-5 text-teal-400" />
               <div>
                 <div className="text-white font-medium">No Data Selling</div>
                 <div className="text-sm text-gray-400">Hum kabhi aapka data nahi bechte</div>
               </div>
             </div>
             
-            <div className="flex items-center gap-3 p-4 bg-purple-900/20 border border-purple-500/30 rounded-lg">
-              <Users className="w-5 h-5 text-purple-400" />
+            <div className="flex items-center gap-3 p-4 bg-cyan-900/20 border border-cyan-500/30 rounded-xl">
+              <Users className="w-5 h-5 text-cyan-400" />
               <div>
                 <div className="text-white font-medium">GDPR Compliant</div>
-                <div className="text-sm text-gray-400">International privacy standards follow karte hain</div>
+                <div className="text-sm text-gray-400">International privacy standards</div>
               </div>
             </div>
           </div>
           
-          <div className="bg-gray-800/50 p-4 rounded-lg border border-gray-600">
+          <div className="bg-gray-800/50 p-4 rounded-xl border border-emerald-800/30">
             <div className="text-center">
               <p className="text-sm text-gray-300">
-                🇮🇳 <strong>Made in India</strong> - Local data centers se faster response
+                🇮🇳 <strong className="text-emerald-400">Made in India</strong> - Local data centers se faster response
               </p>
             </div>
           </div>
@@ -220,13 +222,13 @@ export function OnboardingFlow({ onComplete, onSkip }: OnboardingFlowProps) {
   const progress = ((currentStep + 1) / steps.length) * 100;
 
   return (
-    <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-      <Card className="w-full max-w-2xl bg-gray-900 border-gray-700">
+    <div className="fixed inset-0 bg-black/90 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+      <Card className="w-full max-w-2xl bg-gradient-to-br from-gray-900 via-emerald-950/30 to-gray-900 border-emerald-800/30">
         <CardHeader>
           <div className="flex items-center justify-between">
             <div>
               <CardTitle className="text-2xl text-white">{steps[currentStep].title}</CardTitle>
-              <p className="text-gray-400 mt-1">{steps[currentStep].description}</p>
+              <p className="text-emerald-400 mt-1">{steps[currentStep].description}</p>
             </div>
             <Button 
               variant="ghost" 
@@ -255,7 +257,7 @@ export function OnboardingFlow({ onComplete, onSkip }: OnboardingFlowProps) {
               variant="outline"
               onClick={prevStep}
               disabled={currentStep === 0}
-              className="border-gray-600 text-gray-300"
+              className="border-emerald-700/50 text-gray-300 hover:bg-emerald-900/30"
             >
               <ArrowLeft className="w-4 h-4 mr-2" />
               Previous
@@ -263,9 +265,9 @@ export function OnboardingFlow({ onComplete, onSkip }: OnboardingFlowProps) {
             
             <Button
               onClick={nextStep}
-              className="bg-blue-600 hover:bg-blue-700"
+              className="bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700"
             >
-              {currentStep === steps.length - 1 ? "Start Chatting" : "Next"}
+              {currentStep === steps.length - 1 ? "Start Zentara AI" : "Next"}
               <ArrowRight className="w-4 h-4 ml-2" />
             </Button>
           </div>

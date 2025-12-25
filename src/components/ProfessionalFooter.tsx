@@ -34,7 +34,7 @@ function PrivacyPolicyContent() {
     <div className="space-y-6">
       <section>
         <h3 className="text-xl font-semibold text-white mb-3">1. Information Collection</h3>
-        <p>At Tezu AI, we collect information to provide better services to our users. This includes:</p>
+        <p>At Zentara AI, we collect information to provide better services to our users. This includes:</p>
         <ul className="list-disc list-inside mt-2 space-y-1">
           <li>Information you provide when creating an account</li>
           <li>Chat conversations and AI interactions</li>
@@ -67,8 +67,8 @@ function PrivacyPolicyContent() {
 
       <section>
         <h3 className="text-xl font-semibold text-white mb-3">4. Contact Information</h3>
-        <p>For privacy-related inquiries: <strong>privacy@tezuai.com</strong></p>
-        <p>Data Protection Officer: <strong>dpo@tezuai.com</strong></p>
+        <p>For privacy-related inquiries: <strong>privacy@zentara-ai.com</strong></p>
+        <p>Data Protection Officer: <strong>dpo@zentara-ai.com</strong></p>
       </section>
     </div>
   );
@@ -80,7 +80,7 @@ function TermsOfServiceContent() {
     <div className="space-y-6">
       <section>
         <h3 className="text-xl font-semibold text-white mb-3">1. Service Description</h3>
-        <p>Tezu AI Pro provides advanced artificial intelligence services including:</p>
+        <p>Zentara AI provides advanced artificial intelligence services including:</p>
         <ul className="list-disc list-inside mt-2 space-y-1">
           <li>Multi-modal AI conversations (text, voice, image, video)</li>
           <li>Real-time knowledge and information retrieval</li>
@@ -162,7 +162,7 @@ function AboutCompanyContent() {
 
       <section>
         <h3 className="text-xl font-semibold text-white mb-3">Founded in India</h3>
-        <p>Tezu AI was founded in 2024 in Bangalore, India, with a vision to create AI that understands and respects cultural diversity while providing world-class capabilities.</p>
+        <p>Zentara AI was founded in 2024 in Bangalore, India, with a vision to create AI that understands and respects cultural diversity while providing world-class capabilities.</p>
       </section>
 
       <section>
@@ -216,12 +216,12 @@ export function ProfessionalFooter() {
           {/* Brand Section */}
           <div className="lg:col-span-2 space-y-6">
             <div className="flex items-center gap-3">
-              <div className="w-12 h-12 bg-gradient-to-r from-purple-500 via-pink-500 to-blue-500 rounded-2xl flex items-center justify-center">
+              <div className="w-12 h-12 bg-gradient-to-r from-emerald-500 to-teal-500 rounded-2xl flex items-center justify-center">
                 <Zap className="w-7 h-7 text-white" />
               </div>
               <div>
-                <span className="text-2xl font-bold text-white">Tezu AI Pro</span>
-                <div className="text-sm text-purple-400 font-semibold">तेज़ू ए.आई. प्रो</div>
+                <span className="text-2xl font-bold text-white">Zentara AI</span>
+                <div className="text-sm text-emerald-400 font-semibold">ज़ेंतारा ए.आई.</div>
               </div>
             </div>
             
@@ -283,8 +283,8 @@ export function ProfessionalFooter() {
             <div className="space-y-3 text-sm">
               <div className="text-gray-400 hover:text-white transition-colors cursor-pointer">
                 <LegalDialog
-                  title="About Tezu AI"
-                  trigger={<span className="hover:text-white transition-colors">About Us</span>}
+                  title="About Zentara AI"
+                  trigger={<span className="hover:text-emerald-400 transition-colors">About Us</span>}
                 >
                   <AboutCompanyContent />
                 </LegalDialog>
@@ -328,7 +328,7 @@ export function ProfessionalFooter() {
             <div className="space-y-2 text-sm">
               <div className="flex items-center gap-2 text-gray-400">
                 <Mail className="w-4 h-4" />
-                <span>support@tezuai.com</span>
+                <span>support@zentara-ai.com</span>
               </div>
               <div className="flex items-center gap-2 text-gray-400">
                 <Phone className="w-4 h-4" />
@@ -381,7 +381,7 @@ export function ProfessionalFooter() {
           <div className="flex flex-col lg:flex-row items-center justify-between gap-6">
             <div className="flex flex-col sm:flex-row items-center gap-4 text-sm text-gray-400">
               <div className="flex items-center gap-2">
-                <span>© 2025 Tezu AI Technologies Pvt Ltd.</span>
+                <span>© 2025 Zentara AI Technologies Pvt Ltd.</span>
                 <Heart className="w-4 h-4 text-red-500 fill-current animate-pulse" />
                 <span>Made in India</span>
               </div>
@@ -415,8 +415,8 @@ export function ProfessionalFooter() {
           {/* Additional Legal Text */}
           <div className="mt-6 text-xs text-gray-500 leading-relaxed">
             <p className="mb-2">
-              <strong>Disclaimer:</strong> Tezu AI Pro is an advanced artificial intelligence system designed to assist with various tasks. 
-              While we strive for accuracy, users should verify important information independently. 
+              <strong>Disclaimer:</strong> Zentara AI is an advanced artificial intelligence system designed to assist with various tasks. 
+              While we strive for accuracy, users should verify important information independently.
               AI-generated content should be reviewed before use in critical applications.
             </p>
             <p>
