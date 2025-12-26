@@ -1,1 +1,10 @@
 project_id = "cgqpfsojhmqytjnvzzqe"
+
+[functions.generate-image]
+verify_jwt = false
+
+[functions.zentara-chat]
+verify_jwt = false
+
+[functions.zentara-creative]
+verify_jwt = false
