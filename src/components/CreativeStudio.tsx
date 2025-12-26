@@ -1,11 +1,10 @@
-import React, { useState, useRef, useCallback } from 'react';
+import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
-import { ScrollArea } from "@/components/ui/scroll-area";
 import { toast } from "sonner";
+import { supabase } from "@/integrations/supabase/client";
 import { 
   Palette, 
   Music, 
@@ -13,20 +12,17 @@ import {
   Image, 
   FileText, 
   Mic,
-  Play,
-  Pause,
   Download,
   Share2,
   Sparkles,
   Brush,
-  Camera,
-  Headphones,
   PenTool,
   Wand2,
   Heart,
   Star,
   BookOpen,
-  Film
+  Film,
+  Loader2
 } from "lucide-react";
 
 interface CreativeProject {
@@ -36,11 +32,8 @@ interface CreativeProject {
   description: string;
   content: string;
   status: 'generating' | 'completed' | 'failed';
-  thumbnail?: string;
-  duration?: string;
-  genre?: string;
-  mood?: string;
   style?: string;
+  mood?: string;
   createdAt: string;
 }
 
@@ -57,17 +50,13 @@ interface CreativeTemplate {
 export const CreativeStudio = () => {
   const [projects, setProjects] = useState<CreativeProject[]>([]);
   const [activeTab, setActiveTab] = useState<'create' | 'gallery' | 'templates'>('create');
-  const [selectedType, setSelectedType] = useState<'image' | 'music' | 'video' | 'story' | 'lyrics' | 'poem'>('image');
+  const [selectedType, setSelectedType] = useState<'story' | 'lyrics' | 'poem'>('story');
   const [prompt, setPrompt] = useState('');
   const [isGenerating, setIsGenerating] = useState(false);
   const [selectedStyle, setSelectedStyle] = useState('');
   const [selectedMood, setSelectedMood] = useState('');
-  const audioRef = useRef<HTMLAudioElement>(null);
 
   const creativeTypes = [
-    { id: 'image', name: 'इमेज जेनरेट', icon: Image, color: 'from-purple-500 to-pink-500' },
-    { id: 'music', name: 'संगीत बनाएं', icon: Music, color: 'from-blue-500 to-cyan-500' },
-    { id: 'video', name: 'वीडियो क्रिएट', icon: Video, color: 'from-red-500 to-orange-500' },
     { id: 'story', name: 'कहानी लिखें', icon: BookOpen, color: 'from-green-500 to-emerald-500' },
     { id: 'lyrics', name: 'गीत के बोल', icon: Mic, color: 'from-yellow-500 to-orange-500' },
     { id: 'poem', name: 'कविता रचना', icon: PenTool, color: 'from-indigo-500 to-purple-500' }
@@ -79,7 +68,7 @@ export const CreativeStudio = () => {
       name: 'रोमांटिक गीत',
       type: 'lyrics',
       description: 'प्रेम भरे गीत के बोल',
-      prompt: 'एक खूबसूरत रोमांटिक गीत लिखें जो दिल को छू जाए',
+      prompt: 'एक खूबसूरत रोमांटिक गीत लिखें जो दिल को छू जाए, प्यार और मोहब्बत के बारे में',
       icon: Heart,
       color: 'text-pink-400'
     },
@@ -88,7 +77,7 @@ export const CreativeStudio = () => {
       name: 'प्रेरणादायक कहानी',
       type: 'story',
       description: 'मोटिवेशनल कहानी',
-      prompt: 'एक प्रेरणादायक कहानी लिखें जो जीवन में सफलता का संदेश दे',
+      prompt: 'एक प्रेरणादायक कहानी लिखें जो जीवन में सफलता और मेहनत का संदेश दे',
       icon: Star,
       color: 'text-yellow-400'
     },
@@ -97,49 +86,46 @@ export const CreativeStudio = () => {
       name: 'भावनात्मक कविता', 
       type: 'poem',
       description: 'गहरी भावनाओं की कविता',
-      prompt: 'एक भावनात्मक कविता लिखें जो दिल की गहराई से निकली हो',
+      prompt: 'एक भावनात्मक कविता लिखें जो दिल की गहराई से निकली हो, प्रकृति और जीवन के बारे में',
       icon: PenTool,
       color: 'text-purple-400'
     },
     {
       id: '4',
-      name: 'फ्यूचरिस्टिक आर्ट',
-      type: 'image', 
-      description: 'भविष्य की तकनीक',
-      prompt: 'एक फ्यूचरिस्टिक साइबरपंक शहर का चित्र बनाएं',
-      icon: Wand2,
-      color: 'text-cyan-400'
+      name: 'देशभक्ति गीत',
+      type: 'lyrics', 
+      description: 'भारत माता के लिए',
+      prompt: 'एक देशभक्ति गीत लिखें जो भारत की महिमा और गौरव का वर्णन करे',
+      icon: Star,
+      color: 'text-orange-400'
     },
     {
       id: '5',
-      name: 'शांत संगीत',
-      type: 'music',
-      description: 'मेडिटेशन के लिए',
-      prompt: 'शांत और मेडिटेटिव संगीत बनाएं जो मन को शांति दे',
-      icon: Headphones,
-      color: 'text-blue-400'
+      name: 'बच्चों की कहानी',
+      type: 'story',
+      description: 'मजेदार और शिक्षाप्रद',
+      prompt: 'बच्चों के लिए एक मजेदार और शिक्षाप्रद कहानी लिखें जिसमें जानवर हों',
+      icon: BookOpen,
+      color: 'text-green-400'
     },
     {
       id: '6',
-      name: 'एक्शन वीडियो',
-      type: 'video',
-      description: 'रोमांचक वीडियो',
-      prompt: 'एक रोमांचक एक्शन सीन का वीडियो बनाएं',
-      icon: Film,
+      name: 'प्रेम कविता',
+      type: 'poem',
+      description: 'इश्क़ और मोहब्बत',
+      prompt: 'एक सुंदर प्रेम कविता लिखें जो प्रेमी के दिल की बात कहे',
+      icon: Heart,
       color: 'text-red-400'
     }
   ];
 
   const styleOptions = {
-    image: ['Realistic', 'Anime', 'Oil Painting', 'Digital Art', 'Watercolor', 'Sketch'],
-    music: ['Classical', 'Electronic', 'Rock', 'Jazz', 'Ambient', 'Folk'],
-    video: ['Cinematic', 'Documentary', 'Animation', 'Music Video', 'Commercial', 'Art Film'],
-    story: ['Romance', 'Adventure', 'Mystery', 'Fantasy', 'Sci-Fi', 'Historical'],
-    lyrics: ['Pop', 'Rock', 'Classical', 'Folk', 'Hip-Hop', 'Country'],
-    poem: ['Free Verse', 'Sonnet', 'Haiku', 'Ghazal', 'Ballad', 'Narrative']
+    story: ['Romance', 'Adventure', 'Mystery', 'Fantasy', 'Moral', 'Comedy'],
+    lyrics: ['Bollywood', 'Classical', 'Pop', 'Folk', 'Romantic', 'Sad'],
+    poem: ['Ghazal', 'Free Verse', 'Doha', 'Haiku', 'Nazm', 'Bhajan']
   };
 
-  const moodOptions = ['Happy', 'Romantic', 'Mysterious', 'Energetic', 'Peaceful', 'Dramatic', 'Nostalgic', 'Uplifting'];
+  const moodOptions = ['Happy', 'Romantic', 'Sad', 'Energetic', 'Peaceful', 'Dramatic', 'Nostalgic', 'Motivational'];
 
   const generateCreativeContent = async () => {
     if (!prompt.trim()) {
@@ -150,72 +136,72 @@ export const CreativeStudio = () => {
     setIsGenerating(true);
 
     try {
-      // Simulate AI generation
-      await new Promise(resolve => setTimeout(resolve, 3000));
+      const typeInfo = creativeTypes.find(t => t.id === selectedType);
+      const typeLabel = typeInfo?.name || selectedType;
+
+      let systemPrompt = "";
+      switch (selectedType) {
+        case 'story':
+          systemPrompt = `आप एक प्रसिद्ध हिंदी कहानीकार हैं। कहानी ${selectedStyle || 'interesting'} शैली में और ${selectedMood || 'engaging'} मूड में लिखें। कहानी में:
+- शुरुआत, मध्य और अंत हो
+- पात्रों का विकास हो
+- एक सीख या संदेश हो
+- 300-500 शब्दों में हो`;
+          break;
+        case 'lyrics':
+          systemPrompt = `आप एक प्रसिद्ध गीतकार हैं। गीत ${selectedStyle || 'Bollywood'} शैली में और ${selectedMood || 'melodious'} मूड में लिखें। गीत में:
+- 2-3 अंतरे हों
+- मुखड़ा और अंतरा pattern हो
+- तुकबंदी हो
+- भावनात्मक गहराई हो`;
+          break;
+        case 'poem':
+          systemPrompt = `आप एक प्रसिद्ध हिंदी कवि हैं। कविता ${selectedStyle || 'Free Verse'} शैली में और ${selectedMood || 'beautiful'} मूड में लिखें। कविता में:
+- गहरे भाव हों
+- सुंदर शब्द चयन हो
+- लय और ताल हो
+- 10-20 पंक्तियों में हो`;
+          break;
+      }
+
+      const { data, error } = await supabase.functions.invoke('zentara-creative', {
+        body: { 
+          prompt: prompt,
+          type: selectedType,
+          style: selectedStyle,
+          mood: selectedMood,
+          systemPrompt
+        }
+      });
+
+      if (error) throw error;
+
+      if (data.error) {
+        toast.error(data.error);
+        return;
+      }
 
       const newProject: CreativeProject = {
         id: Date.now().toString(),
         type: selectedType,
-        title: `${creativeTypes.find(t => t.id === selectedType)?.name} - ${new Date().toLocaleDateString('hi-IN')}`,
+        title: `${typeLabel} - ${new Date().toLocaleDateString('hi-IN')}`,
         description: prompt,
-        content: generateMockContent(selectedType),
+        content: data.content || "Content generation failed",
         status: 'completed',
         style: selectedStyle,
         mood: selectedMood,
         createdAt: new Date().toLocaleString('hi-IN'),
-        duration: selectedType === 'music' || selectedType === 'video' ? '3:45' : undefined,
-        genre: selectedStyle
       };
 
       setProjects(prev => [newProject, ...prev]);
       setPrompt('');
-      toast.success("कंटेंट सफलतापूर्वक बना!");
+      toast.success("🎨 Content सफलतापूर्वक बना!");
       setActiveTab('gallery');
-    } catch (error) {
-      toast.error("कंटेंट बनाने में त्रुटि");
+    } catch (error: any) {
+      console.error("Error generating content:", error);
+      toast.error("Content बनाने में error आया");
     } finally {
       setIsGenerating(false);
-    }
-  };
-
-  const generateMockContent = (type: string) => {
-    switch (type) {
-      case 'lyrics':
-        return `तुम हो मेरे साथ तो
-क्या डर है इस जहान का
-सपनों का ये सफर है
-प्यार का ये इम्तिहान है
-
-धड़कता है दिल मेरा
-तुम्हारे प्यार में
-खुशियों से भरा है
-यह नया संसार है`;
-
-      case 'story':
-        return `एक छोटे से गांव में राम नाम का एक लड़का रहता था। वह बहुत मेहनती था लेकिन गरीबी के कारण पढ़ाई नहीं कर सकता था। एक दिन उसे एक पुरानी किताब मिली जिसमें सफलता के राज़ लिखे थे...
-
-राम ने हर दिन उस किताब को पढ़ा और उसकी शिक्षाओं को अपने जीवन में उतारा। धीरे-धीरे उसकी जिंदगी बदलने लगी। कड़ी मेहनत और दृढ़ संकल्प से वह एक सफल व्यापारी बन गया।
-
-इस कहानी से हमें सीख मिलती है कि कड़ी मेहनत और सही दिशा में प्रयास से कोई भी लक्ष्य हासिल किया जा सकता है।`;
-
-      case 'poem':
-        return `चांद की रोशनी में
-तारों का ये जमावड़ा है
-रात की खामोशी में
-दिल का ये सवाल है
-
-क्यों लगता है ऐसा
-जैसे वक़्त रुक गया है
-इश्क़ के इस मौसम में
-हर लम्हा ख़ुशी का है
-
-सपनों के इस आलम में
-उम्मीदों का चिराग है
-जिंदगी का ये सफर
-मोहब्बत का ये राग है`;
-
-      default:
-        return "यहाँ आपका जेनरेट किया गया कंटेंट दिखाई देगा।";
     }
   };
 
@@ -223,18 +209,18 @@ export const CreativeStudio = () => {
     setSelectedType(template.type as any);
     setPrompt(template.prompt);
     setActiveTab('create');
-    toast.success(`टेम्प्लेट "${template.name}" लोड किया गया`);
+    toast.success(`✨ "${template.name}" template लोड किया गया`);
   };
 
   const downloadContent = (project: CreativeProject) => {
     const element = document.createElement('a');
     const file = new Blob([project.content], { type: 'text/plain' });
     element.href = URL.createObjectURL(file);
-    element.download = `${project.title}.txt`;
+    element.download = `zentara-${project.type}-${Date.now()}.txt`;
     document.body.appendChild(element);
     element.click();
     document.body.removeChild(element);
-    toast.success("फाइल डाउनलोड हुई!");
+    toast.success("📥 File download हो गई!");
   };
 
   const shareContent = async (project: CreativeProject) => {
@@ -245,44 +231,47 @@ export const CreativeStudio = () => {
           text: project.content,
         });
       } catch (err) {
-        toast.error("शेयर नहीं हो सका");
+        await navigator.clipboard.writeText(project.content);
+        toast.success("📋 Content copy हो गया!");
       }
     } else {
       await navigator.clipboard.writeText(project.content);
-      toast.success("कंटेंट कॉपी हो गया!");
+      toast.success("📋 Content copy हो गया!");
     }
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-pink-900 via-purple-900 to-indigo-900 p-6">
+    <div className="min-h-screen bg-gradient-to-br from-emerald-900 via-teal-900 to-cyan-900 p-6">
       <div className="max-w-7xl mx-auto space-y-6">
         {/* Header */}
         <Card className="bg-white/10 backdrop-blur-md border-white/20">
           <CardHeader>
             <CardTitle className="text-2xl text-white flex items-center gap-3">
-              <Palette className="h-8 w-8 text-pink-400" />
-              Tezu AI Creative Studio
-              <Badge className="bg-gradient-to-r from-pink-500 to-purple-500 text-white">
-                Professional
+              <Palette className="h-8 w-8 text-emerald-400" />
+              ✨ Zentara AI Creative Studio
+              <Badge className="bg-gradient-to-r from-emerald-500 to-teal-500 text-white">
+                ज़ेंतारा
               </Badge>
             </CardTitle>
+            <p className="text-emerald-200/80 mt-2">AI से कहानी, कविता, गीत बनाएं - Hindi में!</p>
           </CardHeader>
         </Card>
 
         {/* Tab Navigation */}
         <div className="flex gap-2 mb-6">
           {[
-            { id: 'create', label: 'क्रिएट करें', icon: Sparkles },
-            { id: 'gallery', label: 'गैलरी', icon: Image },
-            { id: 'templates', label: 'टेम्प्लेट्स', icon: Brush }
+            { id: 'create', label: '✏️ क्रिएट करें', icon: Sparkles },
+            { id: 'gallery', label: '🖼️ गैलरी', icon: Image },
+            { id: 'templates', label: '📝 टेम्प्लेट्स', icon: Brush }
           ].map(tab => (
             <Button
               key={tab.id}
               variant={activeTab === tab.id ? "default" : "outline"}
               onClick={() => setActiveTab(tab.id as any)}
-              className="flex items-center gap-2"
+              className={activeTab === tab.id 
+                ? "bg-gradient-to-r from-emerald-500 to-teal-500 text-white" 
+                : "border-white/30 text-white hover:bg-white/10"}
             >
-              <tab.icon className="h-4 w-4" />
               {tab.label}
             </Button>
           ))}
@@ -293,10 +282,13 @@ export const CreativeStudio = () => {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             <Card className="bg-white/10 backdrop-blur-md border-white/20">
               <CardHeader>
-                <CardTitle className="text-white">कंटेंट टाइप चुनें</CardTitle>
+                <CardTitle className="text-white flex items-center gap-2">
+                  <Wand2 className="h-5 w-5 text-emerald-400" />
+                  Content Type चुनें
+                </CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="grid grid-cols-2 gap-3 mb-6">
+                <div className="grid grid-cols-3 gap-3 mb-6">
                   {creativeTypes.map((type) => {
                     const IconComponent = type.icon;
                     return (
@@ -304,13 +296,13 @@ export const CreativeStudio = () => {
                         key={type.id}
                         variant={selectedType === type.id ? "default" : "outline"}
                         onClick={() => setSelectedType(type.id as any)}
-                        className={`h-20 flex flex-col gap-2 ${
+                        className={`h-24 flex flex-col gap-2 ${
                           selectedType === type.id 
-                            ? `bg-gradient-to-r ${type.color}` 
-                            : ''
+                            ? `bg-gradient-to-r ${type.color} border-0` 
+                            : 'border-white/30 text-white hover:bg-white/10'
                         }`}
                       >
-                        <IconComponent className="h-6 w-6" />
+                        <IconComponent className="h-8 w-8" />
                         <span className="text-sm">{type.name}</span>
                       </Button>
                     );
@@ -319,14 +311,14 @@ export const CreativeStudio = () => {
 
                 <div className="space-y-4">
                   <div>
-                    <label className="text-white font-medium mb-2 block">स्टाइल</label>
+                    <label className="text-white font-medium mb-2 block">🎨 Style</label>
                     <div className="flex flex-wrap gap-2">
                       {styleOptions[selectedType]?.map((style) => (
                         <Badge
                           key={style}
-                          className={`cursor-pointer ${
+                          className={`cursor-pointer transition-all ${
                             selectedStyle === style 
-                              ? 'bg-purple-500 text-white' 
+                              ? 'bg-emerald-500 text-white' 
                               : 'bg-white/20 text-white hover:bg-white/30'
                           }`}
                           onClick={() => setSelectedStyle(style)}
@@ -338,14 +330,14 @@ export const CreativeStudio = () => {
                   </div>
 
                   <div>
-                    <label className="text-white font-medium mb-2 block">मूड</label>
+                    <label className="text-white font-medium mb-2 block">🎭 Mood</label>
                     <div className="flex flex-wrap gap-2">
                       {moodOptions.map((mood) => (
                         <Badge
                           key={mood}
-                          className={`cursor-pointer ${
+                          className={`cursor-pointer transition-all ${
                             selectedMood === mood 
-                              ? 'bg-pink-500 text-white' 
+                              ? 'bg-teal-500 text-white' 
                               : 'bg-white/20 text-white hover:bg-white/30'
                           }`}
                           onClick={() => setSelectedMood(mood)}
@@ -357,34 +349,31 @@ export const CreativeStudio = () => {
                   </div>
 
                   <div>
-                    <label className="text-white font-medium mb-2 block">प्रॉम्प्ट</label>
+                    <label className="text-white font-medium mb-2 block">📝 आपका Prompt (Hindi/English)</label>
                     <Textarea
-                      placeholder={`${selectedType === 'image' ? 'एक खूबसूरत तस्वीर का वर्णन करें...' :
-                        selectedType === 'music' ? 'आप कैसा संगीत चाहते हैं...' :
-                        selectedType === 'video' ? 'वीडियो के लिए कॉन्सेप्ट बताएं...' :
-                        selectedType === 'story' ? 'कहानी का विषय बताएं...' :
-                        selectedType === 'lyrics' ? 'गीत का विषय और भावना बताएं...' :
-                        'कविता का विषय और भावना बताएं...'}`}
+                      placeholder={`${selectedType === 'story' ? 'कहानी का विषय बताएं... जैसे: एक गरीब लड़के की सफलता की कहानी' :
+                        selectedType === 'lyrics' ? 'गीत का विषय बताएं... जैसे: प्यार और बिछड़ने का दर्द' :
+                        'कविता का विषय बताएं... जैसे: प्रकृति की सुंदरता'}`}
                       value={prompt}
                       onChange={(e) => setPrompt(e.target.value)}
-                      className="min-h-32 bg-white/10 text-white placeholder-white/70 border-white/20"
+                      className="min-h-32 bg-white/10 text-white placeholder-white/50 border-white/20 focus:border-emerald-500"
                     />
                   </div>
 
                   <Button
                     onClick={generateCreativeContent}
-                    disabled={isGenerating}
-                    className="w-full bg-gradient-to-r from-pink-600 to-purple-600 hover:from-pink-700 hover:to-purple-700 text-lg py-3"
+                    disabled={isGenerating || !prompt.trim()}
+                    className="w-full h-14 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-lg font-semibold shadow-lg shadow-emerald-500/25"
                   >
                     {isGenerating ? (
                       <div className="flex items-center gap-2">
-                        <Sparkles className="h-5 w-5 animate-spin" />
-                        जेनरेट हो रहा है...
+                        <Loader2 className="h-5 w-5 animate-spin" />
+                        Zentara AI बना रहा है...
                       </div>
                     ) : (
                       <div className="flex items-center gap-2">
-                        <Wand2 className="h-5 w-5" />
-                        AI से बनाएं
+                        <Sparkles className="h-5 w-5" />
+                        ✨ AI से बनाएं
                       </div>
                     )}
                   </Button>
@@ -394,26 +383,23 @@ export const CreativeStudio = () => {
 
             <Card className="bg-white/10 backdrop-blur-md border-white/20">
               <CardHeader>
-                <CardTitle className="text-white">प्रीव्यू</CardTitle>
+                <CardTitle className="text-white">👁️ Preview</CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="bg-white/5 rounded-lg p-6 min-h-80 flex items-center justify-center">
+                <div className="bg-white/5 rounded-lg p-6 min-h-80 flex items-center justify-center border border-white/10">
                   <div className="text-center">
                     <div className="text-6xl mb-4">
-                      {selectedType === 'image' && '🎨'}
-                      {selectedType === 'music' && '🎵'}
-                      {selectedType === 'video' && '🎬'}
                       {selectedType === 'story' && '📖'}
                       {selectedType === 'lyrics' && '🎤'}
                       {selectedType === 'poem' && '✍️'}
                     </div>
-                    <p className="text-white/70">
-                      {selectedType === 'image' && 'यहाँ आपकी जेनरेट की गई इमेज दिखेगी'}
-                      {selectedType === 'music' && 'यहाँ आपका जेनरेट किया गया संगीत प्ले होगा'}
-                      {selectedType === 'video' && 'यहाँ आपका जेनरेट किया गया वीडियो दिखेगा'}
-                      {selectedType === 'story' && 'यहाँ आपकी जेनरेट की गई कहानी दिखेगी'}
-                      {selectedType === 'lyrics' && 'यहाँ आपके जेनरेट किए गए गीत के बोल दिखेंगे'}
-                      {selectedType === 'poem' && 'यहाँ आपकी जेनरेट की गई कविता दिखेगी'}
+                    <p className="text-white/70 text-lg">
+                      {selectedType === 'story' && 'यहाँ आपकी AI-generated कहानी दिखेगी'}
+                      {selectedType === 'lyrics' && 'यहाँ आपके AI-generated गीत के बोल दिखेंगे'}
+                      {selectedType === 'poem' && 'यहाँ आपकी AI-generated कविता दिखेगी'}
+                    </p>
+                    <p className="text-emerald-300/60 text-sm mt-2">
+                      Prompt लिखें और "AI से बनाएं" दबाएं
                     </p>
                   </div>
                 </div>
@@ -427,8 +413,8 @@ export const CreativeStudio = () => {
           <Card className="bg-white/10 backdrop-blur-md border-white/20">
             <CardHeader>
               <CardTitle className="text-white flex items-center justify-between">
-                <span>आपकी क्रिएशन्स ({projects.length})</span>
-                <Badge className="bg-green-500">
+                <span>🖼️ आपकी क्रिएशन्स ({projects.length})</span>
+                <Badge className="bg-emerald-500">
                   {projects.filter(p => p.status === 'completed').length} Completed
                 </Badge>
               </CardTitle>
@@ -436,27 +422,27 @@ export const CreativeStudio = () => {
             <CardContent>
               {projects.length === 0 ? (
                 <div className="text-center py-12">
-                  <Palette className="h-16 w-16 mx-auto text-pink-400/50 mb-4" />
+                  <Palette className="h-16 w-16 mx-auto text-emerald-400/50 mb-4" />
                   <p className="text-white/70 text-lg">अभी तक कोई क्रिएशन नहीं बनाई गई</p>
                   <Button 
                     onClick={() => setActiveTab('create')}
-                    className="mt-4 bg-gradient-to-r from-pink-500 to-purple-500"
+                    className="mt-4 bg-gradient-to-r from-emerald-500 to-teal-500"
                   >
-                    पहली क्रिएशन बनाएं
+                    ✨ पहली क्रिएशन बनाएं
                   </Button>
                 </div>
               ) : (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                   {projects.map((project) => {
                     const typeInfo = creativeTypes.find(t => t.id === project.type);
-                    const TypeIcon = typeInfo?.icon || Image;
+                    const TypeIcon = typeInfo?.icon || BookOpen;
                     
                     return (
                       <Card key={project.id} className="bg-white/5 border-white/10 hover:bg-white/10 transition-all">
                         <CardContent className="p-4">
                           <div className="flex items-start justify-between mb-3">
                             <div className="flex items-center gap-2">
-                              <TypeIcon className="h-5 w-5 text-pink-400" />
+                              <TypeIcon className="h-5 w-5 text-emerald-400" />
                               <Badge className={`bg-gradient-to-r ${typeInfo?.color} text-white text-xs`}>
                                 {typeInfo?.name}
                               </Badge>
@@ -484,20 +470,20 @@ export const CreativeStudio = () => {
                           <h4 className="text-white font-semibold text-sm mb-2">{project.title}</h4>
                           <p className="text-white/70 text-xs mb-3 line-clamp-2">{project.description}</p>
                           
-                          <div className="bg-white/5 rounded p-3 mb-3 max-h-32 overflow-y-auto">
-                            <p className="text-white/80 text-xs whitespace-pre-wrap">{project.content}</p>
+                          <div className="bg-white/5 rounded p-3 mb-3 max-h-40 overflow-y-auto">
+                            <p className="text-white/80 text-sm whitespace-pre-wrap leading-relaxed">{project.content}</p>
                           </div>
                           
                           <div className="flex items-center justify-between text-xs">
                             <span className="text-white/50">{project.createdAt}</span>
                             <div className="flex gap-2">
                               {project.style && (
-                                <Badge className="bg-blue-500/20 text-blue-300 text-xs">
+                                <Badge className="bg-emerald-500/20 text-emerald-300 text-xs">
                                   {project.style}
                                 </Badge>
                               )}
                               {project.mood && (
-                                <Badge className="bg-purple-500/20 text-purple-300 text-xs">
+                                <Badge className="bg-teal-500/20 text-teal-300 text-xs">
                                   {project.mood}
                                 </Badge>
                               )}
@@ -517,25 +503,28 @@ export const CreativeStudio = () => {
         {activeTab === 'templates' && (
           <Card className="bg-white/10 backdrop-blur-md border-white/20">
             <CardHeader>
-              <CardTitle className="text-white">प्रीमेड टेम्प्लेट्स</CardTitle>
+              <CardTitle className="text-white">📝 Ready Templates - तुरंत शुरू करें</CardTitle>
             </CardHeader>
             <CardContent>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {templates.map((template) => {
                   const IconComponent = template.icon;
                   return (
-                    <Card key={template.id} className="bg-white/5 border-white/10 hover:bg-white/10 transition-all cursor-pointer"
-                          onClick={() => useTemplate(template)}>
+                    <Card 
+                      key={template.id} 
+                      className="bg-white/5 border-white/10 hover:bg-white/10 transition-all cursor-pointer group"
+                      onClick={() => useTemplate(template)}
+                    >
                       <CardContent className="p-6 text-center">
-                        <IconComponent className={`h-12 w-12 mx-auto mb-4 ${template.color}`} />
+                        <IconComponent className={`h-12 w-12 mx-auto mb-4 ${template.color} group-hover:scale-110 transition-transform`} />
                         <h3 className="text-white font-semibold text-lg mb-2">{template.name}</h3>
                         <p className="text-white/70 text-sm mb-4">{template.description}</p>
-                        <Badge className="bg-gradient-to-r from-pink-500 to-purple-500 text-white">
-                          {template.type}
+                        <Badge className="bg-gradient-to-r from-emerald-500 to-teal-500 text-white">
+                          {template.type === 'story' ? 'कहानी' : template.type === 'lyrics' ? 'गीत' : 'कविता'}
                         </Badge>
                         <div className="mt-4">
-                          <Button className="w-full bg-gradient-to-r from-pink-600 to-purple-600 hover:from-pink-700 hover:to-purple-700">
-                            इस्तेमाल करें
+                          <Button className="w-full bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700">
+                            ✨ इस्तेमाल करें
                           </Button>
                         </div>
                       </CardContent>
