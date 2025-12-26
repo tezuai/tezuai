@@ -86,8 +86,8 @@ const quickActions = [
 
 export function WelcomeScreen({ onStartChat }: WelcomeScreenProps) {
   const [progressValue] = useState(() => {
-    const completedTasks = localStorage.getItem('zentara-ai-completed-tasks') || '0';
-    const totalFeatures = localStorage.getItem('zentara-ai-features-explored') || '0';
+    const completedTasks = localStorage.getItem('tezu-ai-completed-tasks') || '0';
+    const totalFeatures = localStorage.getItem('tezu-ai-features-explored') || '0';
     return Math.min(100, parseInt(completedTasks) * 10 + parseInt(totalFeatures) * 5);
   });
 
@@ -97,17 +97,17 @@ export function WelcomeScreen({ onStartChat }: WelcomeScreenProps) {
     <div className="flex-1 flex items-center justify-center p-4 bg-gradient-to-br from-gray-950 via-emerald-950/30 to-gray-950">
       <div className="w-full max-w-3xl mx-auto flex flex-col items-center">
         
-        {/* Zentara AI Logo Section */}
+        {/* TezuAI Logo Section */}
         <div className="text-center mb-8">
           <div className="w-24 h-24 mx-auto mb-4 bg-gradient-to-br from-emerald-500 via-teal-500 to-cyan-500 rounded-3xl flex items-center justify-center shadow-2xl shadow-emerald-500/30 animate-pulse">
             <Bot className="w-12 h-12 text-white" />
           </div>
           <h1 className="text-4xl md:text-5xl font-black mb-2">
             <span className="bg-gradient-to-r from-emerald-400 via-teal-400 to-cyan-400 bg-clip-text text-transparent">
-              Zentara AI
+              TezuAI
             </span>
           </h1>
-          <p className="text-lg text-emerald-400/80 font-medium">ज़ेंतारा ए.आई. - India's Most Intelligent</p>
+          <p className="text-lg text-emerald-400/80 font-medium">तेज़ू ए.आई. - India's Most Intelligent</p>
         </div>
 
         {/* Progress Bar Section */}
@@ -145,16 +145,16 @@ export function WelcomeScreen({ onStartChat }: WelcomeScreenProps) {
           ))}
         </div>
 
-        {/* Zentara AI Branding */}
+        {/* TezuAI Branding */}
         <div className="w-full rounded-2xl bg-gradient-to-br from-gray-900/90 via-emerald-950/50 to-gray-900/90 shadow-2xl p-6 mb-6 flex flex-col md:flex-row items-center md:items-start gap-4 md:gap-8 border border-emerald-800/30">
           <div className="flex flex-col items-center justify-center">
             <div className="w-20 h-20 bg-gradient-to-br from-emerald-500 to-teal-600 rounded-2xl flex items-center justify-center shadow-lg shadow-emerald-500/30 mb-2">
               <Bot className="w-10 h-10 text-white" />
             </div>
             <div className="text-white text-xl font-extrabold tracking-wide">
-              Zentara <span className="text-emerald-400">AI</span>
+              Tezu<span className="text-emerald-400">AI</span>
             </div>
-            <div className="text-xs text-emerald-400/70">ज़ेंतारा ए.आई.</div>
+            <div className="text-xs text-emerald-400/70">तेज़ू ए.आई.</div>
           </div>
           <div className="flex-1">
             <div className="flex flex-wrap gap-2 mb-3">
@@ -191,7 +191,7 @@ export function WelcomeScreen({ onStartChat }: WelcomeScreenProps) {
 
         {/* Bottom Tip */}
         <div className="w-full py-3 px-4 bg-emerald-950/50 border border-emerald-800/30 rounded-xl text-emerald-300 mb-8 text-sm">
-          <span className="font-semibold">💡 Pro Tip:</span> Zentara AI से Hindi, English या Hinglish में बात करें - जैसे चाहो!
+          <span className="font-semibold">💡 Pro Tip:</span> TezuAI से Hindi, English या Hinglish में बात करें - जैसे चाहो!
         </div>
 
         {/* Main Large CTA */}
@@ -201,7 +201,7 @@ export function WelcomeScreen({ onStartChat }: WelcomeScreenProps) {
           className="bg-gradient-to-r from-emerald-600 via-teal-600 to-cyan-600 hover:from-emerald-700 hover:via-teal-700 hover:to-cyan-700 text-white px-12 py-6 text-lg rounded-2xl font-bold shadow-2xl shadow-emerald-500/30 hover:scale-105 transition-all duration-300 flex items-center gap-3"
         >
           <Rocket className="w-6 h-6" />
-          Start Zentara AI Journey
+          Start TezuAI Journey
           <ArrowRight className="w-6 h-6" />
         </Button>
 
@@ -209,7 +209,7 @@ export function WelcomeScreen({ onStartChat }: WelcomeScreenProps) {
         <button
           className={`fixed bottom-7 right-7 z-50 rounded-full bg-gradient-to-tr from-emerald-500 to-teal-500 w-16 h-16 flex items-center justify-center shadow-2xl ring-4 ring-emerald-400/30 hover:scale-110 transition hover:ring-teal-400/50 ${askHover ? "animate-pulse" : ""}`}
           style={{ boxShadow: "0 8px 24px 2px rgba(16,185,129,0.3)" }}
-          title="Zentara AI से पूछें"
+          title="TezuAI से पूछें"
           onClick={onStartChat}
           onMouseEnter={() => setAskHover(true)}
           onMouseLeave={() => setAskHover(false)}

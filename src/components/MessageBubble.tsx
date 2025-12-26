@@ -46,7 +46,7 @@ export function MessageBubble({ message, onCopy }: MessageBubbleProps) {
       <div className={`flex-1 max-w-3xl ${isUser ? "text-right" : ""}`}>
         <div className="flex items-center gap-2 mb-1">
           <span className="text-sm font-medium text-gray-300">
-            {isUser ? "You" : "Zentara AI"}
+            {isUser ? "You" : "TezuAI"}
           </span>
           {message.model && (
             <Badge variant="outline" className="text-xs border-emerald-600 text-emerald-400">
