@@ -78,7 +78,7 @@ export function ProDashboardWidget() {
   const [selectedAvatar, setSelectedAvatar] = useState(avatars[0]);
 
   const communityNotices = [
-    { name: "Deepak", msg: "Zentara AI ने मेरी productivity 2x की!", time: "1 min ago" },
+    { name: "Deepak", msg: "TezuAI ने मेरी productivity 2x की!", time: "1 min ago" },
     { name: "Aarti", msg: "Image generator amazing है!", time: "3 min ago" },
     { name: "Vikas", msg: "200+ XP in 1 week!", time: "5 min ago" }
   ];

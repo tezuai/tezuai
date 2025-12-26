@@ -92,7 +92,7 @@ export function ChatInterface({ conversation, onUpdateConversation, allConversat
       role: "assistant",
       content: "",
       timestamp: new Date(),
-      model: "Zentara AI",
+      model: "TezuAI",
     };
 
     const conversationWithAssistant = {
@@ -117,7 +117,7 @@ export function ChatInterface({ conversation, onUpdateConversation, allConversat
           setIsLoading(false);
         },
         onError: (error) => {
-          console.error("Zentara AI error:", error);
+          console.error("TezuAI error:", error);
           const errorContent = `😓 कुछ गड़बड़ हो गई: ${error.message}. कृपया फिर से कोशिश करें!`;
           const updatedMessages = conversationWithAssistant.messages.map((msg: Message) =>
             msg.id === assistantMessage.id
@@ -178,9 +178,9 @@ export function ChatInterface({ conversation, onUpdateConversation, allConversat
           </Avatar>
           <div>
             <h2 className="text-xl font-bold text-white flex items-center gap-2">
-              ✨ Zentara AI
+              ✨ TezuAI
               <Badge className="bg-emerald-500/20 text-emerald-400 text-xs">
-                ज़ेंतारा
+                तेज़ू
               </Badge>
             </h2>
             <div className="flex items-center gap-2 mt-1">
@@ -228,9 +228,9 @@ export function ChatInterface({ conversation, onUpdateConversation, allConversat
                   <Bot className="w-12 h-12 text-white" />
                 </div>
                 <h3 className="text-2xl font-bold text-white mb-2">
-                  Welcome to Zentara AI ✨
+                  Welcome to TezuAI ✨
                 </h3>
-                <p className="text-lg text-emerald-400 mb-2">ज़ेंतारा AI में आपका स्वागत है!</p>
+                <p className="text-lg text-emerald-400 mb-2">TezuAI में आपका स्वागत है!</p>
                 <p className="text-gray-400 mb-6">
                   India's most intelligent AI assistant - Hindi & English में बात करें
                 </p>
@@ -262,7 +262,7 @@ export function ChatInterface({ conversation, onUpdateConversation, allConversat
                 </div>
 
                 <Button 
-                  onClick={() => handleQuickAction("Namaste Zentara AI! मुझे आपके बारे में बताइए")}
+                  onClick={() => handleQuickAction("Namaste TezuAI! मुझे आपके बारे में बताइए")}
                   className="mt-6 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700"
                 >
                   <MessageSquare className="w-4 h-4 mr-2" />
@@ -321,7 +321,7 @@ export function ChatInterface({ conversation, onUpdateConversation, allConversat
                     value={input}
                     onChange={(e) => setInput(e.target.value)}
                     onKeyPress={handleKeyPress}
-                    placeholder="Zentara AI से कुछ भी पूछें... Hindi/English 💬✨"
+                    placeholder="TezuAI से कुछ भी पूछें... Hindi/English 💬✨"
                     className="input-premium text-lg py-4 pr-16 min-h-[56px] border-0 bg-transparent placeholder:text-gray-400 focus:ring-0 focus:outline-none text-white"
                     disabled={isLoading}
                   />
@@ -373,7 +373,7 @@ export function ChatInterface({ conversation, onUpdateConversation, allConversat
               <div className="flex items-center gap-4">
                 <span className="flex items-center gap-1">
                   <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse"></div>
-                  Zentara AI Ready
+                  TezuAI Ready
                 </span>
                 <span>🔒 End-to-end Secure</span>
               </div>

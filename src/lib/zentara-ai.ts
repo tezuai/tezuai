@@ -1,6 +1,6 @@
-// Zentara AI - Real AI Chat Service
+// TezuAI - Real AI Chat Service
 
-const CHAT_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/zentara-chat`;
+const CHAT_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/tezu-chat`;
 
 export type ChatMessage = { 
   role: "user" | "assistant"; 
@@ -14,7 +14,7 @@ interface StreamChatOptions {
   onError?: (error: Error) => void;
 }
 
-export async function streamZentaraChat({
+export async function streamTezuChat({
   messages,
   onDelta,
   onDone,
@@ -96,7 +96,7 @@ export async function streamZentaraChat({
 
     onDone();
   } catch (error) {
-    console.error("Zentara AI stream error:", error);
+    console.error("TezuAI stream error:", error);
     if (onError) {
       onError(error instanceof Error ? error : new Error("Unknown error"));
     } else {
@@ -104,3 +104,6 @@ export async function streamZentaraChat({
     }
   }
 }
+
+// Keep backward compatibility
+export const streamZentaraChat = streamTezuChat;

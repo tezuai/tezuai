@@ -128,7 +128,7 @@ export function Sidebar({
     conversation.title.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
-  // Zentara AI Features
+  // TezuAI Features
   const navigationItems = [
     {
       title: "💬 Chat",

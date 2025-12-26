@@ -4,7 +4,7 @@
 
 @layer base {
   :root {
-    /* Zentara AI - Modern Dark Theme with Neon Accents */
+    /* TezuAI - Modern Dark Theme with Neon Accents */
     --background: 240 15% 6%;
     --foreground: 0 0% 98%;
 
@@ -33,12 +33,12 @@
     --input: 240 15% 15%;
     --ring: 280 100% 70%;
     
-    /* Zentara Custom Colors */
-    --zentara-pink: 330 100% 65%;
-    --zentara-purple: 280 100% 70%;
-    --zentara-cyan: 180 100% 50%;
-    --zentara-blue: 220 100% 60%;
-    --zentara-green: 160 100% 45%;
+    /* Tezu Custom Colors */
+    --tezu-pink: 330 100% 65%;
+    --tezu-purple: 280 100% 70%;
+    --tezu-cyan: 180 100% 50%;
+    --tezu-blue: 220 100% 60%;
+    --tezu-green: 160 100% 45%;
     
     /* Sidebar Colors */
     --sidebar-background: 240 15% 7%;
@@ -113,12 +113,12 @@
 }
 
 @layer components {
-  /* Zentara Gradient Text */
+  /* Tezu Gradient Text */
   .gradient-text {
     @apply bg-gradient-to-r from-pink-400 via-purple-400 to-cyan-400 bg-clip-text text-transparent;
   }
 
-  .gradient-text-zentara {
+  .gradient-text-tezu {
     @apply bg-gradient-to-r from-[hsl(330,100%,65%)] via-[hsl(280,100%,70%)] to-[hsl(180,100%,50%)] bg-clip-text text-transparent;
   }
 
@@ -153,17 +153,17 @@
     @apply border-cyan-500/50 shadow-[0_0_15px_hsl(180,100%,50%,0.3)];
   }
 
-  /* Zentara Card Styles */
-  .card-zentara {
+  /* Tezu Card Styles */
+  .card-tezu {
     @apply bg-gradient-to-br from-card/95 to-secondary/50 backdrop-blur-xl border border-border/50 rounded-2xl p-6 shadow-xl;
   }
 
-  .card-zentara-glow {
-    @apply card-zentara hover:border-pink-500/30 hover:shadow-[0_0_30px_hsl(280,100%,70%,0.2)] transition-all duration-500;
+  .card-tezu-glow {
+    @apply card-tezu hover:border-pink-500/30 hover:shadow-[0_0_30px_hsl(280,100%,70%,0.2)] transition-all duration-500;
   }
 
   /* Input Styles */
-  .input-zentara {
+  .input-tezu {
     @apply bg-secondary/50 border-border/50 text-foreground placeholder:text-muted-foreground focus:border-primary focus:ring-2 focus:ring-primary/20 rounded-xl transition-all duration-300;
   }
 }

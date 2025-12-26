@@ -3,8 +3,8 @@ project_id = "cgqpfsojhmqytjnvzzqe"
 [functions.generate-image]
 verify_jwt = false
 
-[functions.zentara-chat]
+[functions.tezu-chat]
 verify_jwt = false
 
-[functions.zentara-creative]
+[functions.tezu-creative]
 verify_jwt = false

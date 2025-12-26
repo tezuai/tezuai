@@ -16,13 +16,13 @@ const trendingPrompts = [
 
 const quizQuestions = [
   {
-    q: "Zentara AI किस model पर powered है?",
+    q: "TezuAI किस model पर powered है?",
     options: ["GPT-3", "Claude", "Gemini 2.5", "Llama"],
     correct: 2,
     tip: "Hint: Google का latest model!"
   },
   {
-    q: "Zentara AI में कौन सी language support है?",
+    q: "TezuAI में कौन सी language support है?",
     options: ["Only English", "Only Hindi", "Hindi & English", "French"],
     correct: 2,
     tip: "दोनों languages में बात करो!"
@@ -72,7 +72,7 @@ export function ProSuiteWidget() {
         </div>
         <div>
           <div className="font-extrabold text-lg text-emerald-400 drop-shadow">{getRandomGreeting()}</div>
-          <div className="text-xs text-gray-400">Zentara AI - Your intelligent companion</div>
+          <div className="text-xs text-gray-400">TezuAI - Your intelligent companion</div>
         </div>
       </div>
 
@@ -134,7 +134,7 @@ export function ProSuiteWidget() {
       {/* Help tip */}
       <div className="flex items-center gap-2 mt-4 bg-emerald-950/30 rounded-xl px-4 py-2 border border-emerald-800/20">
         <MessageSquare className="w-5 h-5 text-emerald-400" />
-        <span className="text-xs text-gray-400">Zentara AI से कुछ भी पूछो - Hindi या English में!</span>
+        <span className="text-xs text-gray-400">TezuAI से कुछ भी पूछो - Hindi या English में!</span>
       </div>
     </div>
   );

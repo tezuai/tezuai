@@ -64,7 +64,7 @@ export function PrivacySecurityHub() {
           🛡️ Privacy & Security Center
         </h2>
         <p className="text-lg text-gray-300">
-          Zentara AI - World's Most Secure & Private AI Assistant
+          TezuAI - World's Most Secure & Private AI Assistant
         </p>
         <div className="flex justify-center gap-3">
           <Badge className="bg-green-500/20 text-green-400">
@@ -106,7 +106,7 @@ export function PrivacySecurityHub() {
                       {key.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase())}
                     </h4>
                     <p className="text-sm text-gray-400">
-                      {key === 'dataCollection' && 'Control if Zentara AI can collect usage data for improvements'}
+                      {key === 'dataCollection' && 'Control if TezuAI can collect usage data for improvements'}
                       {key === 'analytics' && 'Allow anonymous analytics to improve service quality'}
                       {key === 'marketing' && 'Receive updates about new features and improvements'}
                       {key === 'thirdPartySharing' && 'Share data with trusted partners (Always disabled for security)'}
@@ -203,7 +203,7 @@ export function PrivacySecurityHub() {
                 </div>
                 <div className="p-4 bg-yellow-500/10 border border-yellow-500/30 rounded">
                   <h4 className="text-yellow-400 font-medium mb-2">No Data Mining</h4>
-                  <p className="text-sm text-gray-300">Zentara AI never mines your data for commercial purposes</p>
+                  <p className="text-sm text-gray-300">TezuAI never mines your data for commercial purposes</p>
                 </div>
                 <Button 
                   onClick={handleDataDeletion}

@@ -28,8 +28,8 @@ export function OnboardingFlow({ onComplete, onSkip }: OnboardingFlowProps) {
 
   const steps = [
     {
-      title: "Welcome to Zentara AI! 🎉",
-      description: "ज़ेंतारा AI में आपका स्वागत है!",
+      title: "Welcome to TezuAI! 🎉",
+      description: "TezuAI में आपका स्वागत है!",
       content: (
         <div className="space-y-6">
           <div className="text-center">
@@ -37,7 +37,7 @@ export function OnboardingFlow({ onComplete, onSkip }: OnboardingFlowProps) {
               <Bot className="w-10 h-10 text-white" />
             </div>
             <h3 className="text-xl font-semibold text-white mb-2">
-              Namaste! Main Zentara AI hun
+              Namaste! Main TezuAI hun
             </h3>
             <p className="text-gray-400">
               Main aapki har sawal ka jawab de sakta hun - coding se lekar creative writing tak!
@@ -62,7 +62,7 @@ export function OnboardingFlow({ onComplete, onSkip }: OnboardingFlowProps) {
       )
     },
     {
-      title: "Zentara AI Features 🆓",
+      title: "TezuAI Features 🆓",
       description: "Dekho aapko kya-kya milta hai!",
       content: (
         <div className="space-y-4">
@@ -128,7 +128,7 @@ export function OnboardingFlow({ onComplete, onSkip }: OnboardingFlowProps) {
               <div>
                 <div className="text-white font-medium">Get Instant Response</div>
                 <div className="text-sm text-gray-400">
-                  Zentara AI turant detailed answer dega
+                  TezuAI turant detailed answer dega
                 </div>
               </div>
             </div>
@@ -267,7 +267,7 @@ export function OnboardingFlow({ onComplete, onSkip }: OnboardingFlowProps) {
               onClick={nextStep}
               className="bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700"
             >
-              {currentStep === steps.length - 1 ? "Start Zentara AI" : "Next"}
+              {currentStep === steps.length - 1 ? "Start TezuAI" : "Next"}
               <ArrowRight className="w-4 h-4 ml-2" />
             </Button>
           </div>
