@@ -1,20 +1,75 @@
 import "jsr:@supabase/functions-js/edge-runtime.d.ts";
 
-const corsHeaders = {
-  "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
-};
+// Allowed origins for CORS
+const ALLOWED_ORIGINS = [
+  'https://tezuai.lovable.app',
+  'https://cgqpfsojhmqytjnvzzqe.lovable.app',
+  'http://localhost:5173',
+  'http://localhost:3000'
+];
+
+function getCorsHeaders(origin: string | null) {
+  const allowedOrigin = origin && ALLOWED_ORIGINS.includes(origin) ? origin : ALLOWED_ORIGINS[0];
+  return {
+    "Access-Control-Allow-Origin": allowedOrigin,
+    "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
+    "Access-Control-Allow-Methods": "POST, OPTIONS",
+  };
+}
+
+// Input validation
+function validateMessages(messages: unknown): { valid: boolean; error?: string } {
+  if (!messages || !Array.isArray(messages)) {
+    return { valid: false, error: "Messages array is required" };
+  }
+  
+  if (messages.length === 0) {
+    return { valid: false, error: "At least one message is required" };
+  }
+  
+  if (messages.length > 50) {
+    return { valid: false, error: "Too many messages (max 50)" };
+  }
+  
+  for (let i = 0; i < messages.length; i++) {
+    const msg = messages[i];
+    
+    if (!msg || typeof msg !== 'object') {
+      return { valid: false, error: `Message at index ${i} is invalid` };
+    }
+    
+    if (!msg.role || !['user', 'assistant', 'system'].includes(msg.role)) {
+      return { valid: false, error: `Invalid role in message at index ${i}` };
+    }
+    
+    if (typeof msg.content !== 'string') {
+      return { valid: false, error: `Content must be a string in message at index ${i}` };
+    }
+    
+    if (msg.content.length > 10000) {
+      return { valid: false, error: `Message at index ${i} exceeds maximum length (10000 chars)` };
+    }
+  }
+  
+  return { valid: true };
+}
 
 Deno.serve(async (req) => {
+  const origin = req.headers.get("origin");
+  const corsHeaders = getCorsHeaders(origin);
+
   if (req.method === "OPTIONS") {
     return new Response("ok", { headers: corsHeaders });
   }
 
   try {
-    const { messages } = await req.json();
+    const body = await req.json();
+    const { messages } = body;
     
-    if (!messages || !Array.isArray(messages)) {
-      return new Response(JSON.stringify({ error: "Messages array required" }), {
+    // Validate input
+    const validation = validateMessages(messages);
+    if (!validation.valid) {
+      return new Response(JSON.stringify({ error: validation.error }), {
         status: 400,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
