@@ -2,8 +2,6 @@ import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { ScrollArea } from "@/components/ui/scroll-area";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { 
   FileText, 
   Mail, 
@@ -42,7 +40,7 @@ const templates: Template[] = [
     prompt: "एक professional business email लिखें जो [विषय] के बारे में हो। Formal tone में लिखें।",
     category: "business",
     icon: Mail,
-    color: "from-blue-500 to-cyan-500",
+    color: "from-emerald-500 to-teal-500",
     popular: true
   },
   {
@@ -53,7 +51,7 @@ const templates: Template[] = [
     prompt: "मेरे [product/service] के लिए एक engaging marketing copy लिखें जो customers को attract करे।",
     category: "business",
     icon: Briefcase,
-    color: "from-purple-500 to-pink-500"
+    color: "from-teal-500 to-cyan-500"
   },
   {
     id: "3",
@@ -63,7 +61,7 @@ const templates: Template[] = [
     prompt: "[Job Title] के लिए एक impressive job application letter लिखें।",
     category: "business",
     icon: FileText,
-    color: "from-green-500 to-emerald-500"
+    color: "from-cyan-500 to-emerald-500"
   },
   // Social Media Templates
   {
@@ -143,11 +141,11 @@ const templates: Template[] = [
   }
 ];
 
-interface ZentaraTemplatesProps {
+interface TezuTemplatesProps {
   onUseTemplate?: (prompt: string) => void;
 }
 
-export function ZentaraTemplates({ onUseTemplate }: ZentaraTemplatesProps) {
+export function TezuTemplates({ onUseTemplate }: TezuTemplatesProps) {
   const [selectedCategory, setSelectedCategory] = useState("all");
   const [copiedId, setCopiedId] = useState<string | null>(null);
 
@@ -184,21 +182,21 @@ export function ZentaraTemplates({ onUseTemplate }: ZentaraTemplatesProps) {
       {/* Header */}
       <div className="text-center">
         <div className="flex items-center justify-center gap-3 mb-2">
-          <div className="p-3 rounded-2xl bg-gradient-to-br from-cyan-500/20 to-blue-500/20 border border-cyan-500/30">
-            <FileText className="w-8 h-8 text-cyan-400" />
+          <div className="p-3 rounded-2xl bg-gradient-to-br from-emerald-500/20 to-teal-500/20 border border-emerald-500/30">
+            <FileText className="w-8 h-8 text-emerald-400" />
           </div>
-          <h2 className="text-2xl font-bold bg-gradient-to-r from-cyan-400 via-blue-400 to-purple-400 bg-clip-text text-transparent">
-            Zentara Templates
+          <h2 className="text-2xl font-bold bg-gradient-to-r from-emerald-400 via-teal-400 to-cyan-400 bg-clip-text text-transparent">
+            TezuAI Templates 2026
           </h2>
         </div>
         <p className="text-muted-foreground">Ready-made prompts से तुरंत content बनाएं 🚀</p>
       </div>
 
       {/* Popular Templates */}
-      <Card className="bg-gradient-to-br from-background/95 to-secondary/50 border-yellow-500/20">
+      <Card className="bg-gradient-to-br from-background/95 to-secondary/50 border-emerald-500/20">
         <CardHeader>
           <CardTitle className="flex items-center gap-2 text-foreground">
-            <Sparkles className="w-5 h-5 text-yellow-400" />
+            <Sparkles className="w-5 h-5 text-emerald-400" />
             Popular Templates ⭐
           </CardTitle>
         </CardHeader>
@@ -236,8 +234,8 @@ export function ZentaraTemplates({ onUseTemplate }: ZentaraTemplatesProps) {
             variant={selectedCategory === cat.id ? "default" : "outline"}
             onClick={() => setSelectedCategory(cat.id)}
             className={selectedCategory === cat.id 
-              ? "bg-gradient-to-r from-cyan-500 to-blue-500 text-white border-0" 
-              : "hover:border-cyan-500/50"}
+              ? "bg-gradient-to-r from-emerald-500 to-teal-500 text-white border-0" 
+              : "hover:border-emerald-500/50"}
           >
             <span className="mr-2">{cat.emoji}</span>
             {cat.name}
@@ -252,7 +250,7 @@ export function ZentaraTemplates({ onUseTemplate }: ZentaraTemplatesProps) {
           return (
             <Card 
               key={template.id}
-              className="bg-gradient-to-br from-background/95 to-secondary/50 border-border/50 hover:border-cyan-500/30 transition-all group"
+              className="bg-gradient-to-br from-background/95 to-secondary/50 border-border/50 hover:border-emerald-500/30 transition-all group"
             >
               <CardHeader className="pb-2">
                 <div className="flex items-start justify-between">
@@ -260,7 +258,7 @@ export function ZentaraTemplates({ onUseTemplate }: ZentaraTemplatesProps) {
                     <IconComponent className="w-5 h-5 text-white" />
                   </div>
                   {template.popular && (
-                    <Badge className="bg-yellow-500/20 text-yellow-400 border-yellow-500/30">
+                    <Badge className="bg-emerald-500/20 text-emerald-400 border-emerald-500/30">
                       ⭐ Popular
                     </Badge>
                   )}
@@ -275,7 +273,7 @@ export function ZentaraTemplates({ onUseTemplate }: ZentaraTemplatesProps) {
                 <div className="flex gap-2">
                   <Button
                     onClick={() => useTemplate(template)}
-                    className="flex-1 bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-600 hover:to-blue-600 text-white"
+                    className="flex-1 bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 text-white"
                   >
                     <Send className="w-4 h-4 mr-2" />
                     Use करें
@@ -283,9 +281,9 @@ export function ZentaraTemplates({ onUseTemplate }: ZentaraTemplatesProps) {
                   <Button
                     variant="outline"
                     onClick={() => copyPrompt(template)}
-                    className="border-border/50 hover:border-cyan-500/50"
+                    className="border-border/50 hover:border-emerald-500/50"
                   >
-                    <Copy className={`w-4 h-4 ${copiedId === template.id ? "text-green-400" : ""}`} />
+                    <Copy className={`w-4 h-4 ${copiedId === template.id ? "text-emerald-400" : ""}`} />
                   </Button>
                 </div>
               </CardContent>
@@ -296,3 +294,6 @@ export function ZentaraTemplates({ onUseTemplate }: ZentaraTemplatesProps) {
     </div>
   );
 }
+
+// Keep backward compatibility
+export { TezuTemplates as ZentaraTemplates };

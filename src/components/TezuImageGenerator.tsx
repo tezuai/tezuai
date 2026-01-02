@@ -27,7 +27,7 @@ const imageStyles = [
   { id: "fantasy", name: "Fantasy", emoji: "🧙" }
 ];
 
-export function ZentaraImageGenerator() {
+export function TezuImageGenerator() {
   const [prompt, setPrompt] = useState("");
   const [style, setStyle] = useState("realistic");
   const [isGenerating, setIsGenerating] = useState(false);
@@ -83,7 +83,7 @@ export function ZentaraImageGenerator() {
     try {
       const link = document.createElement('a');
       link.href = generatedImage;
-      link.download = `zentara-ai-${Date.now()}.png`;
+      link.download = `tezuai-${Date.now()}.png`;
       link.click();
       toast.success("📥 Image download हो गई!");
     } catch (error) {
@@ -97,7 +97,7 @@ export function ZentaraImageGenerator() {
     try {
       if (navigator.share) {
         await navigator.share({
-          title: 'Zentara AI Generated Image',
+          title: 'TezuAI Generated Image',
           text: prompt,
           url: generatedImage
         });
@@ -115,21 +115,21 @@ export function ZentaraImageGenerator() {
       {/* Header */}
       <div className="text-center">
         <div className="flex items-center justify-center gap-3 mb-2">
-          <div className="p-3 rounded-2xl bg-gradient-to-br from-pink-500/20 to-purple-500/20 border border-pink-500/30">
-            <Palette className="w-8 h-8 text-pink-400" />
+          <div className="p-3 rounded-2xl bg-gradient-to-br from-emerald-500/20 to-teal-500/20 border border-emerald-500/30">
+            <Palette className="w-8 h-8 text-emerald-400" />
           </div>
-          <h2 className="text-2xl font-bold bg-gradient-to-r from-pink-400 via-purple-400 to-cyan-400 bg-clip-text text-transparent">
-            Zentara Image Generator
+          <h2 className="text-2xl font-bold bg-gradient-to-r from-emerald-400 via-teal-400 to-cyan-400 bg-clip-text text-transparent">
+            TezuAI Image Generator 2026
           </h2>
         </div>
         <p className="text-muted-foreground">AI से beautiful images बनाएं ✨</p>
       </div>
 
       {/* Generator Card */}
-      <Card className="bg-gradient-to-br from-background/95 to-secondary/50 border-pink-500/20 shadow-xl shadow-pink-500/5">
+      <Card className="bg-gradient-to-br from-background/95 to-secondary/50 border-emerald-500/20 shadow-xl shadow-emerald-500/5">
         <CardHeader>
           <CardTitle className="flex items-center gap-2 text-foreground">
-            <Wand2 className="w-5 h-5 text-pink-400" />
+            <Wand2 className="w-5 h-5 text-emerald-400" />
             नई Image बनाएं
           </CardTitle>
         </CardHeader>
@@ -141,7 +141,7 @@ export function ZentaraImageGenerator() {
               value={prompt}
               onChange={(e) => setPrompt(e.target.value)}
               placeholder="एक सुंदर पहाड़ों में सूर्यास्त... / A beautiful sunset over mountains..."
-              className="bg-background/50 border-border/50 focus:border-pink-500"
+              className="bg-background/50 border-border/50 focus:border-emerald-500"
             />
           </div>
 
@@ -156,8 +156,8 @@ export function ZentaraImageGenerator() {
                   onClick={() => setStyle(s.id)}
                   className={`h-auto py-3 flex flex-col gap-1 ${
                     style === s.id 
-                      ? "bg-gradient-to-r from-pink-500 to-purple-500 text-white border-0" 
-                      : "hover:border-pink-500/50"
+                      ? "bg-gradient-to-r from-emerald-500 to-teal-500 text-white border-0" 
+                      : "hover:border-emerald-500/50"
                   }`}
                 >
                   <span className="text-xl">{s.emoji}</span>
@@ -171,7 +171,7 @@ export function ZentaraImageGenerator() {
           <Button
             onClick={generateImage}
             disabled={isGenerating || !prompt.trim()}
-            className="w-full h-12 bg-gradient-to-r from-pink-500 via-purple-500 to-cyan-500 hover:from-pink-600 hover:via-purple-600 hover:to-cyan-600 text-white font-semibold text-lg shadow-lg shadow-purple-500/25"
+            className="w-full h-12 bg-gradient-to-r from-emerald-500 via-teal-500 to-cyan-500 hover:from-emerald-600 hover:via-teal-600 hover:to-cyan-600 text-white font-semibold text-lg shadow-lg shadow-emerald-500/25"
           >
             {isGenerating ? (
               <>
@@ -190,11 +190,11 @@ export function ZentaraImageGenerator() {
 
       {/* Generated Image Display */}
       {generatedImage && (
-        <Card className="bg-gradient-to-br from-background/95 to-secondary/50 border-green-500/20 shadow-xl shadow-green-500/5 overflow-hidden">
+        <Card className="bg-gradient-to-br from-background/95 to-secondary/50 border-emerald-500/20 shadow-xl shadow-emerald-500/5 overflow-hidden">
           <CardHeader>
             <div className="flex items-center justify-between">
               <CardTitle className="flex items-center gap-2 text-foreground">
-                <ImageIcon className="w-5 h-5 text-green-400" />
+                <ImageIcon className="w-5 h-5 text-emerald-400" />
                 Generated Image
               </CardTitle>
               <div className="flex gap-2">
@@ -202,7 +202,7 @@ export function ZentaraImageGenerator() {
                   onClick={downloadImage}
                   variant="outline"
                   size="sm"
-                  className="border-green-500/30 hover:bg-green-500/10"
+                  className="border-emerald-500/30 hover:bg-emerald-500/10"
                 >
                   <Download className="w-4 h-4 mr-1" />
                   Download
@@ -211,7 +211,7 @@ export function ZentaraImageGenerator() {
                   onClick={shareImage}
                   variant="outline"
                   size="sm"
-                  className="border-purple-500/30 hover:bg-purple-500/10"
+                  className="border-teal-500/30 hover:bg-teal-500/10"
                 >
                   <Share2 className="w-4 h-4 mr-1" />
                   Share
@@ -226,7 +226,7 @@ export function ZentaraImageGenerator() {
                 alt="AI Generated"
                 className="w-full rounded-xl shadow-2xl"
               />
-              <Badge className="absolute top-3 right-3 bg-gradient-to-r from-pink-500 to-purple-500 text-white">
+              <Badge className="absolute top-3 right-3 bg-gradient-to-r from-emerald-500 to-teal-500 text-white">
                 {imageStyles.find(s => s.id === style)?.name}
               </Badge>
             </div>
@@ -270,3 +270,7 @@ export function ZentaraImageGenerator() {
     </div>
   );
 }
+
+// Keep backward compatibility
+export { TezuImageGenerator as ZentaraImageGenerator };
+
