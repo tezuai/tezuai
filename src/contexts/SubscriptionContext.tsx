@@ -1,5 +1,5 @@
-
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import { supabase } from '@/integrations/supabase/client';
 
 interface SubscriptionContextType {
   currentPlan: string;
@@ -31,22 +31,16 @@ interface SubscriptionContextType {
   };
   upgradeToPlan: (planId: string) => void;
   checkFeatureAccess: (feature: string) => boolean;
+  refreshPlan: () => Promise<void>;
 }
 
 const SubscriptionContext = createContext<SubscriptionContextType | undefined>(undefined);
 
-// Demo Mode - All features unlocked for free launch
-const DEMO_MODE = true;
+// Demo mode only in development
+const DEMO_MODE = import.meta.env.DEV;
 
 export function SubscriptionProvider({ children }: { children: ReactNode }) {
-  const [currentPlan, setCurrentPlan] = useState<string>(() => {
-    // Demo Mode: Auto-set to enterprise for all users
-    if (DEMO_MODE) return 'enterprise';
-    const savedPlan = localStorage.getItem('tezu-ai-plan');
-    const isAuth = localStorage.getItem('tezu-ai-authenticated');
-    return isAuth === 'true' ? (savedPlan || 'enterprise') : 'free';
-  });
-  
+  const [currentPlan, setCurrentPlan] = useState<string>('free');
   const [isDemoMode] = useState(DEMO_MODE);
   const [usage, setUsage] = useState({
     messagesUsed: 0,
@@ -57,46 +51,105 @@ export function SubscriptionProvider({ children }: { children: ReactNode }) {
     workflowsLimit: 2,
   });
 
-  const isSubscribed = currentPlan !== 'free';
-
-  const features = {
-    unlimitedChat: currentPlan === 'starter' || currentPlan === 'professional' || currentPlan === 'enterprise',
-    allAIModels: currentPlan === 'professional' || currentPlan === 'enterprise',
-    voiceFeatures: currentPlan === 'starter' || currentPlan === 'professional' || currentPlan === 'enterprise',
-    fileUpload: currentPlan === 'starter' || currentPlan === 'professional' || currentPlan === 'enterprise',
-    analytics: currentPlan === 'starter' || currentPlan === 'professional' || currentPlan === 'enterprise',
-    teamCollaboration: currentPlan === 'professional' || currentPlan === 'enterprise',
-    apiAccess: currentPlan === 'enterprise',
-    customTemplates: currentPlan === 'starter' || currentPlan === 'professional' || currentPlan === 'enterprise',
-    prioritySupport: currentPlan === 'professional' || currentPlan === 'enterprise',
-    workflowAutomation: currentPlan === 'starter' || currentPlan === 'professional' || currentPlan === 'enterprise',
-    customAITraining: currentPlan === 'professional' || currentPlan === 'enterprise',
-    businessIntelligence: currentPlan === 'professional' || currentPlan === 'enterprise',
-    cloudComputing: currentPlan === 'professional' || currentPlan === 'enterprise',
-    dataAnalytics: currentPlan === 'professional' || currentPlan === 'enterprise',
+  // Fetch user plan from database
+  const refreshPlan = async () => {
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      
+      if (user) {
+        const { data: profile } = await supabase
+          .from('profiles')
+          .select('plan')
+          .eq('user_id', user.id)
+          .single();
+        
+        if (profile?.plan) {
+          setCurrentPlan(profile.plan);
+          updateUsageLimits(profile.plan);
+        }
+      } else {
+        setCurrentPlan('free');
+      }
+    } catch (error) {
+      console.error('Error fetching plan:', error);
+    }
   };
 
-  const upgradeToPlan = (planId: string) => {
-    setCurrentPlan(planId);
-    
-    // Update usage limits based on plan
-    if (planId === 'starter') {
+  const updateUsageLimits = (plan: string) => {
+    if (plan === 'starter') {
       setUsage(prev => ({
         ...prev,
         messagesLimit: 500,
         templatesLimit: 20,
         workflowsLimit: 5,
       }));
-    } else if (planId === 'professional' || planId === 'enterprise') {
+    } else if (plan === 'professional' || plan === 'enterprise' || plan === 'premium') {
       setUsage(prev => ({
         ...prev,
-        messagesLimit: -1, // Unlimited
-        templatesLimit: -1, // Unlimited
-        workflowsLimit: -1, // Unlimited
+        messagesLimit: -1,
+        templatesLimit: -1,
+        workflowsLimit: -1,
+      }));
+    } else {
+      setUsage(prev => ({
+        ...prev,
+        messagesLimit: 10,
+        templatesLimit: 5,
+        workflowsLimit: 2,
       }));
     }
-    
-    // Plan upgrade completed successfully
+  };
+
+  useEffect(() => {
+    refreshPlan();
+
+    // Listen for auth changes
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(() => {
+      setTimeout(() => {
+        refreshPlan();
+      }, 0);
+    });
+
+    return () => subscription.unsubscribe();
+  }, []);
+
+  const isSubscribed = currentPlan !== 'free';
+
+  const features = {
+    unlimitedChat: currentPlan === 'starter' || currentPlan === 'professional' || currentPlan === 'enterprise' || currentPlan === 'premium',
+    allAIModels: currentPlan === 'professional' || currentPlan === 'enterprise' || currentPlan === 'premium',
+    voiceFeatures: currentPlan === 'starter' || currentPlan === 'professional' || currentPlan === 'enterprise' || currentPlan === 'premium',
+    fileUpload: currentPlan === 'starter' || currentPlan === 'professional' || currentPlan === 'enterprise' || currentPlan === 'premium',
+    analytics: currentPlan === 'starter' || currentPlan === 'professional' || currentPlan === 'enterprise' || currentPlan === 'premium',
+    teamCollaboration: currentPlan === 'professional' || currentPlan === 'enterprise',
+    apiAccess: currentPlan === 'enterprise',
+    customTemplates: currentPlan === 'starter' || currentPlan === 'professional' || currentPlan === 'enterprise' || currentPlan === 'premium',
+    prioritySupport: currentPlan === 'professional' || currentPlan === 'enterprise',
+    workflowAutomation: currentPlan === 'starter' || currentPlan === 'professional' || currentPlan === 'enterprise' || currentPlan === 'premium',
+    customAITraining: currentPlan === 'professional' || currentPlan === 'enterprise',
+    businessIntelligence: currentPlan === 'professional' || currentPlan === 'enterprise',
+    cloudComputing: currentPlan === 'professional' || currentPlan === 'enterprise',
+    dataAnalytics: currentPlan === 'professional' || currentPlan === 'enterprise',
+  };
+
+  const upgradeToPlan = async (planId: string) => {
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      
+      if (user) {
+        const { error } = await supabase
+          .from('profiles')
+          .update({ plan: planId })
+          .eq('user_id', user.id);
+        
+        if (!error) {
+          setCurrentPlan(planId);
+          updateUsageLimits(planId);
+        }
+      }
+    } catch (error) {
+      console.error('Error upgrading plan:', error);
+    }
   };
 
   const checkFeatureAccess = (feature: string): boolean => {
@@ -134,20 +187,6 @@ export function SubscriptionProvider({ children }: { children: ReactNode }) {
     }
   };
 
-  // Simulate usage tracking
-  useEffect(() => {
-    const interval = setInterval(() => {
-      // This would normally track actual usage
-      setUsage(prev => ({
-        ...prev,
-        messagesUsed: Math.min(prev.messagesUsed, prev.messagesLimit === -1 ? prev.messagesUsed : prev.messagesLimit),
-        workflowsUsed: Math.min(prev.workflowsUsed, prev.workflowsLimit === -1 ? prev.workflowsUsed : prev.workflowsLimit),
-      }));
-    }, 5000);
-
-    return () => clearInterval(interval);
-  }, []);
-
   return (
     <SubscriptionContext.Provider value={{
       currentPlan,
@@ -157,6 +196,7 @@ export function SubscriptionProvider({ children }: { children: ReactNode }) {
       usage,
       upgradeToPlan,
       checkFeatureAccess,
+      refreshPlan,
     }}>
       {children}
     </SubscriptionContext.Provider>

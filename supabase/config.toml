@@ -1,10 +1,16 @@
 project_id = "cgqpfsojhmqytjnvzzqe"
 
 [functions.generate-image]
-verify_jwt = false
+verify_jwt = true
 
 [functions.tezu-chat]
-verify_jwt = false
+verify_jwt = true
 
 [functions.tezu-creative]
-verify_jwt = false
+verify_jwt = true
+
+[functions.zentara-chat]
+verify_jwt = true
+
+[functions.zentara-creative]
+verify_jwt = true

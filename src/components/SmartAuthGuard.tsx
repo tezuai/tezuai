@@ -1,34 +1,15 @@
-
 import { useState, useEffect } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { EnhancedAuthSystem } from "@/components/EnhancedAuthSystem";
-import { 
-  Shield, 
-  Lock, 
-  User, 
-  Star,
-  Crown,
-  Zap,
-  Globe,
-  CheckCircle,
-  AlertTriangle
-} from "lucide-react";
+import { useNavigate } from "react-router-dom";
+import { supabase } from "@/integrations/supabase/client";
+import { User, Session } from "@supabase/supabase-js";
 import { useToast } from "@/hooks/use-toast";
 
-interface SmartAuthGuardProps {
-  children: React.ReactNode;
-  requireAuth?: boolean;
-  onAuthStateChange?: (isAuthenticated: boolean) => void;
-}
-
-interface UserSession {
+export interface UserSession {
   id: string;
   name: string;
   email: string;
   phone: string;
-  plan: 'free' | 'pro' | 'premium';
+  plan: 'free' | 'pro' | 'premium' | 'enterprise';
   joinDate: Date;
   securityScore: number;
   isVerified: boolean;
@@ -38,176 +19,156 @@ interface UserSession {
   level?: string;
 }
 
+interface SmartAuthGuardProps {
+  children: React.ReactNode;
+  requireAuth?: boolean;
+  onAuthStateChange?: (isAuthenticated: boolean, user?: UserSession | null) => void;
+}
+
 export function SmartAuthGuard({ children, requireAuth = false, onAuthStateChange }: SmartAuthGuardProps) {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [showAuthModal, setShowAuthModal] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   const [userSession, setUserSession] = useState<UserSession | null>(null);
-  const [authAttempts, setAuthAttempts] = useState(0);
   const { toast } = useToast();
+  const navigate = useNavigate();
 
   useEffect(() => {
-    // Check existing session
-    const savedSession = localStorage.getItem('tezu-ai-session');
-    const sessionExpiry = localStorage.getItem('tezu-ai-session-expiry');
-    
-    if (savedSession && sessionExpiry) {
-      const now = new Date().getTime();
-      const expiry = parseInt(sessionExpiry);
-      
-      if (now < expiry) {
-        const session = JSON.parse(savedSession);
-        setUserSession(session);
+    // Set up auth state listener FIRST
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      // Only synchronous state updates here
+      if (session?.user) {
+        const userData = mapUserToSession(session.user);
+        setUserSession(userData);
         setIsAuthenticated(true);
-        onAuthStateChange?.(true);
-        
-        toast({
-          title: "🎉 Welcome Back to Tezu AI!",
-          description: `Hi ${session.name}! You're now connected to World's #1 Secure AI Assistant`,
-        });
+        onAuthStateChange?.(true, userData);
       } else {
-        // Session expired
-        handleLogout();
+        setUserSession(null);
+        setIsAuthenticated(false);
+        onAuthStateChange?.(false, null);
       }
-    }
+      setIsLoading(false);
+
+      // Defer profile fetch with setTimeout to prevent deadlock
+      if (session?.user) {
+        setTimeout(() => {
+          fetchUserProfile(session.user.id);
+        }, 0);
+      }
+    });
+
+    // THEN check for existing session
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      if (session?.user) {
+        const userData = mapUserToSession(session.user);
+        setUserSession(userData);
+        setIsAuthenticated(true);
+        onAuthStateChange?.(true, userData);
+        
+        // Fetch profile data
+        setTimeout(() => {
+          fetchUserProfile(session.user.id);
+        }, 0);
+      } else {
+        setIsAuthenticated(false);
+        onAuthStateChange?.(false, null);
+      }
+      setIsLoading(false);
+    });
+
+    return () => subscription.unsubscribe();
   }, []);
 
-  const handleAuthRequired = () => {
-    if (!isAuthenticated && requireAuth) {
-      setShowAuthModal(true);
-      toast({
-        title: "🔐 Authentication Required",
-        description: "Please login to access Tezu AI's premium features",
-      });
+  const mapUserToSession = (user: User): UserSession => {
+    return {
+      id: user.id,
+      name: user.user_metadata?.display_name || user.email?.split('@')[0] || 'User',
+      email: user.email || '',
+      phone: user.phone || '',
+      plan: 'free', // Default, will be updated from profile
+      joinDate: new Date(user.created_at),
+      securityScore: 95,
+      isVerified: !!user.email_confirmed_at,
+      lastActivity: new Date(),
+      avatar: user.user_metadata?.avatar_url,
+      totalChats: 0,
+      level: 'User'
+    };
+  };
+
+  const fetchUserProfile = async (userId: string) => {
+    try {
+      const { data: profile, error } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('user_id', userId)
+        .single();
+
+      if (profile && !error) {
+        setUserSession(prev => prev ? {
+          ...prev,
+          name: profile.display_name || prev.name,
+          phone: profile.phone || prev.phone,
+          plan: (profile.plan as UserSession['plan']) || 'free',
+          avatar: profile.avatar_url || prev.avatar,
+          totalChats: profile.total_chats || 0,
+          securityScore: profile.security_score || 85,
+          isVerified: profile.is_verified || false,
+        } : null);
+      }
+    } catch (error) {
+      console.error('Error fetching profile:', error);
     }
   };
 
-  const handleLogin = (userData: any) => {
-    const newSession: UserSession = {
-      id: Date.now().toString(),
-      name: userData.name || userData.email.split('@')[0],
-      email: userData.email,
-      phone: userData.phone || '',
-      plan: 'premium',
-      joinDate: new Date(),
-      securityScore: 98,
-      isVerified: true,
-      lastActivity: new Date(),
-      avatar: '',
-      totalChats: 0,
-      level: 'Premium'
-    };
+  const handleLogout = async () => {
+    try {
+      const { error } = await supabase.auth.signOut();
+      if (error) throw error;
 
-    // Store session with 7-day expiry for persistent login
-    const expiry = new Date().getTime() + (7 * 24 * 60 * 60 * 1000);
-    localStorage.setItem('tezu-ai-session', JSON.stringify(newSession));
-    localStorage.setItem('tezu-ai-session-expiry', expiry.toString());
-    localStorage.setItem('tezu-ai-authenticated', 'true');
-    localStorage.setItem('tezu-ai-plan', 'enterprise'); // Auto-unlock all features
-
-    setUserSession(newSession);
-    setIsAuthenticated(true);
-    setShowAuthModal(false);
-    setAuthAttempts(0);
-    onAuthStateChange?.(true);
-
-    toast({
-      title: "✅ Login Successful! Welcome to Tezu AI Family! 🎉",
-      description: "You now have access to all premium features with enterprise-grade security!",
-    });
-  };
-
-  const handleLogout = () => {
-    localStorage.removeItem('tezu-ai-session');
-    localStorage.removeItem('tezu-ai-session-expiry');
-    localStorage.removeItem('tezu-ai-authenticated');
-    
-    setUserSession(null);
-    setIsAuthenticated(false);
-    onAuthStateChange?.(false);
-
-    toast({
-      title: "🔒 Secure Logout Complete",
-      description: "Your session has been safely terminated. Thank you for using Tezu AI!",
-    });
-  };
-
-  const handleDeleteAccount = () => {
-    if (window.confirm('⚠️ Are you sure you want to delete your Tezu AI account? This action cannot be undone.')) {
-      // Clear all user data
-      localStorage.clear();
       setUserSession(null);
       setIsAuthenticated(false);
-      onAuthStateChange?.(false);
+      onAuthStateChange?.(false, null);
 
       toast({
-        title: "🗑️ Account Deleted Successfully",
-        description: "Your Tezu AI account and all data have been permanently deleted as per GDPR compliance.",
+        title: "🔒 Logged Out",
+        description: "Your session has been safely terminated. Thank you for using TezuAI!",
+      });
+    } catch (error) {
+      toast({
+        title: "Logout Error",
+        description: "Failed to log out. Please try again.",
         variant: "destructive"
       });
     }
   };
 
-  // Auto-trigger auth for protected actions
+  // Redirect to auth if authentication is required
   useEffect(() => {
-    handleAuthRequired();
-  }, [requireAuth]);
+    if (!isLoading && requireAuth && !isAuthenticated) {
+      navigate('/auth');
+    }
+  }, [isLoading, requireAuth, isAuthenticated, navigate]);
 
-  // Show auth modal when needed
-  if (showAuthModal || (!isAuthenticated && requireAuth)) {
+  // Show loading state
+  if (isLoading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-gray-900 via-blue-900 to-purple-900 flex items-center justify-center p-4">
-        <div className="w-full max-w-md">
-          <div className="text-center mb-6">
-            <div className="w-20 h-20 mx-auto bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center shadow-2xl mb-4">
-              <Shield className="w-10 h-10 text-white" />
-            </div>
-            <h1 className="text-2xl font-bold text-white mb-2">🔐 Secure Access Required</h1>
-            <p className="text-gray-300">Login to unlock Tezu AI's powerful features</p>
-            <div className="flex justify-center gap-2 mt-3">
-              <Badge className="bg-green-500/20 text-green-400">
-                <CheckCircle className="w-3 h-3 mr-1" />
-                World's #1 AI
-              </Badge>
-              <Badge className="bg-blue-500/20 text-blue-400">
-                <Shield className="w-3 h-3 mr-1" />
-                Bank-Grade Security
-              </Badge>
-            </div>
+      <div className="min-h-screen bg-gradient-to-br from-gray-900 via-emerald-900/20 to-gray-900 flex items-center justify-center">
+        <div className="text-center">
+          <div className="w-16 h-16 mx-auto mb-4 bg-gradient-to-br from-emerald-500 to-teal-600 rounded-full flex items-center justify-center animate-pulse">
+            <span className="text-2xl">🚀</span>
           </div>
-
-          <EnhancedAuthSystem 
-            onLogin={handleLogin}
-            authAttempts={authAttempts}
-            onAuthAttempt={() => setAuthAttempts(prev => prev + 1)}
-          />
-
-          {!requireAuth && (
-            <div className="mt-4 text-center">
-              <Button 
-                variant="ghost" 
-                onClick={() => setShowAuthModal(false)}
-                className="text-gray-400 hover:text-white"
-              >
-                Continue without login
-              </Button>
-            </div>
-          )}
+          <p className="text-gray-400">Loading TezuAI...</p>
         </div>
       </div>
     );
   }
 
-  return (
-    <>
-      {children}
-      {/* Pass auth utilities to children */}
-      <div style={{ display: 'none' }}>
-        <div data-auth-state={isAuthenticated} />
-        <div data-user-session={JSON.stringify(userSession)} />
-        <div data-auth-handlers={JSON.stringify({ handleLogout, handleDeleteAccount })} />
-      </div>
-    </>
-  );
+  // If auth required but not authenticated, redirect handled by useEffect
+  if (requireAuth && !isAuthenticated) {
+    return null;
+  }
+
+  return <>{children}</>;
 }
 
-export { type UserSession };
+export { type UserSession as UserSessionType };

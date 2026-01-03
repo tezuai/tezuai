@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -18,7 +17,9 @@ import {
   Zap
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
-import { notificationService } from "@/services/emailService";
+
+// Environment-based demo mode flag
+const DEMO_MODE = import.meta.env.VITE_DEMO_MODE === 'true' || import.meta.env.DEV;
 
 interface OTPVerificationProps {
   email: string;
@@ -89,24 +90,22 @@ export function OTPVerification({
       let emailVerified = false;
       let smsVerified = false;
 
-      // Verify email OTP
+      // Verify email OTP against expected value (from server in production)
       if (emailOTP && expectedEmailOTP) {
-        emailVerified = notificationService.verifyOTP(emailOTP, expectedEmailOTP);
+        emailVerified = emailOTP === expectedEmailOTP;
       }
 
-      // Verify SMS OTP
+      // Verify SMS OTP against expected value (from server in production)
       if (smsOTP && expectedSMSOTP) {
-        smsVerified = notificationService.verifyOTP(smsOTP, expectedSMSOTP);
+        smsVerified = smsOTP === expectedSMSOTP;
       }
 
-      // For demo purposes, also accept default codes
-      const demoEmailVerified = emailOTP === '123456';
-      const demoSmsVerified = smsOTP === '654321';
-
-      if (emailVerified || smsVerified || demoEmailVerified || demoSmsVerified) {
+      // In production, this would call a server-side verification endpoint
+      // For now, verification happens against server-provided OTPs only
+      if (emailVerified || smsVerified) {
         toast({
           title: "✅ Verification Successful!",
-          description: "Your identity has been verified with enterprise-grade security! 🎉",
+          description: "Your identity has been verified! 🎉",
         });
         
         setTimeout(() => {
@@ -232,26 +231,28 @@ export function OTPVerification({
             </div>
           )}
 
-          {/* Demo Notice */}
-          <div className="p-3 bg-yellow-500/10 border border-yellow-500/30 rounded">
-            <div className="flex items-center gap-2 mb-1">
-              <AlertTriangle className="w-4 h-4 text-yellow-400" />
-              <span className="text-yellow-400 font-medium text-xs">DEMO MODE</span>
+          {/* Demo Mode Notice - Only shown in development */}
+          {DEMO_MODE && (
+            <div className="p-3 bg-yellow-500/10 border border-yellow-500/30 rounded">
+              <div className="flex items-center gap-2 mb-1">
+                <AlertTriangle className="w-4 h-4 text-yellow-400" />
+                <span className="text-yellow-400 font-medium text-xs">DEVELOPMENT MODE</span>
+              </div>
+              <p className="text-xs text-gray-300">
+                OTP verification is simulated. In production, real OTPs will be sent via email/SMS.
+              </p>
             </div>
-            <p className="text-xs text-gray-300">
-              For testing: Email OTP = 123456, SMS OTP = 654321
-            </p>
-          </div>
+          )}
 
           {/* Security Features */}
           <div className="grid grid-cols-2 gap-2">
             <div className="p-2 bg-green-500/10 border border-green-500/30 rounded text-center">
               <CheckCircle className="w-4 h-4 text-green-400 mx-auto mb-1" />
-              <div className="text-xs text-green-400">End-to-End Encrypted</div>
+              <div className="text-xs text-green-400">Encrypted</div>
             </div>
             <div className="p-2 bg-blue-500/10 border border-blue-500/30 rounded text-center">
               <Shield className="w-4 h-4 text-blue-400 mx-auto mb-1" />
-              <div className="text-xs text-blue-400">Bank-Grade Security</div>
+              <div className="text-xs text-blue-400">Secure</div>
             </div>
           </div>
 
@@ -265,12 +266,12 @@ export function OTPVerification({
               {isVerifying ? (
                 <>
                   <Zap className="w-4 h-4 mr-2 animate-spin" />
-                  Verifying Security Codes...
+                  Verifying...
                 </>
               ) : (
                 <>
                   <CheckCircle className="w-4 h-4 mr-2" />
-                  ✅ Verify & Login Securely
+                  ✅ Verify & Continue
                 </>
               )}
             </Button>
@@ -278,11 +279,11 @@ export function OTPVerification({
             <Button
               onClick={handleResendOTP}
               variant="outline"
-              disabled={!isExpired && timeLeft > 240} // Can resend after 1 minute
+              disabled={!isExpired && timeLeft > 240}
               className="w-full border-gray-600 text-gray-300 hover:bg-gray-700"
             >
               <RefreshCw className="w-4 h-4 mr-2" />
-              🔄 Resend New OTP Codes
+              🔄 Resend OTP Codes
             </Button>
           </div>
 
@@ -303,10 +304,9 @@ export function OTPVerification({
           <div className="text-center space-y-2">
             <h4 className="text-green-400 font-medium text-sm">🛡️ Your Security is Our Priority</h4>
             <p className="text-xs text-gray-300">
-              • OTP codes expire in 5 minutes for security<br/>
+              • OTP codes expire in 5 minutes<br/>
               • Each code can only be used once<br/>
-              • All communications are encrypted<br/>
-              • Your data never leaves your device
+              • All communications are encrypted
             </p>
           </div>
         </CardContent>

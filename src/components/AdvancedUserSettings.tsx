@@ -36,7 +36,7 @@ interface UserProfile {
   email: string;
   phone: string;
   avatar?: string;
-  plan: 'free' | 'pro' | 'premium';
+  plan: 'free' | 'pro' | 'premium' | 'enterprise';
   joinDate: Date;
   securityScore: number;
   totalChats: number;
