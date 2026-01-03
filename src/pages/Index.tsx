@@ -14,8 +14,8 @@ import { SidebarProvider } from "@/components/ui/sidebar";
 import { SubscriptionProvider } from "@/contexts/SubscriptionContext";
 import { ProfessionalFooter } from "@/components/ProfessionalFooter";
 import { FloatingActions } from "@/components/FloatingActions";
-import { ZentaraImageGenerator } from "@/components/ZentaraImageGenerator";
-import { ZentaraTemplates } from "@/components/ZentaraTemplates";
+import { TezuImageGenerator } from "@/components/TezuImageGenerator";
+import { TezuTemplates } from "@/components/TezuTemplates";
 import { CreativeStudio } from "@/components/CreativeStudio";
 import type { ViewName } from "@/types/views";
 
@@ -262,13 +262,13 @@ const Index = () => {
       case 'image-generator':
         return (
           <div className="p-6 max-w-4xl mx-auto">
-            <ZentaraImageGenerator />
+            <TezuImageGenerator />
           </div>
         );
       case 'templates':
         return (
           <div className="p-6 max-w-6xl mx-auto">
-            <ZentaraTemplates onUseTemplate={handleUseTemplate} />
+            <TezuTemplates onUseTemplate={handleUseTemplate} />
           </div>
         );
       case 'creative-studio':
