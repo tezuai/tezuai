@@ -1,17 +1,25 @@
-import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import "jsr:@supabase/functions-js/edge-runtime.d.ts";
 
-// Allowed origins for CORS
-const ALLOWED_ORIGINS = [
-  'https://tezuai.lovable.app',
-  'https://cgqpfsojhmqytjnvzzqe.lovable.app',
-  'http://localhost:5173',
-  'http://localhost:3000'
-];
+// CORS - Allow Lovable preview domains + production lovable.app + localhost
+function isAllowedOrigin(origin: string | null) {
+  if (!origin) return false;
+  try {
+    const url = new URL(origin);
+    const host = url.hostname;
+    if (host === "localhost" || host === "127.0.0.1") return true;
+    if (host.endsWith(".lovableproject.com")) return true;
+    if (host.endsWith(".lovable.app")) return true;
+    return false;
+  } catch {
+    return false;
+  }
+}
 
 function getCorsHeaders(origin: string | null) {
-  const allowedOrigin = origin && ALLOWED_ORIGINS.includes(origin) ? origin : ALLOWED_ORIGINS[0];
+  const allowOrigin = isAllowedOrigin(origin) ? origin! : "*";
   return {
-    "Access-Control-Allow-Origin": allowedOrigin,
+    "Access-Control-Allow-Origin": allowOrigin,
+    "Vary": "Origin",
     "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
     "Access-Control-Allow-Methods": "POST, OPTIONS",
   };
@@ -36,7 +44,6 @@ function validateInput(body: unknown): { valid: boolean; error?: string; data?: 
   const validTypes = ['story', 'lyrics', 'poem'];
   const contentType = typeof type === 'string' && validTypes.includes(type) ? type : 'story';
   
-  // Validate style and mood if provided
   const sanitizedStyle = typeof style === 'string' ? style.slice(0, 100) : undefined;
   const sanitizedMood = typeof mood === 'string' ? mood.slice(0, 100) : undefined;
   
@@ -51,7 +58,7 @@ function validateInput(body: unknown): { valid: boolean; error?: string; data?: 
   };
 }
 
-serve(async (req) => {
+Deno.serve(async (req) => {
   const origin = req.headers.get("origin");
   const corsHeaders = getCorsHeaders(origin);
 
@@ -62,7 +69,6 @@ serve(async (req) => {
   try {
     const body = await req.json();
     
-    // Validate input - note: systemPrompt is intentionally NOT accepted from user input
     const validation = validateInput(body);
     if (!validation.valid) {
       return new Response(JSON.stringify({ error: validation.error }), {
@@ -75,17 +81,19 @@ serve(async (req) => {
 
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     if (!LOVABLE_API_KEY) {
-      throw new Error("LOVABLE_API_KEY is not configured");
+      console.error("LOVABLE_API_KEY is not configured");
+      return new Response(JSON.stringify({ error: "AI is not configured. Please try again later." }), {
+        status: 500,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
     }
 
-    // Build the user prompt with context
     let fullPrompt = prompt;
     if (style) fullPrompt += ` (Style: ${style})`;
     if (mood) fullPrompt += ` (Mood: ${mood})`;
 
-    console.log(`Generating ${type} content`);
+    console.log(`Generating ${type} content for authenticated user`);
 
-    // Use hardcoded system prompt - never accept from user input
     const systemPrompt = `आप Zentara AI हैं - एक प्रसिद्ध हिंदी लेखक और कवि। 
 आप ${type === 'story' ? 'कहानियां' : type === 'lyrics' ? 'गीत' : 'कविताएं'} लिखने में माहिर हैं।
 हमेशा हिंदी में लिखें। Content creative, emotional और high quality होना चाहिए।`;

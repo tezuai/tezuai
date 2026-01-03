@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { Sidebar } from "@/components/Sidebar";
 import { ChatInterface } from "@/components/ChatInterface";
 import { WelcomeScreen } from "@/components/WelcomeScreen";
@@ -17,6 +18,7 @@ import { FloatingActions } from "@/components/FloatingActions";
 import { TezuImageGenerator } from "@/components/TezuImageGenerator";
 import { TezuTemplates } from "@/components/TezuTemplates";
 import { CreativeStudio } from "@/components/CreativeStudio";
+import { supabase } from "@/integrations/supabase/client";
 import type { ViewName } from "@/types/views";
 
 const Index = () => {
@@ -35,23 +37,13 @@ const Index = () => {
     billingPeriod: "monthly" | "yearly";
   } | null>(null);
 
-  // Check if user is returning
+  const navigate = useNavigate();
+
+  // Check if user is returning (for landing/onboarding flow)
   useEffect(() => {
-    const hasUsedBefore = localStorage.getItem('zentara-ai-used');
-    const savedSession = localStorage.getItem('zentara-ai-session');
-    
+    const hasUsedBefore = localStorage.getItem('tezu-ai-used');
     if (hasUsedBefore) {
       setShowLanding(false);
-    }
-    
-    if (savedSession) {
-      try {
-        const session = JSON.parse(savedSession);
-        setCurrentUser(session);
-        setIsAuthenticated(true);
-      } catch (error) {
-        console.error('Failed to parse saved session:', error);
-      }
     }
   }, []);
 
@@ -62,14 +54,15 @@ const Index = () => {
 
   const handleOnboardingComplete = () => {
     setShowOnboarding(false);
-    localStorage.setItem('zentara-ai-used', 'true');
+    localStorage.setItem('tezu-ai-used', 'true');
     handleNewConversation();
   };
 
   const handleOnboardingSkip = () => {
     setShowOnboarding(false);
-    localStorage.setItem('zentara-ai-used', 'true');
+    localStorage.setItem('tezu-ai-used', 'true');
   };
+
 
   const handleNewConversation = () => {
     const newConversation = {
@@ -122,44 +115,36 @@ const Index = () => {
     setConversations(prev => [duplicatedConversation, ...prev]);
   };
 
-  const handleAuthStateChange = (authenticated: boolean) => {
+  const handleAuthStateChange = (authenticated: boolean, user?: UserSession | null) => {
     setIsAuthenticated(authenticated);
-    
-    if (authenticated) {
-      const sessionElement = document.querySelector('[data-user-session]');
-      if (sessionElement) {
-        try {
-          const sessionData = sessionElement.getAttribute('data-user-session');
-          if (sessionData && sessionData !== 'null') {
-            const session = JSON.parse(sessionData);
-            setCurrentUser(session);
-          }
-        } catch (error) {
-          console.error('Failed to parse user session:', error);
-        }
-      }
+    if (authenticated && user) {
+      setCurrentUser(user);
       setRequireAuth(false);
     } else {
       setCurrentUser(null);
     }
   };
 
-  const handleLogout = () => {
-    setIsAuthenticated(false);
-    setCurrentUser(null);
-    localStorage.removeItem('zentara-ai-session');
+  const handleLogout = async () => {
+    try {
+      await supabase.auth.signOut();
+      setIsAuthenticated(false);
+      setCurrentUser(null);
+    } catch (error) {
+      console.error('Logout error:', error);
+    }
   };
 
-  const handleDeleteAccount = () => {
-    handleLogout();
-    localStorage.clear();
+  const handleDeleteAccount = async () => {
+    // In production, this would call a server-side function to delete the user
+    await handleLogout();
   };
 
   const handleViewChange = (view: ViewName) => {
     const authRequiredViews = ['subscription', 'privacy', 'settings'];
     
     if (authRequiredViews.includes(view) && !isAuthenticated) {
-      setRequireAuth(true);
+      navigate('/auth');
       return;
     }
     
@@ -167,11 +152,27 @@ const Index = () => {
     setRequireAuth(false);
   };
 
-  const handleUpdateProfile = (profileData: Partial<UserSession>) => {
+  const handleUpdateProfile = async (profileData: Partial<UserSession>) => {
     if (currentUser) {
       const updatedUser = { ...currentUser, ...profileData };
       setCurrentUser(updatedUser);
-      localStorage.setItem('zentara-ai-session', JSON.stringify(updatedUser));
+      
+      // Update in database
+      try {
+        const { data: { user } } = await supabase.auth.getUser();
+        if (user) {
+          await supabase
+            .from('profiles')
+            .update({
+              display_name: profileData.name,
+              phone: profileData.phone,
+              avatar_url: profileData.avatar,
+            })
+            .eq('user_id', user.id);
+        }
+      } catch (error) {
+        console.error('Error updating profile:', error);
+      }
     }
   };
 

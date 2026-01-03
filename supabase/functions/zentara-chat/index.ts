@@ -1,17 +1,25 @@
-import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import "jsr:@supabase/functions-js/edge-runtime.d.ts";
 
-// Allowed origins for CORS
-const ALLOWED_ORIGINS = [
-  'https://tezuai.lovable.app',
-  'https://cgqpfsojhmqytjnvzzqe.lovable.app',
-  'http://localhost:5173',
-  'http://localhost:3000'
-];
+// CORS - Allow Lovable preview domains + production lovable.app + localhost
+function isAllowedOrigin(origin: string | null) {
+  if (!origin) return false;
+  try {
+    const url = new URL(origin);
+    const host = url.hostname;
+    if (host === "localhost" || host === "127.0.0.1") return true;
+    if (host.endsWith(".lovableproject.com")) return true;
+    if (host.endsWith(".lovable.app")) return true;
+    return false;
+  } catch {
+    return false;
+  }
+}
 
 function getCorsHeaders(origin: string | null) {
-  const allowedOrigin = origin && ALLOWED_ORIGINS.includes(origin) ? origin : ALLOWED_ORIGINS[0];
+  const allowOrigin = isAllowedOrigin(origin) ? origin! : "*";
   return {
-    "Access-Control-Allow-Origin": allowedOrigin,
+    "Access-Control-Allow-Origin": allowOrigin,
+    "Vary": "Origin",
     "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
     "Access-Control-Allow-Methods": "POST, OPTIONS",
   };
@@ -54,7 +62,7 @@ function validateMessages(messages: unknown): { valid: boolean; error?: string }
   return { valid: true };
 }
 
-serve(async (req) => {
+Deno.serve(async (req) => {
   const origin = req.headers.get("origin");
   const corsHeaders = getCorsHeaders(origin);
 
@@ -66,7 +74,6 @@ serve(async (req) => {
     const body = await req.json();
     const { messages } = body;
     
-    // Validate input
     const validation = validateMessages(messages);
     if (!validation.valid) {
       return new Response(JSON.stringify({ error: validation.error }), {
@@ -76,10 +83,15 @@ serve(async (req) => {
     }
 
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
-    
     if (!LOVABLE_API_KEY) {
-      throw new Error("LOVABLE_API_KEY is not configured");
+      console.error("LOVABLE_API_KEY is not configured");
+      return new Response(JSON.stringify({ error: "AI is not configured. Please try again later." }), {
+        status: 500,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
     }
+
+    console.log("Processing chat request for authenticated user");
 
     const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
@@ -110,7 +122,7 @@ Key traits:
 ⚡ Fast and efficient responses
 🎯 Accurate and reliable information
 
-Always be respectful, helpful, and provide the best possible assistance. When appropriate, use a mix of Hindi and English naturally.`
+Always be respectful, helpful, and provide the best possible assistance.`
           },
           ...messages,
         ],
@@ -120,13 +132,13 @@ Always be respectful, helpful, and provide the best possible assistance. When ap
 
     if (!response.ok) {
       if (response.status === 429) {
-        return new Response(JSON.stringify({ error: "Rate limit exceeded. Please wait a moment and try again." }), {
+        return new Response(JSON.stringify({ error: "Rate limit exceeded. Please wait and try again." }), {
           status: 429,
           headers: { ...corsHeaders, "Content-Type": "application/json" },
         });
       }
       if (response.status === 402) {
-        return new Response(JSON.stringify({ error: "AI credits exhausted. Please try again later." }), {
+        return new Response(JSON.stringify({ error: "AI credits exhausted. Please add credits." }), {
           status: 402,
           headers: { ...corsHeaders, "Content-Type": "application/json" },
         });
