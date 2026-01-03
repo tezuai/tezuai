@@ -1,17 +1,33 @@
 import "jsr:@supabase/functions-js/edge-runtime.d.ts";
 
-// Allowed origins for CORS
-const ALLOWED_ORIGINS = [
-  'https://tezuai.lovable.app',
-  'https://cgqpfsojhmqytjnvzzqe.lovable.app',
-  'http://localhost:5173',
-  'http://localhost:3000'
-];
+// CORS
+// Allow Lovable preview domains + production lovable.app + localhost.
+function isAllowedOrigin(origin: string | null) {
+  if (!origin) return false;
+  try {
+    const url = new URL(origin);
+    const host = url.hostname;
+
+    if (host === "localhost" || host === "127.0.0.1") return true;
+    if (host.endsWith(".lovableproject.com")) return true; // preview domains
+    if (host.endsWith(".lovable.app")) return true; // production domains
+
+    // Optional explicit allowlist (custom domains)
+    const explicit = new Set<string>([
+      "tezuai.lovable.app",
+      "cgqpfsojhmqytjnvzzqe.lovable.app",
+    ]);
+    return explicit.has(host);
+  } catch {
+    return false;
+  }
+}
 
 function getCorsHeaders(origin: string | null) {
-  const allowedOrigin = origin && ALLOWED_ORIGINS.includes(origin) ? origin : ALLOWED_ORIGINS[0];
+  const allowOrigin = isAllowedOrigin(origin) ? origin! : "*";
   return {
-    "Access-Control-Allow-Origin": allowedOrigin,
+    "Access-Control-Allow-Origin": allowOrigin,
+    "Vary": "Origin",
     "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
     "Access-Control-Allow-Methods": "POST, OPTIONS",
   };
@@ -75,17 +91,27 @@ Deno.serve(async (req) => {
       });
     }
 
+    const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
+    if (!LOVABLE_API_KEY) {
+      console.error("LOVABLE_API_KEY is not configured");
+      return new Response(JSON.stringify({ error: "AI is not configured yet. Please try again later." }), {
+        status: 500,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
     const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
+        Authorization: `Bearer ${LOVABLE_API_KEY}`,
       },
       body: JSON.stringify({
         model: "google/gemini-2.5-flash",
         messages: [
-          { 
-            role: "system", 
-            content: `You are TezuAI (तेज़ू AI) - India's most advanced and intelligent AI assistant. 
+          {
+            role: "system",
+            content: `You are TezuAI (तेज़ू AI) - India's most advanced and intelligent AI assistant.
 
 Your personality:
 - Friendly, helpful, and knowledgeable
@@ -99,20 +125,37 @@ Key capabilities:
 - Code generation and debugging in multiple languages
 - Creative content writing (stories, poems, articles)
 - Analysis and explanation of complex topics
-- Real-time knowledge up to your training cutoff
 
-Always aim to be helpful, accurate, and engaging!`
+Always aim to be helpful, accurate, and engaging!`,
           },
-          ...messages
+          ...messages,
         ],
         stream: true,
       }),
     });
 
     if (!response.ok) {
-      const errorText = await response.text();
-      console.error("AI Gateway error:", errorText);
-      throw new Error(`AI Gateway error: ${response.status}`);
+      const t = await response.text().catch(() => "");
+      console.error("AI gateway error:", response.status, t);
+
+      if (response.status === 429) {
+        return new Response(JSON.stringify({ error: "Rate limit लग गया है — थोड़ी देर बाद फिर try करें." }), {
+          status: 429,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+
+      if (response.status === 402) {
+        return new Response(JSON.stringify({ error: "AI credits खत्म हो गए हैं — workspace में credits add करें." }), {
+          status: 402,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+
+      return new Response(JSON.stringify({ error: "AI service error — कृपया फिर से कोशिश करें." }), {
+        status: 500,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
     }
 
     return new Response(response.body, {
