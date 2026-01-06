@@ -1,4 +1,5 @@
 // TezuAI - Real AI Chat Service
+import { supabase } from "@/integrations/supabase/client";
 
 const CHAT_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/tezu-chat`;
 
@@ -21,11 +22,18 @@ export async function streamTezuChat({
   onError,
 }: StreamChatOptions): Promise<void> {
   try {
+    // Get the current session for auth token
+    const { data: { session } } = await supabase.auth.getSession();
+    
+    if (!session?.access_token) {
+      throw new Error("Please login to use TezuAI chat");
+    }
+
     const resp = await fetch(CHAT_URL, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
+        Authorization: `Bearer ${session.access_token}`,
       },
       body: JSON.stringify({ messages }),
     });
