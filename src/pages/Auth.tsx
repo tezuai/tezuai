@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -18,7 +18,8 @@ import {
   Globe,
   UserPlus,
   Zap,
-  ArrowLeft
+  ArrowLeft,
+  KeyRound
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { z } from "zod";
@@ -29,7 +30,8 @@ const passwordSchema = z.string().min(6, "Password must be at least 6 characters
 const nameSchema = z.string().min(1, "Name is required").max(100);
 
 export default function Auth() {
-  const [authMode, setAuthMode] = useState<'login' | 'signup'>('login');
+  const [searchParams] = useSearchParams();
+  const [authMode, setAuthMode] = useState<'login' | 'signup' | 'forgot' | 'reset'>('login');
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [formData, setFormData] = useState({
@@ -39,9 +41,18 @@ export default function Auth() {
     confirmPassword: '',
   });
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const [resetEmailSent, setResetEmailSent] = useState(false);
 
   const { toast } = useToast();
   const navigate = useNavigate();
+
+  // Check if this is a password reset callback
+  useEffect(() => {
+    const type = searchParams.get('type');
+    if (type === 'recovery') {
+      setAuthMode('reset');
+    }
+  }, [searchParams]);
 
   // Check if user is already logged in
   useEffect(() => {
@@ -209,6 +220,89 @@ export default function Auth() {
     }
   };
 
+  const handleForgotPassword = async () => {
+    const emailResult = emailSchema.safeParse(formData.email);
+    if (!emailResult.success) {
+      setErrors({ email: emailResult.error.errors[0].message });
+      return;
+    }
+
+    setIsLoading(true);
+
+    try {
+      const { error } = await supabase.auth.resetPasswordForEmail(formData.email, {
+        redirectTo: `${window.location.origin}/auth?type=recovery`,
+      });
+
+      if (error) {
+        toast({
+          title: "❌ Error",
+          description: error.message,
+          variant: "destructive"
+        });
+        return;
+      }
+
+      setResetEmailSent(true);
+      toast({
+        title: "✅ Reset Link Sent!",
+        description: "Check your email for the password reset link.",
+      });
+    } catch (error) {
+      toast({
+        title: "❌ Error",
+        description: "An unexpected error occurred. Please try again.",
+        variant: "destructive"
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleResetPassword = async () => {
+    const passwordResult = passwordSchema.safeParse(formData.password);
+    if (!passwordResult.success) {
+      setErrors({ password: passwordResult.error.errors[0].message });
+      return;
+    }
+
+    if (formData.password !== formData.confirmPassword) {
+      setErrors({ confirmPassword: "Passwords don't match" });
+      return;
+    }
+
+    setIsLoading(true);
+
+    try {
+      const { error } = await supabase.auth.updateUser({
+        password: formData.password
+      });
+
+      if (error) {
+        toast({
+          title: "❌ Error",
+          description: error.message,
+          variant: "destructive"
+        });
+        return;
+      }
+
+      toast({
+        title: "✅ Password Updated!",
+        description: "Your password has been reset successfully.",
+      });
+      navigate('/');
+    } catch (error) {
+      toast({
+        title: "❌ Error",
+        description: "An unexpected error occurred. Please try again.",
+        variant: "destructive"
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   const passwordStrength = getPasswordStrength(formData.password);
 
   return (
@@ -243,11 +337,176 @@ export default function Auth() {
           </div>
         </div>
 
-        <Tabs value={authMode} onValueChange={(value) => setAuthMode(value as 'login' | 'signup')}>
-          <TabsList className="grid w-full grid-cols-2 bg-gray-800">
-            <TabsTrigger value="login" className="data-[state=active]:bg-emerald-600">🔐 Login</TabsTrigger>
-            <TabsTrigger value="signup" className="data-[state=active]:bg-emerald-600">👤 Sign Up</TabsTrigger>
-          </TabsList>
+        {/* Password Reset Mode */}
+        {authMode === 'reset' ? (
+          <Card className="bg-gray-800/50 border-gray-700 backdrop-blur-xl">
+            <CardHeader>
+              <CardTitle className="text-white flex items-center gap-2">
+                <KeyRound className="w-5 h-5" />
+                Set New Password
+              </CardTitle>
+              <p className="text-gray-400">Enter your new password below</p>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div>
+                <Label className="text-gray-300">New Password</Label>
+                <div className="relative">
+                  <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-purple-400" />
+                  <Input
+                    type={showPassword ? "text" : "password"}
+                    placeholder="Enter new password"
+                    value={formData.password}
+                    onChange={(e) => handleInputChange('password', e.target.value)}
+                    className="bg-gray-700/50 border-gray-600 text-white pl-10 pr-10"
+                  />
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-400"
+                  >
+                    {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                  </Button>
+                </div>
+                {errors.password && <p className="text-red-400 text-xs mt-1">{errors.password}</p>}
+                
+                {formData.password && (
+                  <div className="mt-2 flex items-center gap-2">
+                    <div className="flex-1 h-2 bg-gray-600 rounded overflow-hidden">
+                      <div 
+                        className={`h-full transition-all ${
+                          passwordStrength.score === 1 ? 'w-1/3 bg-red-500' :
+                          passwordStrength.score === 2 ? 'w-2/3 bg-yellow-500' :
+                          'w-full bg-green-500'
+                        }`}
+                      />
+                    </div>
+                    <span className={`text-xs ${passwordStrength.color}`}>
+                      {passwordStrength.level}
+                    </span>
+                  </div>
+                )}
+              </div>
+
+              <div>
+                <Label className="text-gray-300">Confirm Password</Label>
+                <div className="relative">
+                  <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-purple-400" />
+                  <Input
+                    type={showPassword ? "text" : "password"}
+                    placeholder="Confirm new password"
+                    value={formData.confirmPassword}
+                    onChange={(e) => handleInputChange('confirmPassword', e.target.value)}
+                    className="bg-gray-700/50 border-gray-600 text-white pl-10"
+                  />
+                </div>
+                {errors.confirmPassword && <p className="text-red-400 text-xs mt-1">{errors.confirmPassword}</p>}
+              </div>
+
+              <Button 
+                onClick={handleResetPassword} 
+                disabled={isLoading}
+                className="w-full bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700"
+              >
+                {isLoading ? (
+                  <>
+                    <Zap className="w-4 h-4 mr-2 animate-spin" />
+                    Updating...
+                  </>
+                ) : (
+                  <>
+                    <CheckCircle className="w-4 h-4 mr-2" />
+                    Update Password
+                  </>
+                )}
+              </Button>
+            </CardContent>
+          </Card>
+        ) : authMode === 'forgot' ? (
+          <Card className="bg-gray-800/50 border-gray-700 backdrop-blur-xl">
+            <CardHeader>
+              <CardTitle className="text-white flex items-center gap-2">
+                <KeyRound className="w-5 h-5" />
+                Forgot Password
+              </CardTitle>
+              <p className="text-gray-400">
+                {resetEmailSent 
+                  ? "Check your email for the reset link" 
+                  : "Enter your email to receive a reset link"}
+              </p>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              {resetEmailSent ? (
+                <div className="text-center py-6 space-y-4">
+                  <div className="w-16 h-16 mx-auto bg-emerald-500/20 rounded-full flex items-center justify-center">
+                    <Mail className="w-8 h-8 text-emerald-400" />
+                  </div>
+                  <p className="text-gray-300">
+                    We've sent a password reset link to <strong className="text-white">{formData.email}</strong>
+                  </p>
+                  <Button 
+                    variant="outline" 
+                    onClick={() => { setAuthMode('login'); setResetEmailSent(false); }}
+                    className="border-gray-600 text-gray-300"
+                  >
+                    <ArrowLeft className="w-4 h-4 mr-2" />
+                    Back to Login
+                  </Button>
+                </div>
+              ) : (
+                <>
+                  <div>
+                    <Label className="text-gray-300">Email Address</Label>
+                    <div className="relative">
+                      <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-emerald-400" />
+                      <Input
+                        type="email"
+                        placeholder="your@email.com"
+                        value={formData.email}
+                        onChange={(e) => handleInputChange('email', e.target.value)}
+                        className="bg-gray-700/50 border-gray-600 text-white pl-10"
+                      />
+                    </div>
+                    {errors.email && <p className="text-red-400 text-xs mt-1">{errors.email}</p>}
+                  </div>
+
+                  <Button 
+                    onClick={handleForgotPassword} 
+                    disabled={isLoading}
+                    className="w-full bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700"
+                  >
+                    {isLoading ? (
+                      <>
+                        <Zap className="w-4 h-4 mr-2 animate-spin" />
+                        Sending...
+                      </>
+                    ) : (
+                      <>
+                        <Mail className="w-4 h-4 mr-2" />
+                        Send Reset Link
+                      </>
+                    )}
+                  </Button>
+
+                  <Button 
+                    variant="ghost" 
+                    onClick={() => setAuthMode('login')}
+                    className="w-full text-gray-400"
+                  >
+                    <ArrowLeft className="w-4 h-4 mr-2" />
+                    Back to Login
+                  </Button>
+                </>
+              )}
+            </CardContent>
+          </Card>
+        ) : (
+          <Tabs value={authMode} onValueChange={(value) => setAuthMode(value as 'login' | 'signup' | 'forgot' | 'reset')}>
+            <TabsList className="grid w-full grid-cols-2 bg-gray-800">
+              <TabsTrigger value="login" className="data-[state=active]:bg-emerald-600">🔐 Login</TabsTrigger>
+              <TabsTrigger value="signup" className="data-[state=active]:bg-emerald-600">👤 Sign Up</TabsTrigger>
+            </TabsList>
 
           <TabsContent value="login">
             <Card className="bg-gray-800/50 border-gray-700 backdrop-blur-xl">
@@ -296,6 +555,16 @@ export default function Auth() {
                     </Button>
                   </div>
                   {errors.password && <p className="text-red-400 text-xs mt-1">{errors.password}</p>}
+                </div>
+
+                <div className="flex justify-end">
+                  <Button 
+                    variant="link" 
+                    onClick={() => setAuthMode('forgot')}
+                    className="text-emerald-400 hover:text-emerald-300 p-0 h-auto text-sm"
+                  >
+                    Forgot Password?
+                  </Button>
                 </div>
                 
                 <Button 
@@ -435,8 +704,8 @@ export default function Auth() {
               </CardContent>
             </Card>
           </TabsContent>
-        </Tabs>
-
+          </Tabs>
+        )}
         {/* Security Info */}
         <Card className="bg-gradient-to-r from-emerald-500/10 to-teal-500/10 border-emerald-500/30">
           <CardContent className="p-4">
